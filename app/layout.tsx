@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import { AntdStyledComponentsRegistry } from "@/src/shared/infra/antd/AntdStyledComponentsRegistry";
 import { ClerkProvider } from "@clerk/nextjs";
+import { MainLayout } from "@/src/shared/components/common/Layout";
+// Style
+import "@/src/shared/styles/_main.scss";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +23,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <AntdStyledComponentsRegistry>
-            {children}
+            <MainLayout>{children}</MainLayout>
           </AntdStyledComponentsRegistry>
         </body>
       </html>
