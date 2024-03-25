@@ -2,6 +2,8 @@ import type { Config } from "tailwindcss";
 import colors from "tailwindcss/colors";
 
 const config: Config = {
+  mode: "jit",
+  darkMode: "selector",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -19,7 +21,8 @@ const config: Config = {
     },
     colors: {
       ...colors,
-      primary: "rgb(var(--primary-color))",
+      primary: "var(--primary-color)",
+      "dark-header": "#101010",
     },
   },
   plugins: [],

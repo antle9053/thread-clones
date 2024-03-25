@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+import { MainLayout } from "@/src/shared/components/common/Layout";
+
+// Providers
+import { ThemeProvider } from "next-themes";
 import { AntdStyledComponentsRegistry } from "@/src/shared/infra/antd/AntdStyledComponentsRegistry";
 import { ClerkProvider } from "@clerk/nextjs";
-import { MainLayout } from "@/src/shared/components/common/Layout";
+
 // Style
 import "@/src/shared/styles/_main.scss";
 
@@ -22,9 +27,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <AntdStyledComponentsRegistry>
-            <MainLayout>{children}</MainLayout>
-          </AntdStyledComponentsRegistry>
+          <ThemeProvider attribute="class">
+            <AntdStyledComponentsRegistry>
+              <MainLayout>{children}</MainLayout>
+            </AntdStyledComponentsRegistry>{" "}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

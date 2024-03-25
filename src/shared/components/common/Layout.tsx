@@ -13,10 +13,10 @@ export const MainLayout = ({
 }>) => {
   return (
     <Layout>
-      <Header className="w-full !h-[72px] !py-1 !bg-white">
+      <Header className="w-full !h-[76px] !py-1 !bg-white dark:!bg-dark-header">
         <Navbar />
       </Header>
-      <Content className="overflow-scroll h-[calc(100vh_-_72px)]">
+      <Content className="overflow-scroll h-[calc(100vh_-_76px)]">
         {children}
         <MobileNavbar />
       </Content>
