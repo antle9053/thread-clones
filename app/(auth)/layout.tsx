@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import { MainLayout } from "@/src/shared/components/common/Layout";
-
 // Providers
-import { ThemeProvider } from "next-themes";
-import { AntdStyledComponentsRegistry } from "@/src/shared/infra/antd/AntdStyledComponentsRegistry";
 import { ClerkProvider } from "@clerk/nextjs";
 
 // Style
@@ -26,13 +22,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
-          <ThemeProvider attribute="class">
-            <AntdStyledComponentsRegistry>
-              <MainLayout>{children}</MainLayout>
-            </AntdStyledComponentsRegistry>{" "}
-          </ThemeProvider>
-        </body>
+        <body className={inter.className}>{children}</body>
       </html>
     </ClerkProvider>
   );

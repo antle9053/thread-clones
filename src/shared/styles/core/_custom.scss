@@ -5,3 +5,14 @@
   padding: 0 !important;
   overflow: hidden;
 }
+
+// Modal
+.dark .ant-modal-content {
+  background-color: #222222;
+}
+.ant-modal-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

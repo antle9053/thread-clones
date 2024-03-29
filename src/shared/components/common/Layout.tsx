@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Layout } from "antd";
 import { Navbar } from "./Navbar";
 import { MobileNavbar } from "./MobileNavbar";
+import { useUser } from "@clerk/nextjs";
+import { getUserService } from "../../services/user.service";
+import { useAppStore } from "../../infra/zustand";
+import { authSelectors } from "../../infra/zustand/slices/authSlice";
+import { Loading } from "../ui/Loading";
 
 const { Header, Content } = Layout;
 
@@ -11,6 +17,24 @@ export const MainLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const setUser = useAppStore(authSelectors.setUser);
+  const userInfo = useAppStore(authSelectors.user);
+
+  useEffect(() => {
+    const init = async () => {
+      if (!userInfo) {
+        if (isLoaded && user && isSignedIn) {
+          const response = await getUserService(user.id);
+          setUser(response);
+        }
+      }
+    };
+    init();
+  }, [isLoaded, isSignedIn, user, userInfo]);
+
+  if (!user) return <Loading fullPage />;
+
   return (
     <Layout>
       <Header className="w-full !h-[76px] !py-1 !bg-white dark:!bg-dark-header">

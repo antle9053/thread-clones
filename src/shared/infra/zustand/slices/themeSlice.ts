@@ -1,8 +1,4 @@
-import {
-  AppState,
-  getAppState,
-  setAppState,
-} from "@/src/shared/infra/zustand/types";
+import { AppState, getAppState, setAppState } from "../types";
 
 export const arrColors = [
   "9b5de5",

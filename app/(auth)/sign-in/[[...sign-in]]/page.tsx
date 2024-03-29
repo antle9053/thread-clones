@@ -1,5 +1,4 @@
 import { Flex } from "antd";
-
 import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
