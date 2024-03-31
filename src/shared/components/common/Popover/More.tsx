@@ -1,12 +1,14 @@
-import { List, Typography } from "antd";
-import { FC, useState } from "react";
-import { Apperance } from "./Apperance";
+import { FC } from "react";
+import { useClerk } from "@clerk/clerk-react";
+import { useRouter } from "next/navigation";
 
 type MoreProps = {
   onSetApperance: () => void;
 };
 
 export const More: FC<MoreProps> = ({ onSetApperance }) => {
+  const { signOut } = useClerk();
+  const router = useRouter();
   return (
     <div>
       <div
@@ -18,8 +20,11 @@ export const More: FC<MoreProps> = ({ onSetApperance }) => {
       <div className="!py-2 !px-3 cursor-pointer dark:bg-[#222222] border-b border-solid border-gray-200 dark:border-gray-600">
         <span className="dark:text-white text-base font-[500]">Apperance</span>
       </div>
-      <div className="!py-2 !px-3 cursor-pointer dark:bg-[#222222]">
-        <span className="dark:text-white text-base font-[500]">Apperance</span>
+      <div
+        className="!py-2 !px-3 cursor-pointer dark:bg-[#222222]"
+        onClick={() => signOut(() => router.push("/sign-in"))}
+      >
+        <span className="dark:text-white text-base font-[500]">Log out</span>
       </div>
     </div>
   );

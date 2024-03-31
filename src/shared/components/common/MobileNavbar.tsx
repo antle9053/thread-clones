@@ -6,9 +6,11 @@ import { EditProfile } from "./Modal/EditProfile";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { message } from "antd";
+import { CreateThread } from "./Modal/CreateThread";
 
 export const MobileNavbar = () => {
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false);
+  const [isOpenCreateThread, setOpenCreateThread] = useState<boolean>(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -40,6 +42,8 @@ export const MobileNavbar = () => {
                     );
                     setOpenEditProfile(true);
                   }
+                } else if (item.name === "create") {
+                  setOpenCreateThread(true);
                 } else if (item.link) {
                   router.push(item.link);
                 }
@@ -51,6 +55,7 @@ export const MobileNavbar = () => {
         })}
       </nav>
       <EditProfile isOpen={isOpenEditProfile} setOpen={setOpenEditProfile} />
+      <CreateThread isOpen={isOpenCreateThread} setOpen={setOpenCreateThread} />
     </>
   );
 };

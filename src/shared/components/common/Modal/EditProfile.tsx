@@ -1,7 +1,16 @@
-import { Button, Form, Input, Modal, Popover, Upload, message } from "antd";
-import { ImagePlus } from "lucide-react";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popover,
+  Spin,
+  Upload,
+  message,
+} from "antd";
+import { ImagePlus, LoaderCircle } from "lucide-react";
 import { useAvatar } from "@/src/shared/hooks/useAvatar";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useRef, useState } from "react";
 import { UploadRef } from "antd/es/upload/Upload";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
@@ -17,14 +26,17 @@ interface EditProfileProps {
 
 export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
   const [form] = Form.useForm();
-  const [openOption, setOpenOption] = useState(isOpen);
+  const [openOption, setOpenOption] = useState<boolean>(isOpen);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { beforeUpload, preview, removeImage, uploadImage } = useAvatar();
   const uploadRef = useRef<UploadRef>(null);
 
   const user = useAppStore(authSelectors.user);
+  const setUser = useAppStore(authSelectors.setUser);
 
   const handleSubmit = async (formValues: any) => {
+    setLoading(true);
     const avatar = await uploadImage();
 
     if (user?.userId) {
@@ -34,10 +46,13 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
         ...(avatar ? { avatar } : {}),
         bio: formValues.bio,
       });
-      await getUserService(user?.userId);
+      const response = await getUserService(user?.userId);
+      setUser(response);
     } else {
       message.error("Something wrong, please try again");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -99,11 +114,14 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
             multiple={false}
             onPreview={() => alert("Oh yeah")}
           >
-            <div className="h-22 w-22">
+            <div className="!h-[78px] !w-[78px] rounded-full overflow-hidden">
               {preview ? (
-                <img src={preview} className="object-cover rounded-full" />
+                <img src={preview} className="h-full w-full object-cover" />
               ) : user?.avatar ? (
-                <img src={user?.avatar} className="object-cover rounded-full" />
+                <img
+                  src={user?.avatar}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="h-full w-full top-0 left-0 absolute flex justify-center items-center">
                   <ImagePlus size={32} strokeWidth={2.25} />
@@ -118,8 +136,8 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
         className="w-full"
         form={form}
         onFinish={async (values: any) => {
-          setOpen(false);
           await handleSubmit(values);
+          setOpen(false);
         }}
         initialValues={{
           fullName: user?.name || "",
@@ -153,6 +171,7 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
             type="primary"
             htmlType="submit"
             className="bg-primary w-full h-[40px]"
+            disabled={loading}
           >
             Submit
           </Button>

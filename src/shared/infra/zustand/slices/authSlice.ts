@@ -17,11 +17,13 @@ export interface AuthSlice {
 
 export const createAuthSlice: StateCreator<AuthSlice> = (set: setAppState) => ({
   user: null,
-  setUser: (_user: User | null) =>
+  setUser: (_user: User | null) => {
+    console.log(_user);
     set((state: AppState) => ({
       ...state,
       user: _user,
-    })),
+    }));
+  },
 });
 
 export const authSelectors = {
