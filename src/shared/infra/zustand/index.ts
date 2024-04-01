@@ -5,6 +5,7 @@ import { creatFooSlice } from "@/src/modules/foo/zustand/fooSlice";
 
 import { createThemeSlice } from "./slices/themeSlice";
 import { createAuthSlice } from "./slices/authSlice";
+import { createThreadsSlice } from "@/src/modules/threads/zustand/threadsSlice";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 export const useAppStore = create<AppState>()(
@@ -21,5 +22,6 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({ user: state.user }),
       storage: createJSONStorage(() => localStorage),
     })(set, get, api),
+    ...createThreadsSlice(set, get, api),
   })
 );

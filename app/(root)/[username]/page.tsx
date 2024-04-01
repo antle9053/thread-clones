@@ -1,4 +1,4 @@
-import { Profile } from "@/src/modules/profile";
+import { Profile } from "@/src/modules/profile/Profile";
 
 const UsernamePage = () => {
   return (

@@ -6,15 +6,17 @@ import { EditProfile } from "./Modal/EditProfile";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { message } from "antd";
-import { CreateThread } from "./Modal/CreateThread";
+import { CreateThread } from "../../../modules/threads/CreateThread";
+import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 
 export const MobileNavbar = () => {
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false);
-  const [isOpenCreateThread, setOpenCreateThread] = useState<boolean>(false);
+  //const [isOpenCreateThread, setOpenCreateThread] = useState<boolean>(false);
   const pathname = usePathname();
   const router = useRouter();
 
   const user = useAppStore(authSelectors.user);
+  const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
 
   return (
     <>
@@ -55,7 +57,7 @@ export const MobileNavbar = () => {
         })}
       </nav>
       <EditProfile isOpen={isOpenEditProfile} setOpen={setOpenEditProfile} />
-      <CreateThread isOpen={isOpenCreateThread} setOpen={setOpenCreateThread} />
+      <CreateThread />
     </>
   );
 };

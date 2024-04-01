@@ -120,7 +120,9 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
               ) : user?.avatar ? (
                 <img
                   src={user?.avatar}
-                  className="h-full w-full object-cover"
+                  width={78}
+                  height={78}
+                  className="h-[78px] w-[78px] object-cover"
                 />
               ) : (
                 <div className="h-full w-full top-0 left-0 absolute flex justify-center items-center">
