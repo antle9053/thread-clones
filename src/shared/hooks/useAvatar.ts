@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { message } from "antd";
 import type { GetProp, UploadProps } from "antd";
 import { useUploadThing } from "../infra/uploadthing";
-import { ClientUploadedFileData } from "uploadthing/types";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 

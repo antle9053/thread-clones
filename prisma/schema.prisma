@@ -41,4 +41,13 @@ model contents {
   thread          threads @relation(fields: [threadId], references: [id])
   threadId        String @unique @db.ObjectId
   text            String
+  contentType     String
+  files           files[]
+}
+
+model files {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  contentId       String @db.ObjectId
+  content         contents @relation(fields: [contentId], references: [id])
+  url             String
 }

@@ -11,7 +11,6 @@ import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 
 export const MobileNavbar = () => {
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false);
-  //const [isOpenCreateThread, setOpenCreateThread] = useState<boolean>(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -45,7 +44,14 @@ export const MobileNavbar = () => {
                     setOpenEditProfile(true);
                   }
                 } else if (item.name === "create") {
-                  setOpenCreateThread(true);
+                  if (username) {
+                    setOpenCreateThread(true);
+                  } else {
+                    message.info(
+                      "Update your username to create ur very first thread"
+                    );
+                    setOpenEditProfile(true);
+                  }
                 } else if (item.link) {
                   router.push(item.link);
                 }

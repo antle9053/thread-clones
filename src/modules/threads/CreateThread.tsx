@@ -3,7 +3,7 @@ import { FC, useRef } from "react";
 import {
   CreateThreadForm,
   CreateThreadFormHandle,
-} from "./components/Form/CreateThreadForm";
+} from "./components/CreateThreadForm";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "./zustand/threadsSlice";
 
