@@ -61,7 +61,11 @@ export const createThreadService = async (
 export type GetThreadResponse = Prisma.threadsGetPayload<{
   include: {
     author: true;
-    content: true;
+    content: {
+      include: {
+        files: true;
+      };
+    };
     child: {
       select: {
         author: {
@@ -86,7 +90,11 @@ export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
     },
     include: {
       author: true,
-      content: true,
+      content: {
+        include: {
+          files: true,
+        },
+      },
       _count: {
         select: {
           child: true,

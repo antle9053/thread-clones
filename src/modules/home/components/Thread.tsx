@@ -14,6 +14,7 @@ import { CreateThread } from "../../threads/CreateThread";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "../../threads/zustand/threadsSlice";
 import { Avatar } from "antd";
+import { Media } from "./Media";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -46,7 +47,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
             </div>
           ) : null}
         </div>
-        <div className="grow">
+        <div className="basis-0 grow">
           <div className="w-full flex justify-between mb-2">
             <span className="font-bold text-base">{author?.username}</span>
             <div className="flex gap-2">
@@ -63,6 +64,10 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
             <div>
               <span className="text-base">{content?.text}</span>
             </div>
+          </div>
+
+          <div className="w-full mb-2">
+            <Media files={content?.files || []} />
           </div>
 
           <div className="flex h-[36px]">

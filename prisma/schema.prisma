@@ -50,4 +50,5 @@ model files {
   contentId       String @db.ObjectId
   content         contents @relation(fields: [contentId], references: [id])
   url             String
+  type            String
 }

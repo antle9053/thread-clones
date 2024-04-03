@@ -8,7 +8,7 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { useCreateThreadForm } from "../hooks/useCreateThreadForm";
 import moment from "moment";
 import { Loading } from "@/src/shared/components/ui/Loading";
@@ -25,8 +25,16 @@ export const CreateThreadForm = forwardRef<
   CreateThreadFormHandle,
   CreateThreadFormProps
 >(({}, ref: any) => {
-  const { fileList, handleChange, handleRemove, previews, uploadImages } =
-    useUploadImages();
+  const {
+    beforeUpload,
+    fileList,
+    handleChange,
+    handleClear,
+    handleRemove,
+    handleRemoveRow,
+    previews,
+    uploadImages,
+  } = useUploadImages();
 
   const {
     currentValue,
@@ -35,18 +43,24 @@ export const CreateThreadForm = forwardRef<
     isOpenConfirmDiscard,
     loading,
     onFinish,
-    thread,
-    setOpen,
     setOpenConfirmDiscard,
+    thread,
+    threadsValueLength,
+    resetForm,
     user,
   } = useCreateThreadForm({
-    ...(previews.length > 0 ? { beforeSubmit: uploadImages } : {}),
+    ...(previews.flat().length > 0
+      ? { beforeSubmit: uploadImages, afterSubmit: handleClear }
+      : {}),
   });
 
   useImperativeHandle(ref, () => ({
     handleOpenConfirm: () => {
-      if (!disableSubmit || previews.length > 0) setOpenConfirmDiscard(true);
-      else setOpen(false);
+      if (!disableSubmit || previews.length > 0) {
+        setOpenConfirmDiscard(true);
+      } else {
+        resetForm();
+      }
     },
   }));
 
@@ -70,7 +84,7 @@ export const CreateThreadForm = forwardRef<
                     className="w-[48px] h-[48px] rounded-full"
                   />
                   <div className="grow flex justify-center my-2">
-                    <div className="w-[1px] bg-slate-300 h-full"></div>
+                    <div className="w-[1px] bg-slate-300 h-full min-h-[10px]"></div>
                   </div>
                 </div>
                 <div className="grow">
@@ -100,7 +114,7 @@ export const CreateThreadForm = forwardRef<
                 return (
                   <>
                     {fields.map(({ key, name, ...restField }) => (
-                      <div key={key} className="flex gap-3 mt-2 items-stretch">
+                      <div key={key} className="flex gap-3 items-stretch">
                         <div className="basis-[48px] grow-0 flex flex-col">
                           <img
                             src={user?.avatar || ""}
@@ -116,12 +130,16 @@ export const CreateThreadForm = forwardRef<
                               {user?.username}
                             </p>
                             {key !== 0 ? (
-                              <div onClick={() => remove(name)}>
+                              <div
+                                onClick={() => {
+                                  handleRemoveRow(name);
+                                  remove(name);
+                                }}
+                              >
                                 <X size={16} color="#888888" strokeWidth={2} />
                               </div>
                             ) : null}
                           </div>
-
                           <Form.Item
                             {...restField}
                             className="mb-0"
@@ -138,45 +156,45 @@ export const CreateThreadForm = forwardRef<
                           </Form.Item>
                           <div className="w-full mb-2">
                             <MediaPreviews
-                              handleRemove={handleRemove}
-                              previews={previews}
+                              handleRemove={(uid) => handleRemove(uid, name)}
+                              previews={previews[name]}
                             />
                           </div>
                           <div className="flex h-[36px]">
                             <div className="h-full w-[36px] flex items-center">
                               <Upload
+                                {...restField}
+                                beforeUpload={beforeUpload}
+                                id={`upload-${name}`}
                                 multiple
                                 showUploadList={false}
-                                fileList={fileList}
-                                onChange={handleChange}
+                                fileList={fileList[name]}
+                                onChange={(info) => handleChange(info, name)}
                                 className="!h-5"
+                                maxCount={5}
                               >
                                 <Images
                                   size={20}
-                                  color="#999999"
-                                  strokeWidth={1.5}
+                                  color="#666666"
+                                  strokeWidth={2}
                                 />
                               </Upload>
                             </div>
                             <div className="h-full w-[36px] flex items-center">
                               <StickyNote
                                 size={20}
-                                color="#999999"
-                                strokeWidth={1.5}
+                                color="#666666"
+                                strokeWidth={2}
                               />
                             </div>
                             <div className="h-full w-[36px] flex items-center">
-                              <Tag
-                                size={20}
-                                color="#999999"
-                                strokeWidth={1.5}
-                              />
+                              <Tag size={20} color="#666666" strokeWidth={2} />
                             </div>
                             <div className="h-full w-[36px] flex items-center">
                               <AlignLeft
                                 size={20}
-                                color="#999999"
-                                strokeWidth={1.5}
+                                color="#666666"
+                                strokeWidth={2}
                               />
                             </div>
                           </div>
@@ -186,10 +204,17 @@ export const CreateThreadForm = forwardRef<
                     <div
                       className={clsx(
                         "flex gap-3 mb-2 items-center",
-                        currentValue ? "" : "opacity-30"
+                        currentValue ||
+                          previews?.[threadsValueLength - 1]?.length > 0
+                          ? ""
+                          : "opacity-30"
                       )}
                       onClick={() => {
-                        if (currentValue) add();
+                        if (
+                          currentValue ||
+                          previews?.[threadsValueLength - 1]?.length > 0
+                        )
+                          add();
                       }}
                     >
                       <div className="basis-[48px] grow-0 flex justify-center ">
@@ -244,8 +269,7 @@ export const CreateThreadForm = forwardRef<
             className="w-1/2 h-full flex justify-center items-center"
             onClick={() => {
               setOpenConfirmDiscard(false);
-              form.resetFields();
-              setOpen(false);
+              resetForm();
             }}
           >
             <span className="text-base font-[700] text-[#FF3040]">Discard</span>

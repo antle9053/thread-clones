@@ -10,23 +10,28 @@ import {
 } from "@/src/shared/services/thread.service";
 
 interface UseThreadFormProps {
+  afterSubmit?: () => void;
   beforeSubmit?: () => Promise<any>;
 }
 
-export const useCreateThreadForm = ({ beforeSubmit }: UseThreadFormProps) => {
+export const useCreateThreadForm = ({
+  afterSubmit,
+  beforeSubmit,
+}: UseThreadFormProps) => {
   const [form] = Form.useForm();
-  const [messageApi] = message.useMessage();
   const [thread, setThread] = useState<GetReplyThreadResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const user = useAppStore(authSelectors.user);
   const setOpen = useAppStore(threadsSelectors.setOpenCreateThread);
   const replyTo = useAppStore(threadsSelectors.replyTo);
+  const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
   const [isOpenConfirmDiscard, setOpenConfirmDiscard] =
     useState<boolean>(false);
 
   const threadsValue = Form.useWatch("threads", form);
+
   const currentValue = threadsValue?.[threadsValue.length - 1]?.text;
   const disableSubmit = threadsValue?.some(
     (thread: any) => thread?.text === "" || thread === undefined
@@ -51,40 +56,54 @@ export const useCreateThreadForm = ({ beforeSubmit }: UseThreadFormProps) => {
     }
   }, [replyTo]);
 
+  const resetForm = () => {
+    form.resetFields();
+    setReplyTo("");
+    if (thread) setThread(null);
+    setOpen(false);
+    afterSubmit?.();
+  };
+
   const onFinish = async (values: any) => {
+    console.log(values);
     try {
+      message.open({
+        key: "message-loading",
+        type: "loading",
+        content: "Posting...",
+        duration: 0,
+      });
       let uploaded: any = null;
       if (beforeSubmit) {
         uploaded = await beforeSubmit();
       }
 
-      const arg = values.threads.map((value: any) => ({
+      const arg = values.threads.map((value: any, index: number) => ({
         content: {
-          text: value.text,
+          text: value.text ?? "",
           contentType: uploaded ? "media" : "text",
-          ...(uploaded ? { files: uploaded.map((file: any) => file.url) } : {}),
+          ...(uploaded[index]
+            ? { files: uploaded[index].map((file: any) => ({ url: file.url })) }
+            : {}),
         },
       }));
       if (user?.userId) {
         setOpen(false);
-        await message.open({
-          type: "loading",
-          content: "Posting...",
-        });
+
         if (thread) {
           await createThreadService(arg, user?.userId, thread.id);
         } else {
           await createThreadService(arg, user?.userId);
         }
-        setOpen(false);
-        messageApi.destroy();
+
+        message.destroy("message-loading");
         await message.success("Posted");
-        form.resetFields();
       }
     } catch (error) {
-      console.log(error);
-      form.resetFields();
+      message.destroy("message-loading");
       await message.error("Error when posting");
+    } finally {
+      resetForm();
     }
   };
 
@@ -98,7 +117,9 @@ export const useCreateThreadForm = ({ beforeSubmit }: UseThreadFormProps) => {
     replyTo,
     setOpen,
     setOpenConfirmDiscard,
+    resetForm,
     thread,
+    threadsValueLength: threadsValue?.length ?? 0,
     user,
   };
 };
