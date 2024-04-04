@@ -14,6 +14,7 @@ import moment from "moment";
 import { Loading } from "@/src/shared/components/ui/Loading";
 import { MediaPreviews } from "./MediaPreviews";
 import { useUploadImages } from "../hooks/useUploadImages";
+import { AddGif } from "./AddGif";
 
 export type CreateThreadFormHandle = {
   handleOpenConfirm: () => void;
@@ -40,9 +41,11 @@ export const CreateThreadForm = forwardRef<
     currentValue,
     disableSubmit,
     form,
+    isOpenAddGif,
     isOpenConfirmDiscard,
     loading,
     onFinish,
+    setOpenAddGif,
     setOpenConfirmDiscard,
     thread,
     threadsValueLength,
@@ -180,7 +183,12 @@ export const CreateThreadForm = forwardRef<
                                 />
                               </Upload>
                             </div>
-                            <div className="h-full w-[36px] flex items-center">
+                            <div
+                              className="h-full w-[36px] flex items-center"
+                              onClick={() => {
+                                setOpenAddGif(true);
+                              }}
+                            >
                               <StickyNote
                                 size={20}
                                 color="#666666"
@@ -276,6 +284,7 @@ export const CreateThreadForm = forwardRef<
           </div>
         </div>
       </Modal>
+      <AddGif isOpen={isOpenAddGif} setOpen={setOpenAddGif} />
     </>
   );
 });

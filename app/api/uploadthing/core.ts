@@ -31,7 +31,10 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.userId };
     }),
 
-  imagesUploader: f({ image: { maxFileSize: "2MB", maxFileCount: 8 } })
+  imagesUploader: f({
+    image: { maxFileSize: "2MB", maxFileCount: 5 },
+    video: { maxFileCount: 5, maxFileSize: "2MB" },
+  })
     .middleware(async ({ req }) => {
       // This code runs on your server before upload
       const user = await auth();

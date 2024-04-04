@@ -21,17 +21,16 @@ export const useCreateThreadForm = ({
   const [form] = Form.useForm();
   const [thread, setThread] = useState<GetReplyThreadResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isOpenConfirmDiscard, setOpenConfirmDiscard] =
+    useState<boolean>(false);
+  const [isOpenAddGif, setOpenAddGif] = useState<boolean>(false);
 
   const user = useAppStore(authSelectors.user);
   const setOpen = useAppStore(threadsSelectors.setOpenCreateThread);
   const replyTo = useAppStore(threadsSelectors.replyTo);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
-  const [isOpenConfirmDiscard, setOpenConfirmDiscard] =
-    useState<boolean>(false);
-
   const threadsValue = Form.useWatch("threads", form);
-
   const currentValue = threadsValue?.[threadsValue.length - 1]?.text;
   const disableSubmit = threadsValue?.some(
     (thread: any) => thread?.text === "" || thread === undefined
@@ -82,8 +81,13 @@ export const useCreateThreadForm = ({
         content: {
           text: value.text ?? "",
           contentType: uploaded ? "media" : "text",
-          ...(uploaded[index]
-            ? { files: uploaded[index].map((file: any) => ({ url: file.url })) }
+          ...(uploaded?.[index]
+            ? {
+                files: uploaded[index].map((file: any) => ({
+                  url: file.url,
+                  type: file.type,
+                })),
+              }
             : {}),
         },
       }));
@@ -101,6 +105,7 @@ export const useCreateThreadForm = ({
       }
     } catch (error) {
       message.destroy("message-loading");
+      console.log(error);
       await message.error("Error when posting");
     } finally {
       resetForm();
@@ -111,11 +116,13 @@ export const useCreateThreadForm = ({
     currentValue,
     disableSubmit,
     form,
+    isOpenAddGif,
     isOpenConfirmDiscard,
     loading,
     onFinish,
     replyTo,
     setOpen,
+    setOpenAddGif,
     setOpenConfirmDiscard,
     resetForm,
     thread,

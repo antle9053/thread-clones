@@ -1,10 +1,11 @@
 import { FC } from "react";
-import { X } from "lucide-react";
+import ReactPlayer from "react-player";
 
 interface MediaProps {
   files: {
     id: string;
     url: string;
+    type: string;
   }[];
 }
 export const Media: FC<MediaProps> = ({ files }) => {
@@ -12,19 +13,41 @@ export const Media: FC<MediaProps> = ({ files }) => {
     <div className="flex w-full overflow-scroll flex-nowrap gap-2">
       {files.length === 1 ? (
         <div className="relative w-full rounded-xl overflow-hidden">
-          {true ? (
+          {files[0].type.includes("image") ? (
             <img src={files[0].url} className="object-contain h-full" />
-          ) : null}
+          ) : (
+            <ReactPlayer
+              controls
+              height="auto"
+              muted
+              playing
+              pip
+              url={files[0].url}
+              width="100%"
+            />
+          )}
         </div>
       ) : (
         files.map((file, index) => {
-          const { url } = file;
+          const { url, type } = file;
           return (
             <div
               className="relative h-[280px] flex-none max-w-[400px] rounded-xl overflow-hidden"
               key={index}
             >
-              {true ? <img src={url} className="object-cover h-full" /> : null}
+              {type.includes("image") ? (
+                <img src={url} className="object-cover h-full" />
+              ) : (
+                <ReactPlayer
+                  controls
+                  height="100%"
+                  muted
+                  playing
+                  pip
+                  url={url}
+                  width="100%"
+                />
+              )}
             </div>
           );
         })

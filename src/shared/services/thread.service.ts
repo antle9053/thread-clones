@@ -10,12 +10,13 @@ export type CreateThreadArg = {
 
 export type CreateContentArg = {
   text: string;
-  contentType?: string;
+  contentType: string;
   files: FileArg[];
 };
 
 export type FileArg = {
   url: string;
+  type: string;
 };
 
 export const createThreadService = async (

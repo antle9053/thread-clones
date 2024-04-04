@@ -82,6 +82,7 @@ export const useUploadImages = () => {
     { fileList: _fileList, file }: UploadChangeParam<UploadFile<any>>,
     key: number
   ) => {
+    console.log(_fileList);
     const { originFileObj, status, type, uid } = file;
 
     if (!originFileObj) return;

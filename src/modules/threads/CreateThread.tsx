@@ -6,11 +6,16 @@ import {
 } from "./components/CreateThreadForm";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "./zustand/threadsSlice";
+import { useWindowSize } from "usehooks-ts";
 
 export const CreateThread: FC = () => {
   const isOpen = useAppStore(threadsSelectors.isOpenCreateThread);
 
   const formRef = useRef<CreateThreadFormHandle>(null);
+
+  const { width = 0, height = 0 } = useWindowSize();
+
+  console.log(JSON.stringify({ width, height }));
 
   return (
     <Modal
