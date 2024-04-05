@@ -43,6 +43,7 @@ model contents {
   text            String
   contentType     String
   files           files[]
+  gif             String?
 }
 
 model files {

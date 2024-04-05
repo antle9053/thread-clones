@@ -12,7 +12,7 @@ export const MediaPreviews: FC<MediaPreviewsProps> = ({
   previews,
 }) => {
   return (
-    <div className="flex w-full overflow-scroll flex-nowrap gap-2">
+    <div className="flex w-full overflow-scroll flex-nowrap gap-2  mb-2">
       {!previews || previews.length === 0 ? null : previews.length === 1 ? (
         <div className="relative w-full rounded-xl overflow-hidden">
           <div

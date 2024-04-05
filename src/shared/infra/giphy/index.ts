@@ -17,3 +17,9 @@ export const searchGifs = async (offset: number, keyword: string) => {
   "use server";
   return gf.search(keyword, { offset });
 };
+
+export const fetchGif = async (id: string) => {
+  "use server";
+  const { data } = await gf.gif(id);
+  return data;
+};

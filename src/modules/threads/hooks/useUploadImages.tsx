@@ -3,7 +3,6 @@ import { message } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import { useUploadThing } from "@/src/shared/infra/uploadthing";
 import { UploadChangeParam } from "antd/es/upload";
-import { ClientUploadedFileData } from "uploadthing/types";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -46,6 +45,8 @@ export const useUploadImages = () => {
     const newPreviews = [...previews];
     newPreviews[key] = removedReview;
     setPreviews(newPreviews);
+
+    if (removedReview.length === 0) return true;
   };
 
   const handleRemoveRow = (key: number) => {
@@ -85,7 +86,7 @@ export const useUploadImages = () => {
     console.log(_fileList);
     const { originFileObj, status, type, uid } = file;
 
-    if (!originFileObj) return;
+    if (!originFileObj) return false;
 
     const rootType = type?.split("/")?.[0];
 
@@ -108,6 +109,8 @@ export const useUploadImages = () => {
     const newFileList = [...fileList];
     newFileList[key] = [..._fileList];
     setFileList(newFileList);
+
+    return true;
   };
 
   return {

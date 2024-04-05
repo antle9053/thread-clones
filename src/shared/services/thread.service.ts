@@ -12,6 +12,7 @@ export type CreateContentArg = {
   text: string;
   contentType: string;
   files: FileArg[];
+  gif?: string;
 };
 
 export type FileArg = {
@@ -39,6 +40,7 @@ export const createThreadService = async (
               create: {
                 text: content.text,
                 contentType: content.contentType,
+                ...(content.gif ? { gif: content.gif } : {}),
                 ...(content.files
                   ? {
                       files: {

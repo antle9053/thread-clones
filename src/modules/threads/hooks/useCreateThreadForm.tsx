@@ -8,15 +8,18 @@ import {
   createThreadService,
   getThreadService,
 } from "@/src/shared/services/thread.service";
+import { ThreadType } from "../components/CreateThreadForm";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
   beforeSubmit?: () => Promise<any>;
+  gifs?: any[];
 }
 
 export const useCreateThreadForm = ({
   afterSubmit,
   beforeSubmit,
+  gifs,
 }: UseThreadFormProps) => {
   const [form] = Form.useForm();
   const [thread, setThread] = useState<GetReplyThreadResponse | null>(null);
@@ -24,6 +27,7 @@ export const useCreateThreadForm = ({
   const [isOpenConfirmDiscard, setOpenConfirmDiscard] =
     useState<boolean>(false);
   const [isOpenAddGif, setOpenAddGif] = useState<boolean>(false);
+  const [threadTypes, setThreadTypes] = useState<ThreadType[]>(["text"]);
 
   const user = useAppStore(authSelectors.user);
   const setOpen = useAppStore(threadsSelectors.setOpenCreateThread);
@@ -80,17 +84,22 @@ export const useCreateThreadForm = ({
       const arg = values.threads.map((value: any, index: number) => ({
         content: {
           text: value.text ?? "",
-          contentType: uploaded ? "media" : "text",
-          ...(uploaded?.[index]
+          contentType: threadTypes[index],
+          ...(threadTypes[index] === "media"
             ? {
                 files: uploaded[index].map((file: any) => ({
                   url: file.url,
                   type: file.type,
                 })),
               }
+            : threadTypes[index] === "gif"
+            ? {
+                gif: gifs?.[index]?.id,
+              }
             : {}),
         },
       }));
+
       if (user?.userId) {
         setOpen(false);
 
@@ -124,8 +133,10 @@ export const useCreateThreadForm = ({
     setOpen,
     setOpenAddGif,
     setOpenConfirmDiscard,
+    setThreadTypes,
     resetForm,
     thread,
+    threadTypes,
     threadsValueLength: threadsValue?.length ?? 0,
     user,
   };

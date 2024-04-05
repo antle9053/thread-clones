@@ -8,13 +8,18 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useCreateThreadForm } from "../hooks/useCreateThreadForm";
 import moment from "moment";
 import { Loading } from "@/src/shared/components/ui/Loading";
 import { MediaPreviews } from "./MediaPreviews";
 import { useUploadImages } from "../hooks/useUploadImages";
 import { AddGif } from "./AddGif";
+import { useGif } from "../hooks/useGif";
+import { Gif } from "@giphy/react-components";
+import { useWindowSize } from "usehooks-ts";
+
+export type ThreadType = "text" | "media" | "gif" | "poll";
 
 export type CreateThreadFormHandle = {
   handleOpenConfirm: () => void;
@@ -37,24 +42,31 @@ export const CreateThreadForm = forwardRef<
     uploadImages,
   } = useUploadImages();
 
+  const { isOpenGif, gifs, openGifAt, setGifs, setOpenGif, setOpenGifAt } =
+    useGif();
+
   const {
     currentValue,
     disableSubmit,
     form,
-    isOpenAddGif,
     isOpenConfirmDiscard,
     loading,
     onFinish,
-    setOpenAddGif,
     setOpenConfirmDiscard,
+    setThreadTypes,
     thread,
+    threadTypes,
     threadsValueLength,
     resetForm,
     user,
   } = useCreateThreadForm({
     ...(previews.flat().length > 0
-      ? { beforeSubmit: uploadImages, afterSubmit: handleClear }
+      ? {
+          beforeSubmit: uploadImages,
+          afterSubmit: handleClear,
+        }
       : {}),
+    gifs,
   });
 
   useImperativeHandle(ref, () => ({
@@ -66,6 +78,10 @@ export const CreateThreadForm = forwardRef<
       }
     },
   }));
+
+  const { width = 0 } = useWindowSize();
+
+  const gifWidth = width > 600 ? 492 : width - 108;
 
   if (loading) return <Loading />;
 
@@ -137,6 +153,16 @@ export const CreateThreadForm = forwardRef<
                                 onClick={() => {
                                   handleRemoveRow(name);
                                   remove(name);
+                                  setThreadTypes((threadTypes) => {
+                                    const newThreadTypes = [...threadTypes];
+                                    newThreadTypes[name] = "text";
+                                    return newThreadTypes;
+                                  });
+                                  setGifs((gifs) =>
+                                    gifs.filter((gif, index) =>
+                                      index === name ? null : gif
+                                    )
+                                  );
                                 }}
                               >
                                 <X size={16} color="#888888" strokeWidth={2} />
@@ -157,55 +183,113 @@ export const CreateThreadForm = forwardRef<
                               rows={1}
                             />
                           </Form.Item>
-                          <div className="w-full mb-2">
-                            <MediaPreviews
-                              handleRemove={(uid) => handleRemove(uid, name)}
-                              previews={previews[name]}
-                            />
-                          </div>
-                          <div className="flex h-[36px]">
-                            <div className="h-full w-[36px] flex items-center">
-                              <Upload
-                                {...restField}
-                                beforeUpload={beforeUpload}
-                                id={`upload-${name}`}
-                                multiple
-                                showUploadList={false}
-                                fileList={fileList[name]}
-                                onChange={(info) => handleChange(info, name)}
-                                className="!h-5"
-                                maxCount={5}
-                              >
-                                <Images
-                                  size={20}
-                                  color="#666666"
-                                  strokeWidth={2}
+                          <div className="w-full">
+                            {threadTypes[name] === "media" ? (
+                              <MediaPreviews
+                                handleRemove={(uid) => {
+                                  const isClear = handleRemove(uid, name);
+                                  if (isClear) {
+                                    setThreadTypes((threadTypes) => {
+                                      const newThreadTypes = [...threadTypes];
+                                      newThreadTypes[name] = "text";
+                                      return newThreadTypes;
+                                    });
+                                  }
+                                }}
+                                previews={previews[name]}
+                              />
+                            ) : threadTypes[name] === "gif" ? (
+                              <div className="relative w-full mb-2">
+                                <div
+                                  className="absolute top-2 right-2 w-8 h-8 bg-black/40 rounded-full flex justify-center items-center z-[99]"
+                                  onClick={() => {
+                                    setGifs((gifs) =>
+                                      gifs.filter((gif, index) =>
+                                        index === name ? null : gif
+                                      )
+                                    );
+                                    setThreadTypes((threadTypes) => {
+                                      const newThreadTypes = [...threadTypes];
+                                      newThreadTypes[name] = "text";
+                                      return newThreadTypes;
+                                    });
+                                  }}
+                                >
+                                  <X strokeWidth={2} color="white" />
+                                </div>
+                                <Gif
+                                  borderRadius={12}
+                                  gif={gifs[name]}
+                                  width={gifWidth}
+                                  noLink
                                 />
-                              </Upload>
-                            </div>
-                            <div
-                              className="h-full w-[36px] flex items-center"
-                              onClick={() => {
-                                setOpenAddGif(true);
-                              }}
-                            >
-                              <StickyNote
-                                size={20}
-                                color="#666666"
-                                strokeWidth={2}
-                              />
-                            </div>
-                            <div className="h-full w-[36px] flex items-center">
-                              <Tag size={20} color="#666666" strokeWidth={2} />
-                            </div>
-                            <div className="h-full w-[36px] flex items-center">
-                              <AlignLeft
-                                size={20}
-                                color="#666666"
-                                strokeWidth={2}
-                              />
-                            </div>
+                              </div>
+                            ) : null}
                           </div>
+                          {threadTypes[name] === "gif" ||
+                          threadTypes[name] === "poll" ? null : (
+                            <div className="flex h-[36px] -ml-2">
+                              <div className="h-full w-[36px] flex items-center justify-center">
+                                <Upload
+                                  {...restField}
+                                  beforeUpload={beforeUpload}
+                                  id={`upload-${name}`}
+                                  multiple
+                                  showUploadList={false}
+                                  fileList={fileList[name]}
+                                  onChange={(info) => {
+                                    const isChanged = handleChange(info, name);
+                                    if (isChanged) {
+                                      setThreadTypes((threadTypes) => {
+                                        const newThreadTypes = [...threadTypes];
+                                        newThreadTypes[name] = "media";
+                                        return newThreadTypes;
+                                      });
+                                    }
+                                  }}
+                                  className="!h-5"
+                                  maxCount={5}
+                                >
+                                  <Images
+                                    size={20}
+                                    color="#666666"
+                                    strokeWidth={2}
+                                  />
+                                </Upload>
+                              </div>
+                              {threadTypes[name] !== "media" ? (
+                                <>
+                                  <div
+                                    className="h-full w-[36px] flex items-center justify-center"
+                                    onClick={() => {
+                                      setOpenGifAt(name);
+                                      setOpenGif(true);
+                                    }}
+                                  >
+                                    <StickyNote
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                  <div className="h-full w-[36px] flex items-center justify-center">
+                                    <Tag
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                  <div className="h-full w-[36px] flex items-center justify-center">
+                                    <AlignLeft
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                </>
+                              ) : null}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -213,14 +297,16 @@ export const CreateThreadForm = forwardRef<
                       className={clsx(
                         "flex gap-3 mb-2 items-center",
                         currentValue ||
-                          previews?.[threadsValueLength - 1]?.length > 0
+                          previews?.[threadsValueLength - 1]?.length > 0 ||
+                          gifs[threadsValueLength - 1]
                           ? ""
                           : "opacity-30"
                       )}
                       onClick={() => {
                         if (
                           currentValue ||
-                          previews?.[threadsValueLength - 1]?.length > 0
+                          previews?.[threadsValueLength - 1]?.length > 0 ||
+                          gifs[threadsValueLength - 1]
                         )
                           add();
                       }}
@@ -245,7 +331,9 @@ export const CreateThreadForm = forwardRef<
               type="primary"
               htmlType="submit"
               className="bg-primary float-right"
-              disabled={disableSubmit && previews.length === 0}
+              disabled={
+                disableSubmit && previews.length === 0 && gifs.length === 0
+              }
             >
               Post
             </Button>
@@ -284,7 +372,14 @@ export const CreateThreadForm = forwardRef<
           </div>
         </div>
       </Modal>
-      <AddGif isOpen={isOpenAddGif} setOpen={setOpenAddGif} />
+      <AddGif
+        isOpenGif={isOpenGif}
+        openGifAt={openGifAt}
+        setGifs={setGifs}
+        setOpenGifAt={setOpenGifAt}
+        setOpenGif={setOpenGif}
+        afterSelectGif={setThreadTypes}
+      />
     </>
   );
 });

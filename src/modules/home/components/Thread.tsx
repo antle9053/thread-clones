@@ -1,6 +1,4 @@
 import { GetThreadResponse } from "@/src/shared/services/thread.service";
-import { GetUserResponse } from "@/src/shared/services/user.service";
-import { Prisma } from "@prisma/client";
 import {
   Heart,
   MessageCircle,
@@ -15,6 +13,9 @@ import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "../../threads/zustand/threadsSlice";
 import { Avatar } from "antd";
 import { Media } from "./Media";
+import { Gif } from "@giphy/react-components";
+import { useWindowSize } from "usehooks-ts";
+import { fetchGif } from "@/src/shared/infra/giphy";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -30,8 +31,25 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
     _count: { child: numOfChilds },
   } = data;
 
+  const [gif, setGif] = useState<any>(null);
+
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
+
+  useEffect(() => {
+    const initGif = async () => {
+      if (content?.contentType === "gif" && content?.gif) {
+        const data = await fetchGif(content?.gif);
+        console.log(data);
+        setGif(data);
+      }
+    };
+    initGif();
+  }, [content?.contentType, content?.gif]);
+
+  const { width = 0 } = useWindowSize();
+
+  const gifWidth = width > 600 ? 492 : width - 108;
 
   return (
     <div className="w-full bg-white border-b-[0.5px] border-solid border-black/10 p-4">
@@ -66,8 +84,14 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
             </div>
           </div>
 
-          <div className="w-full mb-2">
-            <Media files={content?.files || []} />
+          <div className="w-full">
+            {content?.contentType === "media" ? (
+              <Media files={content?.files || []} />
+            ) : content?.contentType === "gif" && gif ? (
+              <div className="relative w-full mb-2">
+                <Gif borderRadius={12} gif={gif} width={gifWidth} noLink />
+              </div>
+            ) : null}
           </div>
 
           <div className="flex h-[36px]">
