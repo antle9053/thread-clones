@@ -53,3 +53,7 @@ model files {
   url             String
   type            String
 }
+
+model tags {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+}

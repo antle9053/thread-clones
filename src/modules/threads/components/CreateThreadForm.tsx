@@ -8,7 +8,7 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { useCreateThreadForm } from "../hooks/useCreateThreadForm";
 import moment from "moment";
 import { Loading } from "@/src/shared/components/ui/Loading";
@@ -18,6 +18,7 @@ import { AddGif } from "./AddGif";
 import { useGif } from "../hooks/useGif";
 import { Gif } from "@giphy/react-components";
 import { useWindowSize } from "usehooks-ts";
+import { ThreadEditor } from "./ThreadEditor";
 
 export type ThreadType = "text" | "media" | "gif" | "poll";
 
@@ -92,7 +93,7 @@ export const CreateThreadForm = forwardRef<
           autoComplete="off"
           className="h-full"
           form={form}
-          onFinish={onFinish}
+          onFinish={(values) => console.log(values)}
         >
           <div className="max-h-[calc(100vh_-_72px)] overflow-scroll px-6 pb-[72px]">
             {thread ? (
@@ -174,13 +175,13 @@ export const CreateThreadForm = forwardRef<
                             className="mb-0"
                             name={[name, "text"]}
                           >
-                            <Input.TextArea
-                              autoSize
-                              className="!border-0 !shadow-none p-0 text-base"
-                              placeholder={
-                                key === 0 ? "Start a thread" : "Say more..."
-                              }
-                              rows={1}
+                            <ThreadEditor
+                              name={name}
+                              onChange={(value: string) => {
+                                const { threads } = form.getFieldsValue();
+                                Object.assign(threads[name], { text: value });
+                                form.setFieldsValue({ threads });
+                              }}
                             />
                           </Form.Item>
                           <div className="w-full">

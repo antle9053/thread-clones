@@ -4,7 +4,6 @@ import { UserButton } from "@clerk/nextjs";
 const FooPage = () => {
   return (
     <div className="bg-slate-300 h-[200px]">
-      <UserButton />
       <Foo />
     </div>
   );

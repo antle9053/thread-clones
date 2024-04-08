@@ -35,6 +35,7 @@ export const useCreateThreadForm = ({
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
   const threadsValue = Form.useWatch("threads", form);
+  console.log(threadsValue);
   const currentValue = threadsValue?.[threadsValue.length - 1]?.text;
   const disableSubmit = threadsValue?.some(
     (thread: any) => thread?.text === "" || thread === undefined
