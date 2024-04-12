@@ -2,6 +2,7 @@ import { StateCreator } from "zustand";
 import { AppState, setAppState } from "../types";
 
 export interface User {
+  id: string;
   userId: string;
   name: string;
   username: string | null;

@@ -16,6 +16,7 @@ import { Media } from "./Media";
 import { Gif } from "@giphy/react-components";
 import { useWindowSize } from "usehooks-ts";
 import { fetchGif } from "@/src/shared/infra/giphy";
+import { Render } from "./Render";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -40,7 +41,6 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
     const initGif = async () => {
       if (content?.contentType === "gif" && content?.gif) {
         const data = await fetchGif(content?.gif);
-        console.log(data);
         setGif(data);
       }
     };
@@ -79,9 +79,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
           </div>
 
           <div className="w-full mb-2">
-            <div>
-              <span className="text-base">{content?.text}</span>
-            </div>
+            {content?.text ? <Render content={content?.text ?? ""} /> : null}
           </div>
 
           <div className="w-full">

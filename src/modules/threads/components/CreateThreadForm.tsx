@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Upload } from "antd";
+import { Button, Dropdown, Form, Modal, Upload } from "antd";
 import clsx from "clsx";
 import {
   AlignLeft,
@@ -18,7 +18,9 @@ import { AddGif } from "./AddGif";
 import { useGif } from "../hooks/useGif";
 import { Gif } from "@giphy/react-components";
 import { useWindowSize } from "usehooks-ts";
-import { ThreadEditor } from "./ThreadEditor";
+import { TipTap } from "@/src/shared/components/utils/TipTap";
+import { Tags } from "./Toolbar/Tags";
+import { Render } from "../../home/components/Render";
 
 export type ThreadType = "text" | "media" | "gif" | "poll";
 
@@ -43,8 +45,15 @@ export const CreateThreadForm = forwardRef<
     uploadImages,
   } = useUploadImages();
 
-  const { isOpenGif, gifs, openGifAt, setGifs, setOpenGif, setOpenGifAt } =
-    useGif();
+  const {
+    isOpenGif,
+    gifs,
+    openGifAt,
+    removeAllGifs,
+    setGifs,
+    setOpenGif,
+    setOpenGifAt,
+  } = useGif();
 
   const {
     currentValue,
@@ -68,6 +77,7 @@ export const CreateThreadForm = forwardRef<
         }
       : {}),
     gifs,
+    removeAllGifs,
   });
 
   useImperativeHandle(ref, () => ({
@@ -93,7 +103,7 @@ export const CreateThreadForm = forwardRef<
           autoComplete="off"
           className="h-full"
           form={form}
-          onFinish={(values) => console.log(values)}
+          onFinish={onFinish}
         >
           <div className="max-h-[calc(100vh_-_72px)] overflow-scroll px-6 pb-[72px]">
             {thread ? (
@@ -122,9 +132,7 @@ export const CreateThreadForm = forwardRef<
                     </div>
                   </div>
                   <div>
-                    <div>
-                      <span className="text-base">{thread.content?.text}</span>
-                    </div>
+                    <Render content={thread.content?.text ?? ""} />
                   </div>
                 </div>
               </div>
@@ -175,7 +183,7 @@ export const CreateThreadForm = forwardRef<
                             className="mb-0"
                             name={[name, "text"]}
                           >
-                            <ThreadEditor
+                            <TipTap
                               name={name}
                               onChange={(value: string) => {
                                 const { threads } = form.getFieldsValue();
@@ -259,35 +267,37 @@ export const CreateThreadForm = forwardRef<
                                 </Upload>
                               </div>
                               {threadTypes[name] !== "media" ? (
-                                <>
-                                  <div
-                                    className="h-full w-[36px] flex items-center justify-center"
-                                    onClick={() => {
-                                      setOpenGifAt(name);
-                                      setOpenGif(true);
-                                    }}
-                                  >
-                                    <StickyNote
-                                      size={20}
-                                      color="#666666"
-                                      strokeWidth={2}
-                                    />
-                                  </div>
-                                  <div className="h-full w-[36px] flex items-center justify-center">
-                                    <Tag
-                                      size={20}
-                                      color="#666666"
-                                      strokeWidth={2}
-                                    />
-                                  </div>
-                                  <div className="h-full w-[36px] flex items-center justify-center">
-                                    <AlignLeft
-                                      size={20}
-                                      color="#666666"
-                                      strokeWidth={2}
-                                    />
-                                  </div>
-                                </>
+                                <div
+                                  className="h-full w-[36px] flex items-center justify-center"
+                                  onClick={() => {
+                                    setOpenGifAt(name);
+                                    setOpenGif(true);
+                                  }}
+                                >
+                                  <StickyNote
+                                    size={20}
+                                    color="#666666"
+                                    strokeWidth={2}
+                                  />
+                                </div>
+                              ) : null}
+                              <Tags
+                                userId={user?.id as string}
+                                name={name}
+                                onChange={(value: string) => {
+                                  const { threads } = form.getFieldsValue();
+                                  Object.assign(threads[name], { text: value });
+                                  form.setFieldsValue({ threads });
+                                }}
+                              />
+                              {threadTypes[name] !== "media" ? (
+                                <div className="h-full w-[36px] flex items-center justify-center">
+                                  <AlignLeft
+                                    size={20}
+                                    color="#666666"
+                                    strokeWidth={2}
+                                  />
+                                </div>
                               ) : null}
                             </div>
                           )}

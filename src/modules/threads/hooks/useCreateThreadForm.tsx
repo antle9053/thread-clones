@@ -4,22 +4,26 @@ import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { Form, message } from "antd";
 import { threadsSelectors } from "../zustand/threadsSlice";
 import {
+  CreateThreadArg,
   GetReplyThreadResponse,
   createThreadService,
   getThreadService,
 } from "@/src/shared/services/thread.service";
 import { ThreadType } from "../components/CreateThreadForm";
+import { addTags } from "@/src/shared/services/tags.service";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
   beforeSubmit?: () => Promise<any>;
   gifs?: any[];
+  removeAllGifs: () => void;
 }
 
 export const useCreateThreadForm = ({
   afterSubmit,
   beforeSubmit,
   gifs,
+  removeAllGifs,
 }: UseThreadFormProps) => {
   const [form] = Form.useForm();
   const [thread, setThread] = useState<GetReplyThreadResponse | null>(null);
@@ -35,7 +39,6 @@ export const useCreateThreadForm = ({
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
   const threadsValue = Form.useWatch("threads", form);
-  console.log(threadsValue);
   const currentValue = threadsValue?.[threadsValue.length - 1]?.text;
   const disableSubmit = threadsValue?.some(
     (thread: any) => thread?.text === "" || thread === undefined
@@ -65,6 +68,7 @@ export const useCreateThreadForm = ({
     setReplyTo("");
     if (thread) setThread(null);
     setOpen(false);
+    removeAllGifs?.();
     afterSubmit?.();
   };
 
@@ -82,24 +86,38 @@ export const useCreateThreadForm = ({
         uploaded = await beforeSubmit();
       }
 
-      const arg = values.threads.map((value: any, index: number) => ({
-        content: {
-          text: value.text ?? "",
-          contentType: threadTypes[index],
-          ...(threadTypes[index] === "media"
-            ? {
-                files: uploaded[index].map((file: any) => ({
-                  url: file.url,
-                  type: file.type,
-                })),
-              }
-            : threadTypes[index] === "gif"
-            ? {
-                gif: gifs?.[index]?.id,
-              }
-            : {}),
-        },
-      }));
+      const parser = new DOMParser();
+      const listTags: string[] = [];
+
+      const arg: CreateThreadArg[] = values.threads.map(
+        (value: any, index: number) => {
+          const doc = parser.parseFromString(value.text, "text/html");
+          const tagNodes = doc.querySelectorAll("[data-type='mention']");
+          const tags = Array.from(tagNodes).map((node) => ({
+            title: node.getAttribute("data-id"),
+          }));
+          listTags.push(...tags.map((tag) => tag.title ?? ""));
+          return {
+            content: {
+              text: value.text ?? "",
+              tags,
+              contentType: threadTypes[index] ?? "text",
+              ...(threadTypes[index] === "media"
+                ? {
+                    files: uploaded[index].map((file: any) => ({
+                      url: file.url,
+                      type: file.type,
+                    })),
+                  }
+                : threadTypes[index] === "gif"
+                ? {
+                    gif: gifs?.[index]?.id,
+                  }
+                : {}),
+            },
+          };
+        }
+      );
 
       if (user?.userId) {
         setOpen(false);
@@ -110,12 +128,13 @@ export const useCreateThreadForm = ({
           await createThreadService(arg, user?.userId);
         }
 
+        await addTags(user?.id, listTags);
+
         message.destroy("message-loading");
         await message.success("Posted");
       }
     } catch (error) {
       message.destroy("message-loading");
-      console.log(error);
       await message.error("Error when posting");
     } finally {
       resetForm();

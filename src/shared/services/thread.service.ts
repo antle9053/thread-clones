@@ -2,7 +2,6 @@
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
-import { GetUserResponse } from "./user.service";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -12,12 +11,17 @@ export type CreateContentArg = {
   text: string;
   contentType: string;
   files: FileArg[];
+  tags: TagArg[];
   gif?: string;
 };
 
 export type FileArg = {
   url: string;
   type: string;
+};
+
+export type TagArg = {
+  title: string;
 };
 
 export const createThreadService = async (
@@ -50,6 +54,22 @@ export const createThreadService = async (
                       },
                     }
                   : {}),
+                ...(content.tags
+                  ? {
+                      tags: {
+                        connectOrCreate: content.tags.map((tag) => {
+                          return {
+                            where: {
+                              title: tag.title,
+                            },
+                            create: {
+                              title: tag.title,
+                            },
+                          };
+                        }),
+                      },
+                    }
+                  : {}),
               },
             },
           }
@@ -67,8 +87,10 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
     content: {
       include: {
         files: true;
+        tags: true;
       };
     };
+
     child: {
       select: {
         author: {
@@ -96,6 +118,7 @@ export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
       content: {
         include: {
           files: true,
+          tags: true,
         },
       },
       _count: {

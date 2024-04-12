@@ -22,6 +22,8 @@ model users {
   bio             String?
   links           String[]
   threads         threads[]
+  usedTags        tags[] @relation(fields: [usedTagIds], references: [id])
+  usedTagIds      String[] @db.ObjectId
 }
 
 model threads {
@@ -43,6 +45,8 @@ model contents {
   text            String
   contentType     String
   files           files[]
+  tags            tags[] @relation(fields: [tagIds], references: [id])
+  tagIds          String[] @db.ObjectId
   gif             String?
 }
 
@@ -56,4 +60,9 @@ model files {
 
 model tags {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
+  title           String @unique
+  contents        contents[] @relation(fields: [contentIds], references: [id])
+  contentIds      String[] @db.ObjectId
+  users           users[] @relation(fields: [userIds], references: [id])
+  userIds         String[] @db.ObjectId
 }
