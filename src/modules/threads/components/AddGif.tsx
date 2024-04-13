@@ -37,6 +37,7 @@ export const AddGif: FC<AddGifProps> = ({
       <div className="w-full flex justify-between items-center mb-6 pt-5 px-6">
         <span
           onClick={() => {
+            setKeyword("");
             setOpenGif(false);
           }}
           className="w-[50px] text-base text-[#666666]"

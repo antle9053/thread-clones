@@ -30,7 +30,6 @@ export const useCreateThreadForm = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenConfirmDiscard, setOpenConfirmDiscard] =
     useState<boolean>(false);
-  const [isOpenAddGif, setOpenAddGif] = useState<boolean>(false);
   const [threadTypes, setThreadTypes] = useState<ThreadType[]>(["text"]);
 
   const user = useAppStore(authSelectors.user);
@@ -39,10 +38,18 @@ export const useCreateThreadForm = ({
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
   const threadsValue = Form.useWatch("threads", form);
-  const currentValue = threadsValue?.[threadsValue.length - 1]?.text;
-  const disableSubmit = threadsValue?.some(
-    (thread: any) => thread?.text === "" || thread === undefined
+
+  const isSomeValueEmpty = threadsValue?.some(
+    (thread: any) => thread?.text === ""
   );
+
+  const reverseIndex = [...(threadsValue ?? [])]
+    ?.reverse()
+    .findIndex((item) => item.text !== undefined);
+  const latestIndex =
+    [...(threadsValue ?? [])]?.reverse().slice(reverseIndex).reverse().length -
+    1;
+  const currentValue = threadsValue?.[latestIndex]?.text;
 
   useEffect(() => {
     if (replyTo) {
@@ -68,12 +75,12 @@ export const useCreateThreadForm = ({
     setReplyTo("");
     if (thread) setThread(null);
     setOpen(false);
+    setThreadTypes(["text"]);
     removeAllGifs?.();
     afterSubmit?.();
   };
 
   const onFinish = async (values: any) => {
-    console.log(values);
     try {
       message.open({
         key: "message-loading",
@@ -143,21 +150,19 @@ export const useCreateThreadForm = ({
 
   return {
     currentValue,
-    disableSubmit,
+    isSomeValueEmpty,
     form,
-    isOpenAddGif,
     isOpenConfirmDiscard,
+    latestIndex,
     loading,
     onFinish,
     replyTo,
     setOpen,
-    setOpenAddGif,
     setOpenConfirmDiscard,
     setThreadTypes,
     resetForm,
     thread,
     threadTypes,
-    threadsValueLength: threadsValue?.length ?? 0,
     user,
   };
 };

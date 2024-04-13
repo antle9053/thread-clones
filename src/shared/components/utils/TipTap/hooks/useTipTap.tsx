@@ -41,5 +41,7 @@ export const useTipTap = ({ name, onChange }: UseTipTapProps) => {
     },
   });
 
-  return { editor };
+  return {
+    editor,
+  };
 };

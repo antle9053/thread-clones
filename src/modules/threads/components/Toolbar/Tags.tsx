@@ -1,4 +1,4 @@
-import { useTipTap } from "@/src/shared/components/utils/TipTap/hooks/useTIpTap";
+import { useTipTap } from "@/src/shared/components/utils/TipTap/hooks/useTipTap";
 import {
   GetTagsResponse,
   getUsedTagsService,
@@ -48,19 +48,20 @@ export const Tags: FC<TagsProps> = ({ userId, name, onChange }) => {
               label: (
                 <div
                   onClick={() => {
-                    if (editor) {
-                      editor
-                        .chain()
-                        .focus()
-                        .insertContent({
-                          type: "mention",
-                          attrs: {
-                            id: tag.title,
-                          },
-                        })
-                        .insertContent(" ")
-                        .run();
-                    }
+                    // if (editor) {
+                    //   editor
+                    //     .chain()
+                    //     .focus()
+                    //     .insertContent({
+                    //       type: "mention",
+                    //       attrs: {
+                    //         id: tag.title,
+                    //       },
+                    //     })
+                    //     .insertContent(" ")
+                    //     .run();
+                    // }
+                    // insertMention?.(tag.title);
                   }}
                 >
                   {tag.title}

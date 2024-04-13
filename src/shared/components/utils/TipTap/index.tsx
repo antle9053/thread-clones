@@ -1,6 +1,6 @@
 import { EditorContent } from "@tiptap/react";
 import React, { FC } from "react";
-import { useTipTap } from "./hooks/useTIpTap";
+import { useTipTap } from "./hooks/useTipTap";
 
 interface TipTapProps {
   name: number;

@@ -13,8 +13,8 @@ export type Preview = {
 };
 
 export const useUploadImages = () => {
-  const [previews, setPreviews] = useState<Preview[][]>([]);
-  const [fileList, setFileList] = useState<UploadFile[][]>([]);
+  const [previews, setPreviews] = useState<Preview[][]>([[]]);
+  const [fileList, setFileList] = useState<UploadFile[][]>([[]]);
 
   const { startUpload } = useUploadThing("imagesUploader");
 
@@ -50,17 +50,33 @@ export const useUploadImages = () => {
   };
 
   const handleRemoveRow = (key: number) => {
-    setFileList((fileList) =>
-      fileList.filter((file, index) => (index === key ? null : file))
-    );
-    setPreviews((previews) =>
-      previews.filter((preview, index) => (index === key ? null : preview))
-    );
+    console.log(key);
+    setFileList((fileList) => {
+      return fileList.map((files, index) => (index === key ? [] : files));
+    });
+    setPreviews((previews) => {
+      return previews.map((preview, index) => {
+        return index === key ? [] : preview;
+      });
+    });
+  };
+
+  const handleAddRow = () => {
+    setPreviews((previews) => {
+      const newPreviews = [...previews];
+      newPreviews.push([]);
+      return newPreviews;
+    });
+    setFileList((fileList) => {
+      const newfileList = [...fileList];
+      newfileList.push([]);
+      return fileList;
+    });
   };
 
   const handleClear = () => {
-    setFileList([]);
-    setPreviews([]);
+    setFileList([[]]);
+    setPreviews([[]]);
   };
 
   const beforeUpload = (file: FileType) => {
@@ -83,7 +99,6 @@ export const useUploadImages = () => {
     { fileList: _fileList, file }: UploadChangeParam<UploadFile<any>>,
     key: number
   ) => {
-    console.log(_fileList);
     const { originFileObj, status, type, uid } = file;
 
     if (!originFileObj) return false;
@@ -118,6 +133,7 @@ export const useUploadImages = () => {
     fileList,
     handleChange,
     handleClear,
+    handleAddRow,
     handleRemove,
     handleRemoveRow,
     previews,

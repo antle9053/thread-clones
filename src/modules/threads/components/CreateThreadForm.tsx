@@ -38,6 +38,7 @@ export const CreateThreadForm = forwardRef<
     beforeUpload,
     fileList,
     handleChange,
+    handleAddRow,
     handleClear,
     handleRemove,
     handleRemoveRow,
@@ -57,16 +58,16 @@ export const CreateThreadForm = forwardRef<
 
   const {
     currentValue,
-    disableSubmit,
+    isSomeValueEmpty,
     form,
     isOpenConfirmDiscard,
+    latestIndex,
     loading,
     onFinish,
     setOpenConfirmDiscard,
     setThreadTypes,
     thread,
     threadTypes,
-    threadsValueLength,
     resetForm,
     user,
   } = useCreateThreadForm({
@@ -80,9 +81,13 @@ export const CreateThreadForm = forwardRef<
     removeAllGifs,
   });
 
+  const disableAdd =
+    currentValue === "" && previews?.[latestIndex]?.length === 0;
+  const disableSubmit = isSomeValueEmpty && previews.flat(1).length === 0;
+
   useImperativeHandle(ref, () => ({
     handleOpenConfirm: () => {
-      if (!disableSubmit || previews.length > 0) {
+      if (!disableSubmit) {
         setOpenConfirmDiscard(true);
       } else {
         resetForm();
@@ -103,7 +108,9 @@ export const CreateThreadForm = forwardRef<
           autoComplete="off"
           className="h-full"
           form={form}
-          onFinish={onFinish}
+          onFinish={(v) => {
+            console.log(v);
+          }}
         >
           <div className="max-h-[calc(100vh_-_72px)] overflow-scroll px-6 pb-[72px]">
             {thread ? (
@@ -138,188 +145,202 @@ export const CreateThreadForm = forwardRef<
               </div>
             ) : null}
             <Form.List name="threads" initialValue={[{ text: "" }]}>
-              {(fields, { add, remove }) => {
+              {(fields, { add }) => {
                 return (
                   <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <div key={key} className="flex gap-3 items-stretch">
-                        <div className="basis-[48px] grow-0 flex flex-col">
-                          <img
-                            src={user?.avatar || ""}
-                            className="w-[48px] h-[48px] rounded-full"
-                          />
-                          <div className="grow flex justify-center my-2">
-                            <div className="w-[1px] bg-slate-300 h-full"></div>
-                          </div>
-                        </div>
-                        <div className="basis-0 grow">
-                          <div className="w-full flex justify-between">
-                            <p className="font-bold text-base">
-                              {user?.username}
-                            </p>
-                            {key !== 0 ? (
-                              <div
-                                onClick={() => {
-                                  handleRemoveRow(name);
-                                  remove(name);
-                                  setThreadTypes((threadTypes) => {
-                                    const newThreadTypes = [...threadTypes];
-                                    newThreadTypes[name] = "text";
-                                    return newThreadTypes;
-                                  });
-                                  setGifs((gifs) =>
-                                    gifs.filter((gif, index) =>
-                                      index === name ? null : gif
-                                    )
-                                  );
-                                }}
-                              >
-                                <X size={16} color="#888888" strokeWidth={2} />
-                              </div>
-                            ) : null}
-                          </div>
-                          <Form.Item
-                            {...restField}
-                            className="mb-0"
-                            name={[name, "text"]}
-                          >
-                            <TipTap
-                              name={name}
-                              onChange={(value: string) => {
-                                const { threads } = form.getFieldsValue();
-                                Object.assign(threads[name], { text: value });
-                                form.setFieldsValue({ threads });
-                              }}
+                    {fields.map(({ key, name }) => {
+                      const { threads } = form.getFieldsValue();
+                      if (!threads) return null;
+                      if (threads[key].text === undefined) return null;
+                      return (
+                        <div key={key} className="flex gap-3 items-stretch">
+                          <div className="basis-[48px] grow-0 flex flex-col">
+                            <img
+                              src={user?.avatar || ""}
+                              className="w-[48px] h-[48px] rounded-full"
                             />
-                          </Form.Item>
-                          <div className="w-full">
-                            {threadTypes[name] === "media" ? (
-                              <MediaPreviews
-                                handleRemove={(uid) => {
-                                  const isClear = handleRemove(uid, name);
-                                  if (isClear) {
-                                    setThreadTypes((threadTypes) => {
-                                      const newThreadTypes = [...threadTypes];
-                                      newThreadTypes[name] = "text";
-                                      return newThreadTypes;
-                                    });
-                                  }
-                                }}
-                                previews={previews[name]}
-                              />
-                            ) : threadTypes[name] === "gif" ? (
-                              <div className="relative w-full mb-2">
-                                <div
-                                  className="absolute top-2 right-2 w-8 h-8 bg-black/40 rounded-full flex justify-center items-center z-[99]"
-                                  onClick={() => {
-                                    setGifs((gifs) =>
-                                      gifs.filter((gif, index) =>
-                                        index === name ? null : gif
-                                      )
-                                    );
-                                    setThreadTypes((threadTypes) => {
-                                      const newThreadTypes = [...threadTypes];
-                                      newThreadTypes[name] = "text";
-                                      return newThreadTypes;
-                                    });
-                                  }}
-                                >
-                                  <X strokeWidth={2} color="white" />
-                                </div>
-                                <Gif
-                                  borderRadius={12}
-                                  gif={gifs[name]}
-                                  width={gifWidth}
-                                  noLink
-                                />
-                              </div>
-                            ) : null}
+                            <div className="grow flex justify-center my-2">
+                              <div className="w-[1px] bg-slate-300 h-full"></div>
+                            </div>
                           </div>
-                          {threadTypes[name] === "gif" ||
-                          threadTypes[name] === "poll" ? null : (
-                            <div className="flex h-[36px] -ml-2">
-                              <div className="h-full w-[36px] flex items-center justify-center">
-                                <Upload
-                                  {...restField}
-                                  beforeUpload={beforeUpload}
-                                  id={`upload-${name}`}
-                                  multiple
-                                  showUploadList={false}
-                                  fileList={fileList[name]}
-                                  onChange={(info) => {
-                                    const isChanged = handleChange(info, name);
-                                    if (isChanged) {
-                                      setThreadTypes((threadTypes) => {
-                                        const newThreadTypes = [...threadTypes];
-                                        newThreadTypes[name] = "media";
-                                        return newThreadTypes;
-                                      });
-                                    }
-                                  }}
-                                  className="!h-5"
-                                  maxCount={5}
-                                >
-                                  <Images
-                                    size={20}
-                                    color="#666666"
-                                    strokeWidth={2}
-                                  />
-                                </Upload>
-                              </div>
-                              {threadTypes[name] !== "media" ? (
+                          <div className="basis-0 grow">
+                            <div className="w-full flex justify-between">
+                              <p className="font-bold text-base">
+                                {/* {user?.username} */}
+                                name: {name}, key: {key}
+                              </p>
+                              {key !== 0 ? (
                                 <div
-                                  className="h-full w-[36px] flex items-center justify-center"
                                   onClick={() => {
-                                    setOpenGifAt(name);
-                                    setOpenGif(true);
+                                    const { threads } = form.getFieldsValue();
+                                    Object.assign(threads[key], {
+                                      text: undefined,
+                                    });
+                                    form.setFieldsValue({ threads });
+
+                                    handleRemoveRow(key);
+                                    setThreadTypes((threadTypes) => {
+                                      const newThreadTypes = [...threadTypes];
+                                      newThreadTypes[key] = "text";
+                                      return newThreadTypes;
+                                    });
+                                    // setGifs((gifs) =>
+                                    //   gifs.filter((gif, index) =>
+                                    //     index === name ? null : gif
+                                    //   )
+                                    // );
                                   }}
                                 >
-                                  <StickyNote
-                                    size={20}
-                                    color="#666666"
-                                    strokeWidth={2}
-                                  />
-                                </div>
-                              ) : null}
-                              <Tags
-                                userId={user?.id as string}
-                                name={name}
-                                onChange={(value: string) => {
-                                  const { threads } = form.getFieldsValue();
-                                  Object.assign(threads[name], { text: value });
-                                  form.setFieldsValue({ threads });
-                                }}
-                              />
-                              {threadTypes[name] !== "media" ? (
-                                <div className="h-full w-[36px] flex items-center justify-center">
-                                  <AlignLeft
-                                    size={20}
-                                    color="#666666"
+                                  <X
+                                    size={16}
+                                    color="#888888"
                                     strokeWidth={2}
                                   />
                                 </div>
                               ) : null}
                             </div>
-                          )}
+                            <div className="mb-1">
+                              <TipTap
+                                name={key}
+                                onChange={(value: string) => {
+                                  const { threads } = form.getFieldsValue();
+
+                                  Object.assign(threads[key], { text: value });
+                                  form.setFieldsValue({ threads });
+                                }}
+                              />
+                            </div>
+                            <div className="w-full">
+                              {threadTypes[key] === "media" ? (
+                                <MediaPreviews
+                                  handleRemove={(uid) => {
+                                    const isClear = handleRemove(uid, key);
+                                    if (isClear) {
+                                      setThreadTypes((threadTypes) => {
+                                        const newThreadTypes = [...threadTypes];
+                                        newThreadTypes[key] = "text";
+                                        return newThreadTypes;
+                                      });
+                                    }
+                                  }}
+                                  previews={previews[key]}
+                                />
+                              ) : threadTypes[key] === "gif" ? (
+                                <div className="relative w-full mb-2">
+                                  <div
+                                    className="absolute top-2 right-2 w-8 h-8 bg-black/40 rounded-full flex justify-center items-center z-[99]"
+                                    onClick={() => {
+                                      setGifs((gifs) =>
+                                        gifs.filter((gif, index) =>
+                                          index === name ? null : gif
+                                        )
+                                      );
+                                      setThreadTypes((threadTypes) => {
+                                        const newThreadTypes = [...threadTypes];
+                                        newThreadTypes[key] = "text";
+                                        return newThreadTypes;
+                                      });
+                                    }}
+                                  >
+                                    <X strokeWidth={2} color="white" />
+                                  </div>
+                                  <Gif
+                                    borderRadius={12}
+                                    gif={gifs[name]}
+                                    width={gifWidth}
+                                    noLink
+                                  />
+                                </div>
+                              ) : null}
+                            </div>
+                            {threadTypes[key] === "gif" ||
+                            threadTypes[key] === "poll" ? null : (
+                              <div className="flex h-[36px] -ml-2">
+                                <div className="h-full w-[36px] flex items-center justify-center">
+                                  <Upload
+                                    beforeUpload={beforeUpload}
+                                    id={`upload-${key}`}
+                                    multiple
+                                    showUploadList={false}
+                                    fileList={fileList[key]}
+                                    onChange={(info) => {
+                                      const isChanged = handleChange(info, key);
+                                      if (isChanged) {
+                                        setThreadTypes((threadTypes) => {
+                                          const newThreadTypes = [
+                                            ...threadTypes,
+                                          ];
+                                          newThreadTypes[key] = "media";
+                                          return newThreadTypes;
+                                        });
+                                      }
+                                    }}
+                                    className="!h-5"
+                                    maxCount={5}
+                                  >
+                                    <Images
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </Upload>
+                                </div>
+
+                                {threadTypes[name] !== "media" ? (
+                                  <div
+                                    className="h-full w-[36px] flex items-center justify-center"
+                                    onClick={() => {
+                                      setOpenGifAt(name);
+                                      setOpenGif(true);
+                                    }}
+                                  >
+                                    <StickyNote
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                ) : null}
+                                <Tags
+                                  userId={user?.id as string}
+                                  name={name}
+                                  onChange={(value: string) => {
+                                    const { threads } = form.getFieldsValue();
+                                    Object.assign(threads[name], {
+                                      text: value,
+                                    });
+                                    form.setFieldsValue({ threads });
+                                  }}
+                                />
+                                {threadTypes[name] !== "media" ? (
+                                  <div className="h-full w-[36px] flex items-center justify-center">
+                                    <AlignLeft
+                                      size={20}
+                                      color="#666666"
+                                      strokeWidth={2}
+                                    />
+                                  </div>
+                                ) : null}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <div
                       className={clsx(
                         "flex gap-3 mb-2 items-center",
-                        currentValue ||
-                          previews?.[threadsValueLength - 1]?.length > 0 ||
-                          gifs[threadsValueLength - 1]
-                          ? ""
-                          : "opacity-30"
+                        !disableAdd ? "" : "opacity-30"
                       )}
                       onClick={() => {
-                        if (
-                          currentValue ||
-                          previews?.[threadsValueLength - 1]?.length > 0 ||
-                          gifs[threadsValueLength - 1]
-                        )
-                          add();
+                        if (!disableAdd) {
+                          add({ text: "" });
+                          handleAddRow();
+                          setThreadTypes((threadTypes) => [
+                            ...threadTypes,
+                            "text",
+                          ]);
+                        }
                       }}
                     >
                       <div className="basis-[48px] grow-0 flex justify-center ">
@@ -342,9 +363,7 @@ export const CreateThreadForm = forwardRef<
               type="primary"
               htmlType="submit"
               className="bg-primary float-right"
-              disabled={
-                disableSubmit && previews.length === 0 && gifs.length === 0
-              }
+              disabled={disableSubmit}
             >
               Post
             </Button>
@@ -377,6 +396,10 @@ export const CreateThreadForm = forwardRef<
             onClick={() => {
               setOpenConfirmDiscard(false);
               resetForm();
+              handleClear();
+              form.setFieldsValue({
+                threads: [{ text: "" }],
+              });
             }}
           >
             <span className="text-base font-[700] text-[#FF3040]">Discard</span>
