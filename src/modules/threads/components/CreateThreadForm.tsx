@@ -131,7 +131,7 @@ export const CreateThreadForm = forwardRef<
                     </span>
                     <div className="flex gap-2">
                       <span className="text-[#666666]">
-                        {moment().fromNow()}
+                        {moment(thread.createdAt).fromNow()}
                       </span>
                       <div className="text-black/50">
                         <MoreHorizontal />
@@ -166,8 +166,7 @@ export const CreateThreadForm = forwardRef<
                           <div className="basis-0 grow">
                             <div className="w-full flex justify-between">
                               <p className="font-bold text-base">
-                                {/* {user?.username} */}
-                                name: {name}, key: {key}
+                                {user?.username}
                               </p>
                               {key !== 0 ? (
                                 <div

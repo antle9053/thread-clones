@@ -9,6 +9,7 @@ import { threadsSelectors } from "./zustand/threadsSlice";
 
 export const CreateThread: FC = () => {
   const isOpen = useAppStore(threadsSelectors.isOpenCreateThread);
+  const replyTo = useAppStore(threadsSelectors.replyTo);
 
   const formRef = useRef<CreateThreadFormHandle>(null);
 
@@ -30,7 +31,9 @@ export const CreateThread: FC = () => {
         >
           Cancel
         </span>
-        <span className="text-base text-[#333333] font-bold">New thread</span>
+        <span className="text-base text-[#333333] font-bold">
+          {replyTo ? "Reply" : "New thread"}
+        </span>
         <span className="w-[50px]"></span>
       </div>
       <CreateThreadForm ref={formRef} />

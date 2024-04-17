@@ -140,8 +140,6 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
           <span className="text-[#888888] text-base">3,256 likes</span>
         </div>
       </div>
-
-      <CreateThread />
     </div>
   );
 };
