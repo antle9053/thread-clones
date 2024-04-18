@@ -19,7 +19,7 @@ export const useUploadImages = () => {
   const { startUpload } = useUploadThing("imagesUploader");
 
   const uploadImages = async () => {
-    const promiseResult = fileList?.map(async (row: UploadFile[], index) => {
+    const promiseResult = fileList?.map(async (row: UploadFile[]) => {
       const reparedRow = row.map((file) => file.originFileObj) as File[];
       const rowResult = await startUpload(reparedRow);
       return rowResult;

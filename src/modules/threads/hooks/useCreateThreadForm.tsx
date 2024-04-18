@@ -93,11 +93,16 @@ export const useCreateThreadForm = ({
         uploaded = await beforeSubmit();
       }
 
+      console.log(uploaded);
+
       const parser = new DOMParser();
       const listTags: string[] = [];
 
-      const arg: CreateThreadArg[] = values.threads.map(
-        (value: any, index: number) => {
+      console.log(values.threads);
+
+      const arg: CreateThreadArg[] = values.threads
+        .filter((value: any) => value.text !== undefined)
+        .map((value: any, index: number) => {
           const doc = parser.parseFromString(value.text, "text/html");
           const tagNodes = doc.querySelectorAll("[data-type='mention']");
           const tags = Array.from(tagNodes).map((node) => ({
@@ -123,8 +128,9 @@ export const useCreateThreadForm = ({
                 : {}),
             },
           };
-        }
-      );
+        });
+
+      console.log(arg);
 
       if (user?.userId) {
         setOpen(false);

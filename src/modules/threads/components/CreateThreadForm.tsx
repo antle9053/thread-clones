@@ -21,6 +21,7 @@ import { useWindowSize } from "usehooks-ts";
 import { TipTap } from "@/src/shared/components/utils/TipTap";
 import { Tags } from "./Toolbar/Tags";
 import { Render } from "../../home/components/Render";
+import { Poll } from "./Poll";
 
 export type ThreadType = "text" | "media" | "gif" | "poll";
 
@@ -82,8 +83,12 @@ export const CreateThreadForm = forwardRef<
   });
 
   const disableAdd =
-    currentValue === "" && previews?.[latestIndex]?.length === 0;
-  const disableSubmit = isSomeValueEmpty && previews.flat(1).length === 0;
+    currentValue === "" &&
+    previews?.[latestIndex]?.length === 0 &&
+    !gifs?.[latestIndex];
+
+  const disableSubmit =
+    isSomeValueEmpty && previews.flat(1).length === 0 && gifs.length === 0;
 
   useImperativeHandle(ref, () => ({
     handleOpenConfirm: () => {
@@ -108,9 +113,7 @@ export const CreateThreadForm = forwardRef<
           autoComplete="off"
           className="h-full"
           form={form}
-          onFinish={(v) => {
-            console.log(v);
-          }}
+          onFinish={onFinish}
         >
           <div className="max-h-[calc(100vh_-_72px)] overflow-scroll px-6 pb-[72px]">
             {thread ? (
@@ -183,11 +186,11 @@ export const CreateThreadForm = forwardRef<
                                       newThreadTypes[key] = "text";
                                       return newThreadTypes;
                                     });
-                                    // setGifs((gifs) =>
-                                    //   gifs.filter((gif, index) =>
-                                    //     index === name ? null : gif
-                                    //   )
-                                    // );
+                                    setGifs((gifs) =>
+                                      gifs.map((gif, index) =>
+                                        index === key ? null : gif
+                                      )
+                                    );
                                   }}
                                 >
                                   <X
@@ -208,6 +211,9 @@ export const CreateThreadForm = forwardRef<
                                   form.setFieldsValue({ threads });
                                 }}
                               />
+                            </div>
+                            <div className="mb-1">
+                              <Poll />
                             </div>
                             <div className="w-full">
                               {threadTypes[key] === "media" ? (
@@ -230,7 +236,7 @@ export const CreateThreadForm = forwardRef<
                                     className="absolute top-2 right-2 w-8 h-8 bg-black/40 rounded-full flex justify-center items-center z-[99]"
                                     onClick={() => {
                                       setGifs((gifs) =>
-                                        gifs.filter((gif, index) =>
+                                        gifs.map((gif, index) =>
                                           index === name ? null : gif
                                         )
                                       );
@@ -245,7 +251,7 @@ export const CreateThreadForm = forwardRef<
                                   </div>
                                   <Gif
                                     borderRadius={12}
-                                    gif={gifs[name]}
+                                    gif={gifs[key]}
                                     width={gifWidth}
                                     noLink
                                   />

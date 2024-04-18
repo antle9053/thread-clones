@@ -14,55 +14,72 @@ datasource db {
 }
 
 model users {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String @unique
-  username        String?
-  name            String
-  avatar          String?
-  bio             String?
-  links           String[]
-  threads         threads[]
-  usedTags        tags[] @relation(fields: [usedTagIds], references: [id])
-  usedTagIds      String[] @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @unique
+  username   String?
+  name       String
+  avatar     String?
+  bio        String?
+  links      String[]
+  threads    threads[]
+  usedTags   tags[]    @relation(fields: [usedTagIds], references: [id])
+  usedTagIds String[]  @db.ObjectId
 }
 
 model threads {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  authorId        String
-  author          users @relation(fields: [authorId], references: [userId])
-  content         contents?
-  parentId        String? @db.ObjectId
-  parent          threads? @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  child           threads[] @relation("ParentChilds")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  authorId  String
+  author    users     @relation(fields: [authorId], references: [userId])
+  content   contents?
+  parentId  String?   @db.ObjectId
+  parent    threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  child     threads[] @relation("ParentChilds")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model contents {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  thread          threads @relation(fields: [threadId], references: [id])
-  threadId        String @unique @db.ObjectId
-  text            String
-  contentType     String
-  files           files[]
-  tags            tags[] @relation(fields: [tagIds], references: [id])
-  tagIds          String[] @db.ObjectId
-  gif             String?
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  thread      threads  @relation(fields: [threadId], references: [id])
+  threadId    String   @unique @db.ObjectId
+  text        String
+  contentType String
+  files       files[]
+  tags        tags[]   @relation(fields: [tagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+  gif         String?
+  poll        polls?
 }
 
 model files {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  contentId       String @db.ObjectId
-  content         contents @relation(fields: [contentId], references: [id])
-  url             String
-  type            String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  contentId String   @db.ObjectId
+  content   contents @relation(fields: [contentId], references: [id])
+  url       String
+  type      String
 }
 
 model tags {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
-  title           String @unique
-  contents        contents[] @relation(fields: [contentIds], references: [id])
-  contentIds      String[] @db.ObjectId
-  users           users[] @relation(fields: [userIds], references: [id])
-  userIds         String[] @db.ObjectId
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  title      String     @unique
+  contents   contents[] @relation(fields: [contentIds], references: [id])
+  contentIds String[]   @db.ObjectId
+  users      users[]    @relation(fields: [userIds], references: [id])
+  userIds    String[]   @db.ObjectId
+}
+
+model polls {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  options   options[]
+  createdAt DateTime  @default(now())
+  content   contents @relation(fields: [contentId], references: [id])
+  contentId String    @unique @db.ObjectId
+}
+
+model options {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  text   String
+  votes  Int    @default(0)
+  pollId String @db.ObjectId
+  poll   polls  @relation(fields: [pollId], references: [id])
 }
