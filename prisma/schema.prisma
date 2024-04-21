@@ -14,16 +14,18 @@ datasource db {
 }
 
 model users {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String    @unique
-  username   String?
-  name       String
-  avatar     String?
-  bio        String?
-  links      String[]
-  threads    threads[]
-  usedTags   tags[]    @relation(fields: [usedTagIds], references: [id])
-  usedTagIds String[]  @db.ObjectId
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String    @unique
+  username       String?
+  name           String
+  avatar         String?
+  bio            String?
+  links          String[]
+  threads        threads[]
+  usedTags       tags[]    @relation(fields: [usedTagIds], references: [id])
+  usedTagIds     String[]  @db.ObjectId
+  votedOptions   options[] @relation(fields: [votedOptionIds], references: [id])
+  votedOptionIds String[]  @db.ObjectId
 }
 
 model threads {
@@ -72,14 +74,15 @@ model polls {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   options   options[]
   createdAt DateTime  @default(now())
-  content   contents @relation(fields: [contentId], references: [id])
+  content   contents  @relation(fields: [contentId], references: [id])
   contentId String    @unique @db.ObjectId
 }
 
 model options {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  text   String
-  votes  Int    @default(0)
-  pollId String @db.ObjectId
-  poll   polls  @relation(fields: [pollId], references: [id])
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  text    String
+  users   users[]  @relation(fields: [userIds], references: [id])
+  userIds String[] @db.ObjectId
+  pollId  String   @db.ObjectId
+  poll    polls    @relation(fields: [pollId], references: [id])
 }

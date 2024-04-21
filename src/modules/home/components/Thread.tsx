@@ -17,6 +17,7 @@ import { Gif } from "@giphy/react-components";
 import { useWindowSize } from "usehooks-ts";
 import { fetchGif } from "@/src/shared/infra/giphy";
 import { Render } from "./Render";
+import { Poll } from "./Poll";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -89,6 +90,8 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
               <div className="relative w-full mb-2">
                 <Gif borderRadius={12} gif={gif} width={gifWidth} noLink />
               </div>
+            ) : content?.contentType === "poll" ? (
+              <Poll data={content?.poll || {}} />
             ) : null}
           </div>
 

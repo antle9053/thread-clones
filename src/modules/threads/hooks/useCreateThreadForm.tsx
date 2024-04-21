@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { Form, message } from "antd";
@@ -16,6 +16,7 @@ interface UseThreadFormProps {
   afterSubmit?: () => void;
   beforeSubmit?: () => Promise<any>;
   gifs?: any[];
+
   removeAllGifs: () => void;
 }
 
@@ -51,6 +52,23 @@ export const useCreateThreadForm = ({
     1;
   const currentValue = threadsValue?.[latestIndex]?.text;
 
+  const isPollValid = useCallback(
+    (index: number) => {
+      return (
+        threadTypes?.[index] === "poll" &&
+        threadsValue?.[index]?.poll?.[0].option &&
+        threadsValue?.[index]?.poll?.[1].option
+      );
+    },
+    [threadTypes, threadsValue]
+  );
+
+  const isCurrentPollValid = isPollValid(latestIndex);
+  const allPollValid = Array.from(
+    { length: threadsValue?.length },
+    (_, i) => i
+  ).every(isPollValid);
+
   useEffect(() => {
     if (replyTo) {
       const initThread = async () => {
@@ -80,6 +98,14 @@ export const useCreateThreadForm = ({
     afterSubmit?.();
   };
 
+  const changeThreadType = (key: number, type: ThreadType) => {
+    setThreadTypes((threadTypes) => {
+      const newThreadTypes = [...threadTypes];
+      newThreadTypes[key] = type;
+      return newThreadTypes;
+    });
+  };
+
   const onFinish = async (values: any) => {
     try {
       message.open({
@@ -93,12 +119,8 @@ export const useCreateThreadForm = ({
         uploaded = await beforeSubmit();
       }
 
-      console.log(uploaded);
-
       const parser = new DOMParser();
       const listTags: string[] = [];
-
-      console.log(values.threads);
 
       const arg: CreateThreadArg[] = values.threads
         .filter((value: any) => value.text !== undefined)
@@ -113,7 +135,11 @@ export const useCreateThreadForm = ({
             content: {
               text: value.text ?? "",
               tags,
-              contentType: threadTypes[index] ?? "text",
+              contentType:
+                value?.poll?.filter((item: any) => item.option).length === 0 ||
+                value?.poll?.filter((item: any) => item.option).length === 1
+                  ? "text"
+                  : threadTypes[index] ?? "text",
               ...(threadTypes[index] === "media"
                 ? {
                     files: uploaded[index].map((file: any) => ({
@@ -124,6 +150,17 @@ export const useCreateThreadForm = ({
                 : threadTypes[index] === "gif"
                 ? {
                     gif: gifs?.[index]?.id,
+                  }
+                : threadTypes[index] === "poll" &&
+                  value?.poll?.filter((item: any) => item.option).length > 1
+                ? {
+                    poll: {
+                      options: value.poll
+                        .filter((item: any) => item.option !== "")
+                        .map((item: any) => ({
+                          text: item.option,
+                        })),
+                    },
                   }
                 : {}),
             },
@@ -155,9 +192,12 @@ export const useCreateThreadForm = ({
   };
 
   return {
+    allPollValid,
+    changeThreadType,
     currentValue,
     isSomeValueEmpty,
     form,
+    isCurrentPollValid,
     isOpenConfirmDiscard,
     latestIndex,
     loading,

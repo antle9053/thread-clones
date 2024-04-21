@@ -2,7 +2,6 @@
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
-import { isArray } from "lodash";
 
 export type CreateTagArg = {
   title: string;

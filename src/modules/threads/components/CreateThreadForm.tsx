@@ -58,9 +58,12 @@ export const CreateThreadForm = forwardRef<
   } = useGif();
 
   const {
+    allPollValid,
+    changeThreadType,
     currentValue,
     isSomeValueEmpty,
     form,
+    isCurrentPollValid,
     isOpenConfirmDiscard,
     latestIndex,
     loading,
@@ -85,10 +88,14 @@ export const CreateThreadForm = forwardRef<
   const disableAdd =
     currentValue === "" &&
     previews?.[latestIndex]?.length === 0 &&
-    !gifs?.[latestIndex];
+    !gifs?.[latestIndex] &&
+    !isCurrentPollValid;
 
   const disableSubmit =
-    isSomeValueEmpty && previews.flat(1).length === 0 && gifs.length === 0;
+    isSomeValueEmpty &&
+    previews.flat(1).length === 0 &&
+    gifs.length === 0 &&
+    !allPollValid;
 
   useImperativeHandle(ref, () => ({
     handleOpenConfirm: () => {
@@ -177,15 +184,11 @@ export const CreateThreadForm = forwardRef<
                                     const { threads } = form.getFieldsValue();
                                     Object.assign(threads[key], {
                                       text: undefined,
+                                      poll: [],
                                     });
                                     form.setFieldsValue({ threads });
-
                                     handleRemoveRow(key);
-                                    setThreadTypes((threadTypes) => {
-                                      const newThreadTypes = [...threadTypes];
-                                      newThreadTypes[key] = "text";
-                                      return newThreadTypes;
-                                    });
+                                    changeThreadType(key, "text");
                                     setGifs((gifs) =>
                                       gifs.map((gif, index) =>
                                         index === key ? null : gif
@@ -206,14 +209,19 @@ export const CreateThreadForm = forwardRef<
                                 name={key}
                                 onChange={(value: string) => {
                                   const { threads } = form.getFieldsValue();
-
                                   Object.assign(threads[key], { text: value });
                                   form.setFieldsValue({ threads });
                                 }}
                               />
                             </div>
                             <div className="mb-1">
-                              <Poll />
+                              {threadTypes[key] === "poll" ? (
+                                <Poll
+                                  form={form}
+                                  name={key}
+                                  onRemove={() => changeThreadType(key, "text")}
+                                />
+                              ) : null}
                             </div>
                             <div className="w-full">
                               {threadTypes[key] === "media" ? (
@@ -221,11 +229,7 @@ export const CreateThreadForm = forwardRef<
                                   handleRemove={(uid) => {
                                     const isClear = handleRemove(uid, key);
                                     if (isClear) {
-                                      setThreadTypes((threadTypes) => {
-                                        const newThreadTypes = [...threadTypes];
-                                        newThreadTypes[key] = "text";
-                                        return newThreadTypes;
-                                      });
+                                      changeThreadType(key, "text");
                                     }
                                   }}
                                   previews={previews[key]}
@@ -240,11 +244,7 @@ export const CreateThreadForm = forwardRef<
                                           index === name ? null : gif
                                         )
                                       );
-                                      setThreadTypes((threadTypes) => {
-                                        const newThreadTypes = [...threadTypes];
-                                        newThreadTypes[key] = "text";
-                                        return newThreadTypes;
-                                      });
+                                      changeThreadType(key, "text");
                                     }}
                                   >
                                     <X strokeWidth={2} color="white" />
@@ -252,8 +252,8 @@ export const CreateThreadForm = forwardRef<
                                   <Gif
                                     borderRadius={12}
                                     gif={gifs[key]}
-                                    width={gifWidth}
                                     noLink
+                                    width={gifWidth}
                                   />
                                 </div>
                               ) : null}
@@ -271,13 +271,7 @@ export const CreateThreadForm = forwardRef<
                                     onChange={(info) => {
                                       const isChanged = handleChange(info, key);
                                       if (isChanged) {
-                                        setThreadTypes((threadTypes) => {
-                                          const newThreadTypes = [
-                                            ...threadTypes,
-                                          ];
-                                          newThreadTypes[key] = "media";
-                                          return newThreadTypes;
-                                        });
+                                        changeThreadType(key, "media");
                                       }
                                     }}
                                     className="!h-5"
@@ -318,7 +312,12 @@ export const CreateThreadForm = forwardRef<
                                   }}
                                 />
                                 {threadTypes[name] !== "media" ? (
-                                  <div className="h-full w-[36px] flex items-center justify-center">
+                                  <div
+                                    className="h-full w-[36px] flex items-center justify-center"
+                                    onClick={() =>
+                                      changeThreadType(key, "poll")
+                                    }
+                                  >
                                     <AlignLeft
                                       size={20}
                                       color="#666666"

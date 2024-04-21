@@ -2,6 +2,7 @@
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
+import { PollArg } from "./polls.service";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -13,6 +14,7 @@ export type CreateContentArg = {
   files: FileArg[];
   tags: TagArg[];
   gif?: string;
+  poll?: PollArg;
 };
 
 export type FileArg = {
@@ -70,6 +72,23 @@ export const createThreadService = async (
                       },
                     }
                   : {}),
+                ...(content.poll
+                  ? {
+                      poll: {
+                        create: {
+                          options: {
+                            createMany: {
+                              data: content.poll.options.map((option) => {
+                                return {
+                                  text: option.text,
+                                };
+                              }),
+                            },
+                          },
+                        },
+                      },
+                    }
+                  : {}),
               },
             },
           }
@@ -88,6 +107,11 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
       include: {
         files: true;
         tags: true;
+        poll: {
+          include: {
+            options: true;
+          };
+        };
       };
     };
 
@@ -119,6 +143,11 @@ export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
         include: {
           files: true,
           tags: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
         },
       },
       _count: {
