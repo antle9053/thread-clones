@@ -91,7 +91,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
                 <Gif borderRadius={12} gif={gif} width={gifWidth} noLink />
               </div>
             ) : content?.contentType === "poll" ? (
-              <Poll data={content?.poll || {}} />
+              <Poll contentId={content?.id} />
             ) : null}
           </div>
 

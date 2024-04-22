@@ -1,32 +1,55 @@
-import { useAppStore } from "@/src/shared/infra/zustand";
-import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
-import { votesService } from "@/src/shared/services/polls.service";
 import { FC } from "react";
+import { usePoll } from "../hooks/usePoll";
+import clsx from "clsx";
+import _ from "lodash";
+import { Spin } from "antd";
 
 interface PollProps {
-  data: any;
+  contentId: string;
 }
 
-export const Poll: FC<PollProps> = ({ data }) => {
-  const { options } = data;
-  const user = useAppStore(authSelectors.user);
+export const Poll: FC<PollProps> = ({ contentId }) => {
+  const {
+    data,
+    isPollEnd,
+    handleVote,
+    percentPerOption,
+    votedByMe,
+    voteLoading,
+    votes,
+  } = usePoll({
+    contentId,
+  });
   return (
     <div className="w-full mb-2 flex flex-col gap-2">
-      {options.map((option: any, index: number) => (
-        <div
-          key={index}
-          className="w-full border border-solid border-slate-500 p-2 rounded-lg"
-          onClick={async () => {
-            await votesService({
-              pollId: data.id,
-              optionId: option.id,
-              userId: user?.id as string,
-            });
-          }}
-        >
-          <span className="font-bold">{option.text}</span>
+      {voteLoading ? (
+        <div className="w-full flex justify-center py-2">
+          <Spin />
         </div>
-      ))}
+      ) : (
+        (data?.options ?? []).map((option, index: number) => (
+          <div
+            key={index}
+            className={clsx(
+              "flex justify-between items-center w-full border border-solid border-slate-300 p-2 rounded-lg",
+              votedByMe === option.id ? "bg-slate-200" : "bg-inherit",
+              isPollEnd ? "opacity-50" : "opacity-100"
+            )}
+            onClick={() => {
+              if (!isPollEnd) handleVote(index);
+            }}
+          >
+            <span className="font-bold">{option.text}</span>
+            <span className="font-bold">{percentPerOption[index]}%</span>
+          </div>
+        ))
+      )}
+      <div className="flex justify-between items-center">
+        <span className="font-semibold">Votes: {votes}</span>
+        {isPollEnd ? (
+          <span className="font-semibold text-primary">Poll ended</span>
+        ) : null}
+      </div>
     </div>
   );
 };
