@@ -116,10 +116,22 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
     };
 
     child: {
-      select: {
-        author: {
+      include: {
+        author: true;
+        content: {
+          include: {
+            files: true;
+            tags: true;
+            poll: {
+              include: {
+                options: true;
+              };
+            };
+          };
+        };
+        _count: {
           select: {
-            avatar: true;
+            child: true;
           };
         };
       };
@@ -157,14 +169,77 @@ export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
       },
       child: {
         take: 3,
-        select: {
-          author: {
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          _count: {
             select: {
-              avatar: true,
+              child: true,
             },
           },
         },
         distinct: ["authorId"],
+      },
+    },
+  });
+  return result;
+};
+
+export const getThreadByIdService = async (
+  id: string
+): Promise<GetThreadResponse | null> => {
+  const result = await prisma.threads.findFirst({
+    where: {
+      id,
+    },
+    include: {
+      author: true,
+      content: {
+        include: {
+          files: true,
+          tags: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          child: true,
+        },
+      },
+      child: {
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              child: true,
+            },
+          },
+        },
       },
     },
   });

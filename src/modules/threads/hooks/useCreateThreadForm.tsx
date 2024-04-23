@@ -188,6 +188,7 @@ export const useCreateThreadForm = ({
       await message.error("Error when posting");
     } finally {
       resetForm();
+      location.reload();
     }
   };
 

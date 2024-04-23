@@ -1,4 +1,4 @@
-import { GetThreadResponse } from "@/src/shared/services/thread.service";
+import { Prisma } from "@prisma/client";
 import {
   Heart,
   MessageCircle,
@@ -8,33 +8,38 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { FC, useEffect, useState } from "react";
-import { useAppStore } from "@/src/shared/infra/zustand";
-import { threadsSelectors } from "../../threads/zustand/threadsSlice";
-import { Avatar } from "antd";
-import { Media } from "./Media";
+import { Poll } from "@/src/modules/home/components/Poll";
+import { Render } from "@/src/modules/home/components/Render";
+import { Media } from "@/src/modules/home/components/Media";
 import { Gif } from "@giphy/react-components";
-import { useWindowSize } from "usehooks-ts";
 import { fetchGif } from "@/src/shared/infra/giphy";
-import { Render } from "./Render";
-import { Poll } from "./Poll";
 import { useRouter } from "next/navigation";
 
-interface ThreadProps {
-  data: GetThreadResponse;
+import { useAppStore } from "@/src/shared/infra/zustand";
+import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
+
+interface ThreadDetailItemProps {
+  id: string;
+  author: Prisma.usersGetPayload<{}>;
+  content: Prisma.contentsGetPayload<{
+    include: {
+      files: true;
+    };
+  }> | null;
+  createdAt: Date;
+  gifWidth: number;
+  numOfChilds: number;
 }
 
-export const Thread: FC<ThreadProps> = ({ data }) => {
-  const {
-    id,
-    author,
-    content,
-    createdAt,
-    child,
-    _count: { child: numOfChilds },
-  } = data;
-
+export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
+  id,
+  author,
+  content,
+  createdAt,
+  gifWidth,
+  numOfChilds,
+}) => {
   const router = useRouter();
-
   const [gif, setGif] = useState<any>(null);
 
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
@@ -49,31 +54,23 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
     };
     initGif();
   }, [content?.contentType, content?.gif]);
-
-  const { width = 0 } = useWindowSize();
-
-  const gifWidth = width > 600 ? 492 : width - 108;
-
   return (
     <div
-      className="w-full bg-white border-b-[0.5px] border-solid border-black/10 p-4"
-      onClick={() => router.push(`/${author?.username}/post/${id}`)}
+      className="border-b border-solid border-slate-200 p-4"
+      onClick={() => {
+        router.push(`/${author?.username}/post/${id}`);
+      }}
     >
       <div className="flex gap-3 items-stretch mb-2">
-        <div className="basis-[48px] grow-0 flex flex-col">
-          <img
-            src={author?.avatar || ""}
-            className="w-[48px] h-[48px] rounded-full"
-          />
-          {numOfChilds > 0 ? (
-            <div className="grow flex justify-center mt-2">
-              <div className="w-[1px] bg-slate-300 h-full"></div>
-            </div>
-          ) : null}
-        </div>
         <div className="basis-0 grow">
-          <div className="w-full flex justify-between mb-2">
-            <span className="font-bold text-base">{author?.username}</span>
+          <div className="w-full flex justify-between items-center mb-2">
+            <div className="flex items-center gap-2">
+              <img
+                src={author?.avatar || ""}
+                className="w-[36px] h-[36px] rounded-full"
+              />
+              <span className="font-bold text-base">{author?.username}</span>
+            </div>
             <div className="flex gap-2">
               <span className="text-[#666666]">
                 {moment(createdAt).fromNow()}
@@ -124,19 +121,6 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
         </div>
       </div>
       <div className="flex gap-3 items-center">
-        <div className="basis-[48px] grow-0 flex justify-center ">
-          <Avatar.Group>
-            {child.map((item, index) => {
-              return (
-                <Avatar
-                  key={index}
-                  src={item?.author?.avatar || ""}
-                  className="w-[20px] h-[20px] rounded-full"
-                ></Avatar>
-              );
-            })}
-          </Avatar.Group>
-        </div>
         <div>
           {numOfChilds > 0 ? (
             <>

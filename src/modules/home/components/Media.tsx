@@ -12,7 +12,7 @@ export const Media: FC<MediaProps> = ({ files }) => {
   return (
     <div className="flex w-full overflow-scroll flex-nowrap gap-2 mb-2">
       {files.length === 1 ? (
-        <div className="relative w-full rounded-xl overflow-hidden">
+        <div className="relative w-full rounded-xl overflow-hidden flex justify-center border border-solid border-slate-200">
           {files[0].type.includes("image") ? (
             <img src={files[0].url} className="object-contain h-full" />
           ) : (
