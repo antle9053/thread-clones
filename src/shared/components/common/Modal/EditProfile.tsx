@@ -38,7 +38,7 @@ export const EditProfile: FC<EditProfileProps> = ({ isOpen, setOpen }) => {
   const handleSubmit = async (formValues: any) => {
     setLoading(true);
     const avatar = await uploadImage();
-
+    console.log(user);
     if (user?.userId) {
       await updateUserService(user?.userId, {
         name: formValues.fullName,

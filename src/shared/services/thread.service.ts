@@ -139,6 +139,7 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
     _count: {
       select: {
         child: true;
+        likedByUsers: true;
       };
     };
   };
@@ -165,6 +166,7 @@ export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
       _count: {
         select: {
           child: true,
+          likedByUsers: true,
         },
       },
       child: {
@@ -218,6 +220,7 @@ export const getThreadByIdService = async (
       _count: {
         select: {
           child: true,
+          likedByUsers: true,
         },
       },
       child: {

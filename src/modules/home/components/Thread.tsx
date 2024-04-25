@@ -18,6 +18,7 @@ import { fetchGif } from "@/src/shared/infra/giphy";
 import { Render } from "./Render";
 import { Poll } from "./Poll";
 import { useRouter } from "next/navigation";
+import { Like } from "./Like";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -30,8 +31,11 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
     content,
     createdAt,
     child,
+    likedByUserIds,
     _count: { child: numOfChilds },
   } = data;
+
+  const [initLike, setInitLike] = useState<number>(likedByUserIds.length);
 
   const router = useRouter();
 
@@ -101,9 +105,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
           </div>
 
           <div className="flex h-[36px]">
-            <div className="h-full w-[36px] flex items-center">
-              <Heart />
-            </div>
+            <Like threadId={id} setInitLike={setInitLike} />
             <div
               className="h-full w-[36px] flex items-center"
               onClick={(e) => {
@@ -139,14 +141,18 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
         </div>
         <div>
           {numOfChilds > 0 ? (
-            <>
-              <span className="text-[#888888] text-base">
-                {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
-              </span>
-              <span>&nbsp;·&nbsp;</span>
-            </>
+            <span className="text-[#888888] text-base">
+              {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
+            </span>
           ) : null}
-          <span className="text-[#888888] text-base">3,256 likes</span>
+          {numOfChilds > 0 && likedByUserIds.length > 0 ? (
+            <span>&nbsp;·&nbsp;</span>
+          ) : null}
+          {initLike > 0 ? (
+            <span className="text-[#888888] text-base">
+              {initLike} {initLike === 1 ? "like" : "likes"}
+            </span>
+          ) : null}
         </div>
       </div>
     </div>

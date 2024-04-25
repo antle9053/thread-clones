@@ -12,7 +12,6 @@ interface ThreadDetailProps {}
 
 export const ThreadDetail: FC<ThreadDetailProps> = () => {
   const params = useParams<{ username: string; postId: string }>();
-  console.log(params);
 
   const [data, setData] = useState<GetThreadResponse | null>(null);
 

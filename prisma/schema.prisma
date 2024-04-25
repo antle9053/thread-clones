@@ -26,6 +26,8 @@ model users {
   usedTagIds     String[]  @db.ObjectId
   votedOptions   options[] @relation(fields: [votedOptionIds], references: [id])
   votedOptionIds String[]  @db.ObjectId
+  likedThreads   threads[] @relation("Likes", fields: [likedThreadIds], references: [id])
+  likedThreadIds String[]  @db.ObjectId
 }
 
 model threads {
@@ -38,6 +40,8 @@ model threads {
   child     threads[] @relation("ParentChilds")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  likedByUsers   users[]  @relation("Likes", fields: [likedByUserIds], references: [id])
+  likedByUserIds String[] @db.ObjectId
 }
 
 model contents {
