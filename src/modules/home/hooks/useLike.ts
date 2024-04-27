@@ -56,6 +56,8 @@ export const useLike = ({ threadId, setInitLike }: UseLikeProps) => {
     [threadId, user?.id]
   );
 
+  const handleHeartClick = useCallback(() => {}, [threadId, user?.id]);
+
   useEffect(() => {
     fetchLiked(threadId);
   }, [threadId]);

@@ -15,7 +15,10 @@ export const MoreButton = () => {
           openApperance ? (
             <Apperance onSetApperance={() => setOpenApperance(false)} />
           ) : (
-            <More onSetApperance={() => setOpenApperance(true)} />
+            <More
+              onClose={() => setOpen(false)}
+              onSetApperance={() => setOpenApperance(true)}
+            />
           )
         }
         placement="bottomRight"

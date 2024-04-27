@@ -145,10 +145,19 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
   };
 }>;
 
-export const getThreadsService = async (): Promise<GetThreadResponse[]> => {
+export const getThreadsService = async (
+  userId?: string
+): Promise<GetThreadResponse[]> => {
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
+      ...(userId
+        ? {
+            likedByUserIds: {
+              has: userId,
+            },
+          }
+        : {}),
     },
     include: {
       author: true,

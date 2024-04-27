@@ -1,11 +1,15 @@
 "use client";
 
+import { FC } from "react";
 import { Loading } from "@/src/shared/components/ui/Loading";
 import { useGetThreads } from "./hooks/useGetThreads";
 import { Thread } from "./components/Thread";
 
-export const Home = () => {
-  const { loading, threads } = useGetThreads();
+interface HomeProps {
+  isLikedPage?: boolean;
+}
+export const Home: FC<HomeProps> = ({ isLikedPage }) => {
+  const { loading, threads } = useGetThreads({ isLiked: isLikedPage });
   if (loading) {
     return <Loading fullPage />;
   }
