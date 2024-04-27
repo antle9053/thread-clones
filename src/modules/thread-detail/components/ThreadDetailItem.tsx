@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
+import { Like } from "../../home/components/Like";
 
 interface ThreadDetailItemProps {
   id: string;
@@ -29,6 +30,7 @@ interface ThreadDetailItemProps {
   createdAt: Date;
   gifWidth: number;
   numOfChilds: number;
+  numOfLikes: number;
 }
 
 export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
@@ -38,9 +40,11 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
   createdAt,
   gifWidth,
   numOfChilds,
+  numOfLikes,
 }) => {
   const router = useRouter();
   const [gif, setGif] = useState<any>(null);
+  const [initLike, setInitLike] = useState<number>(numOfLikes);
 
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
@@ -54,6 +58,7 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
     };
     initGif();
   }, [content?.contentType, content?.gif]);
+
   return (
     <div
       className="border-b border-solid border-slate-200 p-4"
@@ -98,9 +103,7 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
           </div>
 
           <div className="flex h-[36px]">
-            <div className="h-full w-[36px] flex items-center">
-              <Heart />
-            </div>
+            <Like threadId={id} setInitLike={setInitLike} />
             <div
               className="h-full w-[36px] flex items-center"
               onClick={(e) => {
@@ -123,14 +126,16 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
       <div className="flex gap-3 items-center">
         <div>
           {numOfChilds > 0 ? (
-            <>
-              <span className="text-[#888888] text-base">
-                {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
-              </span>
-              <span>&nbsp;·&nbsp;</span>
-            </>
+            <span className="text-[#888888] text-base">
+              {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
+            </span>
           ) : null}
-          <span className="text-[#888888] text-base">3,256 likes</span>
+          {numOfChilds > 0 && initLike > 0 ? <span>&nbsp;·&nbsp;</span> : null}
+          {initLike > 0 ? (
+            <span className="text-[#888888] text-base">
+              {initLike} {initLike === 1 ? "like" : "likes"}
+            </span>
+          ) : null}
         </div>
       </div>
     </div>

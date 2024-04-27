@@ -103,6 +103,7 @@ export const createThreadService = async (
 export type GetThreadResponse = Prisma.threadsGetPayload<{
   include: {
     author: true;
+    parent: true;
     content: {
       include: {
         files: true;
@@ -161,6 +162,7 @@ export const getThreadsService = async (
     },
     include: {
       author: true,
+      parent: true,
       content: {
         include: {
           files: true,
@@ -226,6 +228,7 @@ export const getThreadByIdService = async (
           },
         },
       },
+      parent: true,
       _count: {
         select: {
           child: true,

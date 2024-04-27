@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { usePoll } from "../hooks/usePoll";
 import clsx from "clsx";
-import _ from "lodash";
 import { Spin } from "antd";
 
 interface PollProps {
@@ -20,6 +19,7 @@ export const Poll: FC<PollProps> = ({ contentId }) => {
   } = usePoll({
     contentId,
   });
+
   return (
     <div className="w-full mb-2 flex flex-col gap-2">
       {voteLoading ? (

@@ -145,9 +145,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
               {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
             </span>
           ) : null}
-          {numOfChilds > 0 && likedByUserIds.length > 0 ? (
-            <span>&nbsp;·&nbsp;</span>
-          ) : null}
+          {numOfChilds > 0 && initLike > 0 ? <span>&nbsp;·&nbsp;</span> : null}
           {initLike > 0 ? (
             <span className="text-[#888888] text-base">
               {initLike} {initLike === 1 ? "like" : "likes"}
