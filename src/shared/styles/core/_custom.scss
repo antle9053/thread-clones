@@ -70,6 +70,20 @@
   }
 }
 
+.confirm-delete-thread-modal {
+  width: 280px !important;
+  .ant-modal-content {
+    width: 100% !important;
+    height: 180px !important;
+    padding: 0;
+
+    .ant-modal-body {
+      height: 100% !important;
+      display: block;
+    }
+  }
+}
+
 // ============================= //
 
 // SWIPER

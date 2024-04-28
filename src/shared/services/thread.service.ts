@@ -283,3 +283,132 @@ export const getThreadService = async (
 
   return result;
 };
+
+async function fetchAllChildThreads(threadId: string): Promise<
+  Prisma.threadsGetPayload<{
+    include: { content: true };
+  }>[]
+> {
+  const childThreads: Prisma.threadsGetPayload<{
+    include: { content: true };
+  }>[] = await prisma.threads.findMany({
+    where: {
+      parentId: threadId,
+    },
+    include: {
+      content: true,
+    },
+  });
+
+  const descendantThreads: Prisma.threadsGetPayload<{
+    include: { content: true };
+  }>[] = [];
+  for (const childThread of childThreads) {
+    const descendants = await fetchAllChildThreads(childThread.id);
+    descendantThreads.push(childThread, ...descendants);
+  }
+
+  return descendantThreads;
+}
+
+export const deleteThreadService = async (threadId: string) => {
+  const mainThread = (await prisma.threads.findFirst({
+    where: {
+      id: threadId,
+    },
+    include: {
+      content: true,
+    },
+  })) as Prisma.threadsGetPayload<{
+    include: { content: true };
+  }>;
+  const descendantThreads = await fetchAllChildThreads(threadId);
+
+  const descendantThreadIds = [
+    threadId,
+    ...descendantThreads.map((thread) => thread.id),
+  ];
+
+  const descendantContentIds = [mainThread, ...descendantThreads].map(
+    (thread) => thread.content?.id
+  );
+
+  for (const contentId of descendantContentIds) {
+    const poll = await prisma.polls.findFirst({
+      where: {
+        contentId: contentId,
+      },
+    });
+    const options = await prisma.options.findMany({
+      where: {
+        pollId: poll?.id as string,
+      },
+    });
+
+    const optionIds = options.map((option) => option.id);
+
+    const votedUsers = await prisma.users.findMany({
+      where: {
+        votedOptionIds: {
+          hasSome: optionIds,
+        },
+      },
+    });
+
+    for (const user of votedUsers) {
+      const { votedOptionIds } = user;
+      await prisma.users.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          votedOptionIds: votedOptionIds.filter(
+            (id) => !optionIds.includes(id)
+          ),
+        },
+      });
+    }
+  }
+
+  for (const threadId of descendantThreadIds) {
+    const likedUsers = await prisma.users.findMany({
+      where: {
+        likedThreadIds: {
+          has: threadId,
+        },
+      },
+    });
+
+    for (const user of likedUsers) {
+      const { likedThreadIds } = user;
+      await prisma.users.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          likedThreadIds: likedThreadIds.filter((id) => id !== threadId),
+        },
+      });
+    }
+  }
+
+  await prisma.threads.updateMany({
+    where: {
+      id: {
+        in: descendantThreadIds,
+      },
+    },
+    data: {
+      parentId: null,
+    },
+  });
+
+  await prisma.threads.deleteMany({
+    where: {
+      id: {
+        in: descendantThreadIds,
+      },
+    },
+  });
+  return true;
+};

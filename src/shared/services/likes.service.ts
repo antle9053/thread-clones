@@ -8,27 +8,26 @@ export const likeThreadService = async (threadId: string, userId: string) => {
       id: threadId,
     },
     data: {
-      likedByUserIds: {
-        push: userId,
+      likedByUsers: {
+        connect: {
+          id: userId,
+        },
       },
     },
   });
 };
 
 export const unlikeThreadService = async (threadId: string, userId: string) => {
-  const thread = await prisma.threads.findFirst({
-    where: {
-      id: threadId,
-    },
-  });
-  if (!thread) throw Error("Cannot found thread");
-  const { likedByUserIds } = thread;
   await prisma.threads.update({
     where: {
       id: threadId,
     },
     data: {
-      likedByUserIds: likedByUserIds.filter((id) => id !== userId),
+      likedByUsers: {
+        disconnect: {
+          id: userId,
+        },
+      },
     },
   });
 };

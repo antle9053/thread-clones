@@ -1,31 +1,32 @@
 import { AppState, setAppState } from "@/src/shared/infra/zustand/types";
+import { GetThreadResponse } from "@/src/shared/services/thread.service";
 import { StateCreator } from "zustand";
 
 export interface ThreadActionSlice {
   isOpenThreadAction: boolean;
-  threadId?: string;
+  thread?: GetThreadResponse;
 
   setOpenThreadAction: (_isOpen: boolean) => void;
-  setThreadId: (_threadId: string) => void;
+  setThread: (_thread: GetThreadResponse) => void;
 }
 
 export const createThreadActionSlice: StateCreator<ThreadActionSlice> = (
   set: setAppState
 ) => ({
   isOpenThreadAction: false,
-  threadId: undefined,
+  thread: undefined,
 
   setOpenThreadAction: (_isOpen: boolean) =>
     set((state: AppState) => ({ ...state, isOpenThreadAction: _isOpen })),
-  setThreadId: (_threadId: string) => {
-    set((state: AppState) => ({ ...state, threadId: _threadId }));
+  setThread: (_thread: GetThreadResponse) => {
+    set((state: AppState) => ({ ...state, thread: _thread }));
   },
 });
 
 export const threadActionSelectors = {
   isOpenThreadAction: (state: AppState) => state.isOpenThreadAction,
-  threadId: (state: AppState) => state.threadId,
+  thread: (state: AppState) => state.thread,
 
   setOpenThreadAction: (state: AppState) => state.setOpenThreadAction,
-  setThreadId: (state: AppState) => state.setThreadId,
+  setThread: (state: AppState) => state.setThread,
 };

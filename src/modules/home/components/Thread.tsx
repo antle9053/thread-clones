@@ -20,6 +20,7 @@ import { Poll } from "./Poll";
 import { useRouter } from "next/navigation";
 import { Like } from "./Like";
 import { threadActionSelectors } from "../zustand/threadActionSlice";
+import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -48,7 +49,7 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
   const setOpenThreadAction = useAppStore(
     threadActionSelectors.setOpenThreadAction
   );
-  const setThreadId = useAppStore(threadActionSelectors.setThreadId);
+  const setThread = useAppStore(threadActionSelectors.setThread);
 
   useEffect(() => {
     const initGif = async () => {
@@ -85,15 +86,13 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
           <div className="w-full flex justify-between mb-2">
             <span className="font-bold text-base">{author?.username}</span>
             <div className="flex gap-2">
-              <span className="text-[#666666]">
-                {moment(createdAt).fromNow()}
-              </span>
+              <span className="text-[#666666]">{formatFromNow(createdAt)}</span>
 
               <div
                 className="text-black/50"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setThreadId(id);
+                  setThread(data);
                   setOpenThreadAction(true);
                 }}
               >

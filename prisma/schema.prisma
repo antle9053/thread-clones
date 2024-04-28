@@ -31,22 +31,22 @@ model users {
 }
 
 model threads {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  authorId  String
-  author    users     @relation(fields: [authorId], references: [userId])
-  content   contents?
-  parentId  String?   @db.ObjectId
-  parent    threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  child     threads[] @relation("ParentChilds")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  likedByUsers   users[]  @relation("Likes", fields: [likedByUserIds], references: [id])
-  likedByUserIds String[] @db.ObjectId
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  authorId       String
+  author         users     @relation(fields: [authorId], references: [userId])
+  content        contents?
+  parentId       String?   @db.ObjectId
+  parent         threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  child          threads[] @relation("ParentChilds")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  likedByUsers   users[]   @relation("Likes", fields: [likedByUserIds], references: [id])
+  likedByUserIds String[]  @db.ObjectId
 }
 
 model contents {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  thread      threads  @relation(fields: [threadId], references: [id])
+  thread      threads  @relation(fields: [threadId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threadId    String   @unique @db.ObjectId
   text        String
   contentType String
@@ -60,7 +60,7 @@ model contents {
 model files {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   contentId String   @db.ObjectId
-  content   contents @relation(fields: [contentId], references: [id])
+  content   contents @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   url       String
   type      String
 }
@@ -78,7 +78,7 @@ model polls {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   options   options[]
   createdAt DateTime  @default(now())
-  content   contents  @relation(fields: [contentId], references: [id])
+  content   contents  @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   contentId String    @unique @db.ObjectId
 }
 
@@ -88,5 +88,5 @@ model options {
   users   users[]  @relation(fields: [userIds], references: [id])
   userIds String[] @db.ObjectId
   pollId  String   @db.ObjectId
-  poll    polls    @relation(fields: [pollId], references: [id])
+  poll    polls    @relation(fields: [pollId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
