@@ -6,7 +6,6 @@ import { EditProfile } from "./Modal/EditProfile";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { message } from "antd";
-import { CreateThread } from "../../../modules/threads/CreateThread";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 
 export const MobileNavbar = () => {
@@ -63,7 +62,6 @@ export const MobileNavbar = () => {
         })}
       </nav>
       <EditProfile isOpen={isOpenEditProfile} setOpen={setOpenEditProfile} />
-      <CreateThread />
     </>
   );
 };

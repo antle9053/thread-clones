@@ -6,6 +6,15 @@
   overflow: hidden;
 }
 
+// Drawer
+
+.ant-drawer-content-wrapper {
+  height: unset !important;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  overflow: hidden;
+}
+
 // Modal
 .dark .ant-modal-content {
   background-color: #222222;

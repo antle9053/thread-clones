@@ -12,6 +12,7 @@ import { Media } from "@/src/modules/home/components/Media";
 import { Gif } from "@giphy/react-components";
 import { Poll } from "@/src/modules/home/components/Poll";
 import { fetchGif } from "@/src/shared/infra/giphy";
+import { ThreadDetailParentItem } from "./components/ThreadDetailParentItem";
 
 interface ThreadDetailProps {}
 
@@ -46,53 +47,18 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
   return (
     <div className="mx-auto w-[600px] max-w-full min-h-full pb-[48px]">
       {ancestor.length > 0 ? (
-        <div className="w-full px-4 bg-white">
+        <div className="w-full bg-white">
           {ancestor.map((item, index) => (
-            <div key={index} className="flex gap-3 items-stretch">
-              <div className="basis-[36px] grow-0 flex flex-col">
-                <img
-                  src={item.author?.avatar || ""}
-                  className="w-[36px] h-[36px] rounded-full"
-                />
-                <div className="grow flex justify-center my-2">
-                  <div className="w-[1px] bg-slate-300 h-full min-h-[10px]"></div>
-                </div>
-              </div>
-              <div className="basis-0 grow">
-                <div className="w-full flex justify-between">
-                  <span className="font-bold text-base">
-                    {item.author?.username}
-                  </span>
-                  <div className="flex gap-2">
-                    <span className="text-[#666666]">
-                      {moment(item.createdAt).fromNow()}
-                    </span>
-                    <div className="text-black/50">
-                      <MoreHorizontal />
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full mb-1">
-                  <Render content={item.content?.text ?? ""} />
-                </div>
-                <div className="w-full">
-                  {item.content?.contentType === "media" ? (
-                    <Media files={item.content?.files || []} />
-                  ) : item.content?.contentType === "gif" ? (
-                    <div className="relative w-full mb-2">
-                      {/* <Gif
-                        borderRadius={12}
-                        gif={gif}
-                        width={gifWidth}
-                        noLink
-                      /> */}
-                    </div>
-                  ) : item.content?.contentType === "poll" ? (
-                    <Poll contentId={item.content?.id} />
-                  ) : null}
-                </div>
-              </div>
-            </div>
+            <ThreadDetailParentItem
+              key={index}
+              id={item.id}
+              author={item.author}
+              content={item.content}
+              createdAt={item.createdAt}
+              gifWidth={gifWidth}
+              numOfChilds={item.child.length}
+              numOfLikes={item.likedByUserIds.length}
+            />
           ))}
         </div>
       ) : null}

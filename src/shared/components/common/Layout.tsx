@@ -9,6 +9,8 @@ import { getUserService } from "../../services/user.service";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Loading } from "../ui/Loading";
+import { CreateThread } from "@/src/modules/threads/CreateThread";
+import { ThreadAction } from "./Drawer/ThreadAction";
 
 const { Header, Content } = Layout;
 
@@ -43,6 +45,8 @@ export const MainLayout = ({
       <Content className="overflow-scroll h-[calc(100vh_-_76px)]">
         {children}
         <MobileNavbar />
+        <CreateThread />
+        <ThreadAction />
       </Content>
     </Layout>
   );

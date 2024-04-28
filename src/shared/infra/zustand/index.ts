@@ -1,4 +1,6 @@
+import { createThreadActionSlice } from "./../../../modules/home/zustand/threadActionSlice";
 import { StoreApi, create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 import { AppState, getAppState, setAppState } from "./types";
 import { creatFooSlice } from "@/src/modules/foo/zustand/fooSlice";
@@ -6,7 +8,6 @@ import { creatFooSlice } from "@/src/modules/foo/zustand/fooSlice";
 import { createThemeSlice } from "./slices/themeSlice";
 import { createAuthSlice } from "./slices/authSlice";
 import { createThreadsSlice } from "@/src/modules/threads/zustand/threadsSlice";
-import { persist, createJSONStorage } from "zustand/middleware";
 
 export const useAppStore = create<AppState>()(
   (set: setAppState, get: getAppState, api: StoreApi<AppState>) => ({
@@ -23,5 +24,6 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
     })(set, get, api),
     ...createThreadsSlice(set, get, api),
+    ...createThreadActionSlice(set, get, api),
   })
 );

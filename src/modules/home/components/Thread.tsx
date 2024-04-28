@@ -10,7 +10,7 @@ import moment from "moment";
 import { FC, useEffect, useState } from "react";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "../../threads/zustand/threadsSlice";
-import { Avatar } from "antd";
+import { Avatar, Popover } from "antd";
 import { Media } from "./Media";
 import { Gif } from "@giphy/react-components";
 import { useWindowSize } from "usehooks-ts";
@@ -19,6 +19,7 @@ import { Render } from "./Render";
 import { Poll } from "./Poll";
 import { useRouter } from "next/navigation";
 import { Like } from "./Like";
+import { threadActionSelectors } from "../zustand/threadActionSlice";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -43,6 +44,11 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
 
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
+
+  const setOpenThreadAction = useAppStore(
+    threadActionSelectors.setOpenThreadAction
+  );
+  const setThreadId = useAppStore(threadActionSelectors.setThreadId);
 
   useEffect(() => {
     const initGif = async () => {
@@ -82,7 +88,15 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
               <span className="text-[#666666]">
                 {moment(createdAt).fromNow()}
               </span>
-              <div className="text-black/50">
+
+              <div
+                className="text-black/50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setThreadId(id);
+                  setOpenThreadAction(true);
+                }}
+              >
                 <MoreHorizontal />
               </div>
             </div>

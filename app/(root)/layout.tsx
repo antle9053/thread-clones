@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Lexend } from "next/font/google";
 
 import { MainLayout } from "@/src/shared/components/common/Layout";
 
-// Providers
 import { ThemeProvider } from "next-themes";
 import { AntdStyledComponentsRegistry } from "@/src/shared/infra/antd/AntdStyledComponentsRegistry";
 import { ClerkProvider } from "@clerk/nextjs";
 
-// Style
 import "@/src/shared/styles/_main.scss";
 
-const inter = Inter({ subsets: ["latin"] });
+const lexend = Lexend({ display: "swap", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={lexend.className}>
         <ClerkProvider>
           <ThemeProvider attribute="class">
             <AntdStyledComponentsRegistry>
