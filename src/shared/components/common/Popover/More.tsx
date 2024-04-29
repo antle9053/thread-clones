@@ -24,7 +24,14 @@ export const More: FC<MoreProps> = ({ onClose, onSetApperance }) => {
       </div>
       <div className="!py-2 !px-3 cursor-pointer dark:bg-[#222222] border-b border-solid border-gray-200 dark:border-gray-600">
         <Link href="/liked" onClick={onClose}>
-          <span className="dark:text-white text-base font-[500]">Liked</span>
+          <span className="dark:text-white text-base font-[500]">
+            Your likes
+          </span>
+        </Link>
+      </div>
+      <div className="!py-2 !px-3 cursor-pointer dark:bg-[#222222] border-b border-solid border-gray-200 dark:border-gray-600">
+        <Link href="/saved" onClick={onClose}>
+          <span className="dark:text-white text-base font-[500]">Saved</span>
         </Link>
       </div>
       <div

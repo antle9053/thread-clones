@@ -8,12 +8,13 @@ import {
 } from "@/src/shared/services/thread.service";
 import { message } from "antd";
 import { useEffect, useState } from "react";
+import { pageType } from "..";
 
 interface UseGetThreadsProps {
-  isLiked?: boolean;
+  pageType?: pageType;
 }
 
-export const useGetThreads = ({ isLiked }: UseGetThreadsProps) => {
+export const useGetThreads = ({ pageType }: UseGetThreadsProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [threads, setThreads] = useState<GetThreadResponse[]>([]);
 
@@ -24,8 +25,8 @@ export const useGetThreads = ({ isLiked }: UseGetThreadsProps) => {
       try {
         setLoading(true);
         let result: any;
-        if (isLiked && user && user?.id)
-          result = await getThreadsService(user?.id);
+        if (pageType && user && user?.id)
+          result = await getThreadsService(user?.id, pageType);
         else result = await getThreadsService();
         setThreads(result);
         setLoading(false);

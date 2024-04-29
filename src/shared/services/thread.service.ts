@@ -3,6 +3,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
 import { PollArg } from "./polls.service";
+import { pageType } from "@/src/modules/home";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -147,17 +148,26 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
 }>;
 
 export const getThreadsService = async (
-  userId?: string
+  userId?: string,
+  type?: pageType
 ): Promise<GetThreadResponse[]> => {
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
       ...(userId
-        ? {
-            likedByUserIds: {
-              has: userId,
-            },
-          }
+        ? type === "liked"
+          ? {
+              likedByUserIds: {
+                has: userId,
+              },
+            }
+          : type === "saved"
+          ? {
+              savedByUserIds: {
+                has: userId,
+              },
+            }
+          : {}
         : {}),
     },
     include: {

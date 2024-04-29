@@ -1,3 +1,4 @@
+import { ImagePreview } from "@/src/shared/components/ui/ImagePreview";
 import { FC } from "react";
 import ReactPlayer from "react-player";
 
@@ -14,7 +15,7 @@ export const Media: FC<MediaProps> = ({ files }) => {
       {files.length === 1 ? (
         <div className="relative w-full rounded-xl overflow-hidden flex justify-center border border-solid border-slate-200">
           {files[0].type.includes("image") ? (
-            <img src={files[0].url} className="object-contain h-full" />
+            <ImagePreview src={files[0].url} type="single" />
           ) : (
             <ReactPlayer
               controls
@@ -36,7 +37,7 @@ export const Media: FC<MediaProps> = ({ files }) => {
               key={index}
             >
               {type.includes("image") ? (
-                <img src={url} className="object-cover h-full" />
+                <ImagePreview src={url} type="multiple" />
               ) : (
                 <ReactPlayer
                   controls

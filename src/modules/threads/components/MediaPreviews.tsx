@@ -12,9 +12,9 @@ export const MediaPreviews: FC<MediaPreviewsProps> = ({
   previews,
 }) => {
   return (
-    <div className="flex w-full overflow-scroll flex-nowrap gap-2  mb-2">
+    <div className="flex w-full overflow-scroll flex-nowrap gap-2 mb-2">
       {!previews || previews.length === 0 ? null : previews.length === 1 ? (
-        <div className="relative w-full rounded-xl overflow-hidden">
+        <div className="relative flex justify-center w-full rounded-xl overflow-hidden border border-solid border-slate-200">
           <div
             className="absolute top-2 right-2 w-8 h-8 bg-black/40 rounded-full flex justify-center items-center z-[99]"
             onClick={() => {
@@ -24,7 +24,10 @@ export const MediaPreviews: FC<MediaPreviewsProps> = ({
             <X strokeWidth={2} color="white" />
           </div>
           {previews[0].type === "image" ? (
-            <img src={previews[0].preview} className="object-contain h-full" />
+            <img
+              src={previews[0].preview}
+              className="object-contain h-full max-h-[400px]"
+            />
           ) : (
             <ReactPlayer
               controls

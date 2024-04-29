@@ -1,14 +1,18 @@
 import { threadActionSelectors } from "@/src/modules/home/zustand/threadActionSlice";
 import { useAppStore } from "../infra/zustand";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { authSelectors } from "../infra/zustand/slices/authSlice";
 import { deleteThreadService } from "../services/thread.service";
 import { message } from "antd";
+import {
+  isSavedService,
+  saveThreadService,
+  unsaveThreadService,
+} from "../services/save.service";
 
 export const useThreadAction = () => {
   const [isSelf, setIsSelf] = useState<boolean | null>(null);
-
-  const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
   const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
 
   const isOpen = useAppStore(threadActionSelectors.isOpenThreadAction);
@@ -25,7 +29,6 @@ export const useThreadAction = () => {
 
   const handleDelete = useCallback(async () => {
     if (thread && thread?.id) {
-      setLoadingDelete(true);
       message.open({
         key: "message-loading",
         type: "loading",
@@ -34,10 +37,55 @@ export const useThreadAction = () => {
       });
       await deleteThreadService(thread?.id);
       setOpen(false);
-      setLoadingDelete(false);
       message.destroy("message-loading");
       await message.success("Deleted");
     }
+  }, [thread]);
+
+  const handleSave = useCallback(async () => {
+    if (thread?.id && user?.id) {
+      message.open({
+        key: "message-saved-loading",
+        type: "loading",
+        content: "Saving...",
+        duration: 0,
+      });
+      await saveThreadService(thread?.id, user?.id);
+      setOpen(false);
+      message.destroy("message-saved-loading");
+      setIsSaved(true);
+      await message.success("Saved");
+    }
+  }, [thread, user]);
+
+  const handleUnsave = useCallback(async () => {
+    if (thread?.id && user?.id) {
+      message.open({
+        key: "message-saved-loading",
+        type: "loading",
+        content: "Unsaving...",
+        duration: 0,
+      });
+      await unsaveThreadService(thread?.id, user?.id);
+      setOpen(false);
+      message.destroy("message-saved-loading");
+      setIsSaved(false);
+      await message.success("Unsaved");
+    }
+  }, [thread, user]);
+
+  const fetchSaved = useCallback(
+    async (threadId?: string) => {
+      if (threadId && user?.id) {
+        const res = await isSavedService(threadId, user?.id);
+        return res;
+      }
+    },
+    [thread, user]
+  );
+
+  useEffect(() => {
+    fetchSaved(thread?.id);
   }, [thread]);
 
   const handleClose = () => {
@@ -56,10 +104,13 @@ export const useThreadAction = () => {
   return {
     isOpen,
     isSelf,
+    isSaved,
     handleClose,
     handleOpenConfirmDelete,
     handleCloseConfirmDelete,
     handleDelete,
+    handleSave,
+    handleUnsave,
     openConfirmDelete,
   };
 };

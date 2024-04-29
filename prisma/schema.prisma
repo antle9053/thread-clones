@@ -28,6 +28,8 @@ model users {
   votedOptionIds String[]  @db.ObjectId
   likedThreads   threads[] @relation("Likes", fields: [likedThreadIds], references: [id])
   likedThreadIds String[]  @db.ObjectId
+  savedThreads   threads[] @relation("Saves", fields: [savedThreadIds], references: [id])
+  savedThreadIds String[]  @db.ObjectId
 }
 
 model threads {
@@ -42,6 +44,8 @@ model threads {
   updatedAt      DateTime  @updatedAt
   likedByUsers   users[]   @relation("Likes", fields: [likedByUserIds], references: [id])
   likedByUserIds String[]  @db.ObjectId
+  savedByUsers   users[]   @relation("Saves", fields: [savedByUserIds], references: [id])
+  savedByUserIds String[]  @db.ObjectId
 }
 
 model contents {
