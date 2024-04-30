@@ -1,14 +1,14 @@
 import { Modal } from "antd";
 import clsx from "clsx";
 import { X } from "lucide-react";
-import { FC, useState } from "react";
+import { CSSProperties, FC, useState } from "react";
 
 interface ImagePreview {
+  imageStyle?: CSSProperties;
   src: string;
-  type: "single" | "multiple";
 }
 
-export const ImagePreview: FC<ImagePreview> = ({ src, type }) => {
+export const ImagePreview: FC<ImagePreview> = ({ imageStyle, src }) => {
   const [open, setOpen] = useState<boolean>(false);
   return (
     <div
@@ -18,14 +18,7 @@ export const ImagePreview: FC<ImagePreview> = ({ src, type }) => {
         setOpen(true);
       }}
     >
-      <img
-        className={clsx(
-          type === "single"
-            ? "object-contain h-full max-h-[400px]"
-            : "object-cover h-full"
-        )}
-        src={src}
-      />
+      <img src={src} style={imageStyle} />
       <Modal
         className="preview-image-modal"
         footer={[]}

@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
 
 export type CreateUserArg = {
@@ -9,16 +10,6 @@ export type CreateUserArg = {
   avatar?: string;
   bio?: string;
   links?: string[];
-};
-
-export type GetUserResponse = {
-  id: string;
-  userId: string;
-  username: string | null;
-  name: string;
-  avatar: string | null;
-  bio: string | null;
-  links: string[];
 };
 
 export type UpdateUserArg = {
@@ -32,12 +23,16 @@ export const createUserService = async (args: CreateUserArg): Promise<void> => {
   await prisma.users.create({ data: { ...args } });
 };
 
+export type GetUserResponse = Prisma.usersGetPayload<{}>;
+
 export const getUserService = async (
-  userId: string
+  userId?: string,
+  username?: string
 ): Promise<GetUserResponse | null> => {
-  const user = await prisma.users.findUnique({
+  const user = await prisma.users.findFirst({
     where: {
-      userId,
+      ...(userId ? { userId } : {}),
+      ...(username ? { username } : {}),
     },
   });
   return user;

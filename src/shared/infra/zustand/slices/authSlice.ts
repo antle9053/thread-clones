@@ -1,15 +1,8 @@
 import { StateCreator } from "zustand";
 import { AppState, setAppState } from "../types";
+import { GetUserResponse } from "@/src/shared/services/user.service";
 
-export interface User {
-  id: string;
-  userId: string;
-  name: string;
-  username: string | null;
-  avatar: string | null;
-  bio: string | null;
-  links: string[];
-}
+export type User = GetUserResponse;
 
 export interface AuthSlice {
   user: User | null;

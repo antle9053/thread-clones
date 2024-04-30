@@ -30,6 +30,10 @@ model users {
   likedThreadIds String[]  @db.ObjectId
   savedThreads   threads[] @relation("Saves", fields: [savedThreadIds], references: [id])
   savedThreadIds String[]  @db.ObjectId
+  followedBy     users[]   @relation("UserFollows", fields: [followedByIDs], references: [id])
+  followedByIDs  String[]  @db.ObjectId
+  following      users[]   @relation("UserFollows", fields: [followingIDs], references: [id])
+  followingIDs   String[]  @db.ObjectId
 }
 
 model threads {

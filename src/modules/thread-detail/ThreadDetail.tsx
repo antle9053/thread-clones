@@ -5,13 +5,6 @@ import { useParams } from "next/navigation";
 import { useWindowSize } from "usehooks-ts";
 import { ThreadDetailItem } from "./components/ThreadDetailItem";
 import { useThreadDetail } from "./hooks/useThreadDetail";
-import { MoreHorizontal } from "lucide-react";
-import moment from "moment";
-import { Render } from "../home/components/Render";
-import { Media } from "@/src/modules/home/components/Media";
-import { Gif } from "@giphy/react-components";
-import { Poll } from "@/src/modules/home/components/Poll";
-import { fetchGif } from "@/src/shared/infra/giphy";
 import { ThreadDetailParentItem } from "./components/ThreadDetailParentItem";
 
 interface ThreadDetailProps {}

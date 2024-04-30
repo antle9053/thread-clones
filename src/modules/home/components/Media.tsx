@@ -15,7 +15,14 @@ export const Media: FC<MediaProps> = ({ files }) => {
       {files.length === 1 ? (
         <div className="relative w-full rounded-xl overflow-hidden flex justify-center border border-solid border-slate-200">
           {files[0].type.includes("image") ? (
-            <ImagePreview src={files[0].url} type="single" />
+            <ImagePreview
+              imageStyle={{
+                objectFit: "contain",
+                height: "100%",
+                maxHeight: "400px",
+              }}
+              src={files[0].url}
+            />
           ) : (
             <ReactPlayer
               controls
@@ -37,7 +44,13 @@ export const Media: FC<MediaProps> = ({ files }) => {
               key={index}
             >
               {type.includes("image") ? (
-                <ImagePreview src={url} type="multiple" />
+                <ImagePreview
+                  imageStyle={{
+                    objectFit: "cover",
+                    height: "100%",
+                  }}
+                  src={url}
+                />
               ) : (
                 <ReactPlayer
                   controls

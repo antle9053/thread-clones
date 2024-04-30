@@ -6,7 +6,6 @@ import {
   Repeat,
   Send,
 } from "lucide-react";
-import moment from "moment";
 import { FC, useEffect, useState } from "react";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "../../threads/zustand/threadsSlice";
@@ -21,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { Like } from "./Like";
 import { threadActionSelectors } from "../zustand/threadActionSlice";
 import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
+import { UserAvatar } from "./User";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -64,18 +64,16 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
   const { width = 0 } = useWindowSize();
 
   const gifWidth = width > 600 ? 492 : width - 108;
+  console.log(author);
 
   return (
     <div
       className="w-full bg-white border-b-[0.5px] border-solid border-black/10 p-4"
-      onClick={() => router.push(`/${author?.username}/post/${id}`)}
+      onClick={() => router.push(`/@${author?.username}/post/${id}`)}
     >
       <div className="flex gap-3 items-stretch mb-2">
         <div className="basis-[48px] grow-0 flex flex-col">
-          <img
-            src={author?.avatar || ""}
-            className="w-[48px] h-[48px] rounded-full"
-          />
+          <UserAvatar user={author} />
           {numOfChilds > 0 ? (
             <div className="grow flex justify-center mt-2">
               <div className="w-[1px] bg-slate-300 h-full"></div>
@@ -84,7 +82,15 @@ export const Thread: FC<ThreadProps> = ({ data }) => {
         </div>
         <div className="basis-0 grow">
           <div className="w-full flex justify-between mb-2">
-            <span className="font-bold text-base">{author?.username}</span>
+            <span
+              className="font-bold text-base"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/@${author?.username}`);
+              }}
+            >
+              {author?.username}
+            </span>
             <div className="flex gap-2">
               <span className="text-[#666666]">{formatFromNow(createdAt)}</span>
 
