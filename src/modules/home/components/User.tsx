@@ -68,7 +68,7 @@ export const UserAvatar: FC<UserProps> = ({ user }) => {
           <div>
             <Button
               className={clsx(
-                "w-full border border-solid border-blackmin-h-10 mt-5",
+                "w-full border border-solid border-black min-h-10 mt-5",
                 followed ? "!bg-white !text-black" : "!bg-black !text-white"
               )}
               onClick={(e) => {

@@ -89,6 +89,20 @@
   }
 }
 
+// Tabs
+
+#content-tabs {
+  .ant-tabs-nav-list {
+    width: 100%;
+
+    .ant-tabs-tab {
+      display: block;
+      flex: 1;
+      text-align: center;
+    }
+  }
+}
+
 // ============================= //
 
 // SWIPER

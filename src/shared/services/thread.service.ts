@@ -147,13 +147,23 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
   };
 }>;
 
-export const getThreadsService = async (
-  userId?: string,
-  type?: pageType
-): Promise<GetThreadResponse[]> => {
+export const getThreadsService = async ({
+  authorId,
+  userId,
+  type,
+}: {
+  authorId?: string;
+  userId?: string;
+  type?: pageType;
+}): Promise<GetThreadResponse[]> => {
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
+      ...(authorId
+        ? {
+            authorId,
+          }
+        : {}),
       ...(userId
         ? type === "liked"
           ? {

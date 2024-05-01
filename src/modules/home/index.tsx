@@ -5,15 +5,19 @@ import { Loading } from "@/src/shared/components/ui/Loading";
 import { useGetThreads } from "./hooks/useGetThreads";
 import { Thread } from "./components/Thread";
 
-export type pageType = "home" | "liked" | "saved";
+export type pageType = "home" | "liked" | "saved" | "profile";
 
 interface HomeProps {
   pageType?: pageType;
+  profileId?: string;
 }
-export const Home: FC<HomeProps> = ({ pageType = "home" }) => {
+
+export const Home: FC<HomeProps> = ({ pageType = "home", profileId }) => {
   const { loading, threads } = useGetThreads({
     pageType,
+    profileId,
   });
+
   if (loading) {
     return <Loading fullPage />;
   }

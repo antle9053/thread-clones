@@ -25,7 +25,7 @@ export const useUser = ({ followedId }: UseUserProps) => {
 
   const fetchFollowed = useCallback(
     async (followedId: string) => {
-      if (user && user?.id) {
+      if (user && user?.id && followedId) {
         const res = await isFollowedService(user?.id, followedId);
         setFollowed(res);
       }

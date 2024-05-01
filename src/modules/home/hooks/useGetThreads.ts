@@ -12,9 +12,10 @@ import { pageType } from "..";
 
 interface UseGetThreadsProps {
   pageType?: pageType;
+  profileId?: string;
 }
 
-export const useGetThreads = ({ pageType }: UseGetThreadsProps) => {
+export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [threads, setThreads] = useState<GetThreadResponse[]>([]);
 
@@ -25,9 +26,16 @@ export const useGetThreads = ({ pageType }: UseGetThreadsProps) => {
       try {
         setLoading(true);
         let result: any;
-        if (pageType && user && user?.id)
-          result = await getThreadsService(user?.id, pageType);
-        else result = await getThreadsService();
+        if (profileId) {
+          result = await getThreadsService({
+            authorId: profileId,
+          });
+        } else if (pageType && user && user?.id)
+          result = await getThreadsService({
+            userId: user?.id,
+            type: pageType,
+          });
+        else result = await getThreadsService({});
         setThreads(result);
         setLoading(false);
       } catch (error) {
