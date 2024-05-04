@@ -167,7 +167,7 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
         <div className="flex gap-3 items-center px-4 pb-4">
           <div className="basis-[48px] grow-0 flex justify-center ">
             <Avatar.Group>
-              {child.map((item, index) => {
+              {child.map((item: any, index: number) => {
                 return (
                   <Avatar
                     key={index}
@@ -197,10 +197,10 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
       ) : (
         <div>
           {child
-            .filter((item) => {
+            .filter((item: any) => {
               return item.authorId === profileId;
             })
-            .map((item, index) => {
+            .map((item: any, index: number) => {
               return (
                 <ThreadReply key={index} gifWidth={gifWidth} data={item} />
               );

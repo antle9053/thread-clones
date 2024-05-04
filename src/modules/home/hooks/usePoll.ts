@@ -29,7 +29,7 @@ export const usePoll = ({ contentId }: UsePollProps) => {
   const votes = useMemo(() => {
     if (data) {
       const { options } = data;
-      const allVotes = options.reduce((prev, current) => {
+      const allVotes = options.reduce((prev: any, current: any) => {
         return prev + current.userIds.length;
       }, 0);
       return allVotes;
@@ -40,7 +40,7 @@ export const usePoll = ({ contentId }: UsePollProps) => {
   const percentPerOption = useMemo(() => {
     if (data) {
       const { options } = data;
-      return options.map((option) => {
+      return options.map((option: any) => {
         if (votes === 0) return Number(0).toFixed(2);
         return ((option.userIds.length / votes) * 100).toFixed(2);
       });
@@ -72,7 +72,7 @@ export const usePoll = ({ contentId }: UsePollProps) => {
   );
 
   const votedByMe = useMemo(() => {
-    const votedOption = data?.options?.find((option) =>
+    const votedOption = data?.options?.find((option: any) =>
       option.userIds.includes(user?.id as string)
     );
     if (votedOption) return votedOption.id;

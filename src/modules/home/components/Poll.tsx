@@ -27,7 +27,7 @@ export const Poll: FC<PollProps> = ({ contentId }) => {
           <Spin />
         </div>
       ) : (
-        (data?.options ?? []).map((option, index: number) => (
+        (data?.options ?? []).map((option: any, index: number) => (
           <div
             key={index}
             className={clsx(

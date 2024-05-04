@@ -70,7 +70,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
           numOfLikes={likedByUserIds.length}
         />
         <div>
-          {child.map((item, index) => (
+          {child.map((item: any, index: number) => (
             <ThreadDetailItem
               key={index}
               id={item.id}
