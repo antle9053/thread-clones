@@ -432,3 +432,66 @@ export const deleteThreadService = async (threadId: string) => {
   });
   return true;
 };
+
+export const getRepliesThread = async (
+  userId: string
+): Promise<GetThreadResponse[]> => {
+  const threads = await prisma.threads.findMany({
+    where: {
+      authorId: userId,
+      NOT: {
+        parentId: null,
+      },
+    },
+  });
+  const result = await prisma.threads.findMany({
+    where: {
+      id: {
+        in: threads.map((thread) => thread.parentId as string),
+      },
+    },
+    include: {
+      author: true,
+      content: {
+        include: {
+          files: true,
+          tags: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
+        },
+      },
+      parent: true,
+      _count: {
+        select: {
+          child: true,
+          likedByUsers: true,
+        },
+      },
+      child: {
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              child: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return result;
+};

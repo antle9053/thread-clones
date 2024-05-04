@@ -62,7 +62,8 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
   return (
     <div
       className="border-b border-solid border-slate-200 p-4"
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         router.push(`/${author?.username}/post/${id}`);
       }}
     >

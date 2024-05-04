@@ -1,8 +1,9 @@
 import Mention from "@tiptap/extension-mention";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { suggestion } from "../suggestion";
 import Placeholder from "@tiptap/extension-placeholder";
+import { hashtagConfigure } from "../hashtags/hashtagSuggestion";
+import { mentionConfigure } from "../mentions/mentionSuggestion";
 
 interface UseTipTapProps {
   name: number;
@@ -13,12 +14,8 @@ export const useTipTap = ({ name, onChange }: UseTipTapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Mention.configure({
-        HTMLAttributes: {
-          class: "text-[#0095F6]",
-        },
-        suggestion,
-      }),
+      hashtagConfigure,
+      mentionConfigure,
       Placeholder.configure({
         placeholder: name === 0 ? "Start a thread..." : "Say more...",
       }),

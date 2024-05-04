@@ -50,4 +50,16 @@ export const updateUserService = async (
   });
 };
 
+export const getUsersService = async (
+  search: string
+): Promise<GetUserResponse[]> => {
+  return await prisma.users.findMany({
+    where: {
+      username: {
+        contains: search,
+      },
+    },
+  });
+};
+
 export const deleteUserService = async (userId: string) => {};

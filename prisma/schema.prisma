@@ -34,22 +34,26 @@ model users {
   followedByIDs  String[]  @db.ObjectId
   following      users[]   @relation("UserFollows", fields: [followingIDs], references: [id])
   followingIDs   String[]  @db.ObjectId
+  reposts        threads[] @relation("Reposts", fields: [repostIds], references: [id])
+  repostIds      String[]  @db.ObjectId
 }
 
 model threads {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  authorId       String
-  author         users     @relation(fields: [authorId], references: [userId])
-  content        contents?
-  parentId       String?   @db.ObjectId
-  parent         threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  child          threads[] @relation("ParentChilds")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  likedByUsers   users[]   @relation("Likes", fields: [likedByUserIds], references: [id])
-  likedByUserIds String[]  @db.ObjectId
-  savedByUsers   users[]   @relation("Saves", fields: [savedByUserIds], references: [id])
-  savedByUserIds String[]  @db.ObjectId
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  authorId          String
+  author            users     @relation(fields: [authorId], references: [userId])
+  content           contents?
+  parentId          String?   @db.ObjectId
+  parent            threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  child             threads[] @relation("ParentChilds")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  likedByUsers      users[]   @relation("Likes", fields: [likedByUserIds], references: [id])
+  likedByUserIds    String[]  @db.ObjectId
+  savedByUsers      users[]   @relation("Saves", fields: [savedByUserIds], references: [id])
+  savedByUserIds    String[]  @db.ObjectId
+  repostedByUsers   users[]   @relation("Reposts", fields: [repostedByUserIds], references: [id])
+  repostedByUserIds String[]  @db.ObjectId
 }
 
 model contents {

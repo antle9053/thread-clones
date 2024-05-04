@@ -1,6 +1,5 @@
 import React, { FC } from "react";
 import Link from "next/link";
-
 import parse, { HTMLReactParserOptions, domToReact } from "html-react-parser";
 
 interface RenderProps {
@@ -17,6 +16,7 @@ const options: HTMLReactParserOptions = {
         <Link
           href={`/search?q=${attribs["data-id"]}`}
           className="text-[#0095F6]"
+          onClick={(e) => e.stopPropagation()}
         >
           {domToReact(children, options)}
         </Link>

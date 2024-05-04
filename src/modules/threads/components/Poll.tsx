@@ -50,7 +50,6 @@ export const Poll: FC<PollProps> = ({ form, name, onRemove }) => {
                             add({ option: "" });
                           } else {
                             const { poll } = currentThread;
-                            console.log(poll?.[key - 1]?.option);
                             if (poll?.[key - 1]?.option === "") {
                               Object.assign(currentThread, {
                                 ...currentThread,

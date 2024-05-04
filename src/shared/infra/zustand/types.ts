@@ -4,6 +4,7 @@ import { ThemeSlice } from "./slices/themeSlice";
 import { AuthSlice } from "./slices/authSlice";
 import { ThreadsSlice } from "@/src/modules/threads/zustand/threadsSlice";
 import { ThreadActionSlice } from "@/src/modules/home/zustand/threadActionSlice";
+import { RepostSlice } from "@/src/modules/home/zustand/repostSlice";
 
 export type AppState = {
   foo: FooSlice;
@@ -11,7 +12,8 @@ export type AppState = {
   //auth: AuthSlice;
 } & AuthSlice &
   ThreadsSlice &
-  ThreadActionSlice;
+  ThreadActionSlice &
+  RepostSlice;
 
 export type setAppState = StoreApi<AppState>["setState"];
 export type getAppState = StoreApi<AppState>["getState"];

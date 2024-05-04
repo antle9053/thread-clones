@@ -6,11 +6,11 @@ import React, {
 } from "react";
 import clsx from "clsx";
 
-export type MentionListRef = {
+export type HashtagListRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
 };
 
-export const MentionList = forwardRef<MentionListRef, any>((props, ref) => {
+export const HashtagList = forwardRef<HashtagListRef, any>((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const selectItem = (index: number) => {
@@ -60,7 +60,8 @@ export const MentionList = forwardRef<MentionListRef, any>((props, ref) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md text-opacity-80 text-sm overflow-hidden p-1 relative">
-      {props.query.length >= 1 ? (
+      {props.query.length >= 1 &&
+      !props.items.every((item: string) => item === props.query) ? (
         <button
           className={clsx(
             `bg-transparent border border-solid border-transparent rounded-md block m-0 py-1 px-2 text-primary text-left w-full`
@@ -93,4 +94,4 @@ export const MentionList = forwardRef<MentionListRef, any>((props, ref) => {
   );
 });
 
-MentionList.displayName = "MentionList";
+HashtagList.displayName = "HashtagList";

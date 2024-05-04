@@ -11,6 +11,7 @@ import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Loading } from "../ui/Loading";
 import { CreateThread } from "@/src/modules/threads/CreateThread";
 import { ThreadAction } from "./Drawer/ThreadAction";
+import { Repost } from "@/src/shared/components/common/Drawer/Repost";
 
 const { Header, Content } = Layout;
 
@@ -47,6 +48,7 @@ export const MainLayout = ({
         <MobileNavbar />
         <CreateThread />
         <ThreadAction />
+        <Repost />
       </Content>
     </Layout>
   );

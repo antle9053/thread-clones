@@ -3,19 +3,21 @@ import tippy from "tippy.js";
 
 import { MentionList, MentionListRef } from "./MentionList";
 import { SuggestionKeyDownProps, SuggestionProps } from "@tiptap/suggestion";
-import { MentionOptions } from "@tiptap/extension-mention";
-import { getTagsService } from "@/src/shared/services/tags.service";
+import Mention, { MentionOptions } from "@tiptap/extension-mention";
+import { getUsersService } from "@/src/shared/services/user.service";
+import { PluginKey } from "@tiptap/pm/state";
 
-export const suggestion: MentionOptions["suggestion"] = {
+const mentionSuggestion: MentionOptions["suggestion"] = {
   allowSpaces: true,
-  char: "#",
+  char: "@",
   items: async ({ query }) => {
     if (query.length >= 1) {
-      const tags = await getTagsService(query);
-      return tags.map((tag) => tag.title);
+      const users = await getUsersService(query);
+      return users;
     }
     return [];
   },
+  pluginKey: new PluginKey("mention"),
 
   render: () => {
     let component: ReactRenderer<MentionListRef>;
@@ -73,3 +75,12 @@ export const suggestion: MentionOptions["suggestion"] = {
     };
   },
 };
+
+export const mentionConfigure = Mention.extend({
+  name: "mention",
+}).configure({
+  HTMLAttributes: {
+    class: "text-[#0095F6]",
+  },
+  suggestion: mentionSuggestion,
+});

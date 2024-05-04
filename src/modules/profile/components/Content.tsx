@@ -21,7 +21,7 @@ export const Content: FC<ContentProps> = ({ profileId }) => {
     {
       key: "replies",
       label: "Replies",
-      children: "Content of Tab Pane 2",
+      children: <Home pageType="replies" profileId={profileId} />,
     },
     {
       key: "reposts",

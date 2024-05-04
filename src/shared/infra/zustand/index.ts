@@ -1,3 +1,4 @@
+import { createRepostSlice } from "./../../../modules/home/zustand/repostSlice";
 import { createThreadActionSlice } from "./../../../modules/home/zustand/threadActionSlice";
 import { StoreApi, create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
@@ -25,5 +26,6 @@ export const useAppStore = create<AppState>()(
     })(set, get, api),
     ...createThreadsSlice(set, get, api),
     ...createThreadActionSlice(set, get, api),
+    ...createRepostSlice(set, get, api),
   })
 );

@@ -4,6 +4,7 @@ import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
   GetThreadResponse,
+  getRepliesThread,
   getThreadsService,
 } from "@/src/shared/services/thread.service";
 import { message } from "antd";
@@ -27,9 +28,13 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
         setLoading(true);
         let result: any;
         if (profileId) {
-          result = await getThreadsService({
-            authorId: profileId,
-          });
+          if (pageType === "profile")
+            result = await getThreadsService({
+              authorId: profileId,
+            });
+          else if (pageType === "replies") {
+            result = await getRepliesThread(profileId);
+          }
         } else if (pageType && user && user?.id)
           result = await getThreadsService({
             userId: user?.id,

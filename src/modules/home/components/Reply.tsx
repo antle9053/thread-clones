@@ -1,4 +1,4 @@
-import { GetThreadResponse } from "@/src/shared/services/thread.service";
+import { Prisma } from "@prisma/client";
 import {
   Heart,
   MessageCircle,
@@ -6,47 +6,39 @@ import {
   Repeat,
   Send,
 } from "lucide-react";
+import moment from "moment";
 import { FC, useEffect, useState } from "react";
-import { useAppStore } from "@/src/shared/infra/zustand";
-import { threadsSelectors } from "../../threads/zustand/threadsSlice";
-import { Avatar, Popover } from "antd";
-import { Media } from "./Media";
+import { Poll } from "@/src/modules/home/components/Poll";
+import { Render } from "@/src/modules/home/components/Render";
+import { Media } from "@/src/modules/home/components/Media";
 import { Gif } from "@giphy/react-components";
-import { useWindowSize } from "usehooks-ts";
 import { fetchGif } from "@/src/shared/infra/giphy";
-import { Render } from "./Render";
-import { Poll } from "./Poll";
 import { useRouter } from "next/navigation";
-import { Like } from "./Like";
-import { threadActionSelectors } from "../zustand/threadActionSlice";
-import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
-import { UserAvatar } from "./User";
-import { ThreadDetailItem } from "../../thread-detail/components/ThreadDetailItem";
-import { ThreadReply } from "./Reply";
-import { Repost } from "./Repost";
 
-interface ThreadProps {
-  data: GetThreadResponse;
-  profileId?: string;
-  type?: string;
+import { useAppStore } from "@/src/shared/infra/zustand";
+import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
+import { Like } from "../../home/components/Like";
+import { UserAvatar } from "./User";
+import { threadActionSelectors } from "../zustand/threadActionSlice";
+import { GetThreadResponse } from "@/src/shared/services/thread.service";
+
+interface ThreadReplyProps {
+  data: GetThreadResponse | any;
+  gifWidth: number;
 }
 
-export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
+export const ThreadReply: FC<ThreadReplyProps> = ({ data, gifWidth }) => {
   const {
     id,
     author,
     content,
     createdAt,
-    child,
-    likedByUserIds,
-    _count: { child: numOfChilds },
+    _count: { child: numOfChilds, likedByUsers: numOfLikes },
   } = data;
 
-  const [initLike, setInitLike] = useState<number>(likedByUserIds.length);
-
   const router = useRouter();
-
   const [gif, setGif] = useState<any>(null);
+  const [initLike, setInitLike] = useState<number>(numOfLikes);
 
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
@@ -66,23 +58,17 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     initGif();
   }, [content?.contentType, content?.gif]);
 
-  const { width = 0 } = useWindowSize();
-
-  const gifWidth = width > 600 ? 492 : width - 108;
-
   return (
     <div
-      className="w-full bg-white border-b-[0.5px] border-solid border-black/10"
-      onClick={() => router.push(`/@${author?.username}/post/${id}`)}
+      className="border-b border-solid border-slate-200 p-4 !pt-0"
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/${author?.username}/post/${id}`);
+      }}
     >
-      <div className="flex gap-3 items-stretch pt-4 px-4 mb-2">
-        <div className="basis-[48px] grow-0 flex flex-col">
+      <div className="flex gap-3 items-stretch mb-2">
+        <div className="basis-[48px] grow-0">
           <UserAvatar user={author} />
-          {numOfChilds > 0 ? (
-            <div className="grow flex justify-center mt-2">
-              <div className="w-[1px] bg-slate-300 h-full"></div>
-            </div>
-          ) : null}
         </div>
         <div className="basis-0 grow">
           <div className="w-full flex justify-between mb-2">
@@ -96,7 +82,9 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
               {author?.username}
             </span>
             <div className="flex gap-2">
-              <span className="text-[#666666]">{formatFromNow(createdAt)}</span>
+              <span className="text-[#666666]">
+                {moment(createdAt).fromNow()}
+              </span>
 
               <div
                 className="text-black/50"
@@ -110,7 +98,6 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
               </div>
             </div>
           </div>
-
           <div className="w-full mb-2">
             {content?.text ? <Render content={content?.text ?? ""} /> : null}
           </div>
@@ -139,12 +126,14 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
             >
               <MessageCircle />
             </div>
-            <Repost thread={data} />
+            <div className="h-full w-[36px] flex items-center">
+              <Repeat />
+            </div>
             <div className="h-full w-[36px] flex items-center">
               <Send />
             </div>
           </div>
-          {type === "replies" ? (
+          <div className="flex gap-3 items-center">
             <div>
               {numOfChilds > 0 ? (
                 <span className="text-[#888888] text-base">
@@ -160,53 +149,9 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
                 </span>
               ) : null}
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
-      {type !== "replies" ? (
-        <div className="flex gap-3 items-center px-4 pb-4">
-          <div className="basis-[48px] grow-0 flex justify-center ">
-            <Avatar.Group>
-              {child.map((item, index) => {
-                return (
-                  <Avatar
-                    key={index}
-                    src={item?.author?.avatar || ""}
-                    className="w-[20px] h-[20px] rounded-full"
-                  ></Avatar>
-                );
-              })}
-            </Avatar.Group>
-          </div>
-          <div>
-            {numOfChilds > 0 ? (
-              <span className="text-[#888888] text-base">
-                {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
-              </span>
-            ) : null}
-            {numOfChilds > 0 && initLike > 0 ? (
-              <span>&nbsp;·&nbsp;</span>
-            ) : null}
-            {initLike > 0 ? (
-              <span className="text-[#888888] text-base">
-                {initLike} {initLike === 1 ? "like" : "likes"}
-              </span>
-            ) : null}
-          </div>
-        </div>
-      ) : (
-        <div>
-          {child
-            .filter((item) => {
-              return item.authorId === profileId;
-            })
-            .map((item, index) => {
-              return (
-                <ThreadReply key={index} gifWidth={gifWidth} data={item} />
-              );
-            })}
-        </div>
-      )}
     </div>
   );
 };

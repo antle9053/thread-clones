@@ -167,8 +167,6 @@ export const useCreateThreadForm = ({
           };
         });
 
-      console.log(arg);
-
       if (user?.userId) {
         setOpen(false);
 
