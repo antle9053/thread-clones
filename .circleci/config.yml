@@ -3,6 +3,7 @@
 version: 2.1
 orbs:
   node: circleci/node@5
+  docker: circleci/docker@2.6.0
 jobs:
   build-node:
     # Build node project
@@ -23,19 +24,32 @@ jobs:
       - store_artifacts:
           path: ~/artifacts
           destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+  build-and-push:
+    environment:
+      DOCKER_IMAGE: thread-clone
+    executor: docker/docker
     steps:
-      # Replace this with steps to deploy to users
+      - setup_remote_docker
+      - checkout
+      - docker/check:
+          docker-username: DOCKER_LOGIN
+          docker-password: DOCKER_PASSWORD
+      - docker/build:
+          image: $DOCKER_IMAGE
+      - docker/push:
+          digest-path: /tmp/digest.txt
+          image: $DOCKER_IMAGE
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          command: |
+            echo "Digest is: $(</tmp/digest.txt)"
 workflows:
   build:
     jobs:
       - build-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+      - build-and-push:
+          requires:
+            - build-node
+          filters:
+            branches:
+              only:
+                - master
