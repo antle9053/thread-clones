@@ -26,7 +26,8 @@ jobs:
           destination: node-build
   build-and-push:
     environment:
-      DOCKER_IMAGE: thread-clone
+      DOCKER_IMAGE: anthony847/thread-clone
+      DOCKER_TAG: latest
     executor: docker/docker
     steps:
       - setup_remote_docker
@@ -36,9 +37,11 @@ jobs:
           docker-password: DOCKER_PASSWORD
       - docker/build:
           image: $DOCKER_IMAGE
+          tag: $DOCKER_TAG
       - docker/push:
           digest-path: /tmp/digest.txt
           image: $DOCKER_IMAGE
+          tag: $DOCKER_TAG
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
