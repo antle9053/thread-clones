@@ -55,7 +55,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: SHA256:zYUuIbO2/2dhHPH4WrD7YMkacVSd2nGitTBN/CPYN7s
       - run:
-          command: ssh -oStrictHostKeyChecking=no root@170.64.220.89 './workspace/thread-clones/deploy.sh'
+          command: ssh -oStrictHostKeyChecking=no root@209.38.28.113 './workspace/thread-clones/deploy.sh'
 
 workflows:
   build:
