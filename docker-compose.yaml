@@ -3,6 +3,5 @@ version: "3.8"
 services:
   app:
     image: anthony847/thread-clone
-    network_mode: host
     ports:
       - 3000:3000
