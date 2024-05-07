@@ -53,6 +53,12 @@ jobs:
     executor: docker/docker
     steps:
       - run:
+          name: Install sshpass
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y sshpass
+      - run:
+          name: Run deployment script
           command: |
             sshpass -p ${SSH_PASSWORD} ssh -oStrictHostKeyChecking=no root@209.38.28.113 './workspace/thread-clones/deploy.sh'
 
