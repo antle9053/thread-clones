@@ -1,29 +1,32 @@
 # This config was automatically generated from your source code
 # Stacks detected: deps:node:.
+
 version: 2.1
+
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.6.0
+
 jobs:
   build-node:
-    # Build node project
     executor: node/default
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: npm run build
           command: npm run build
       - run:
           name: Create the ~/artifacts directory if it doesn't exist
           command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
       - run:
           name: Copy artifacts
           command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
       - store_artifacts:
           path: ~/artifacts
           destination: node-build
+
   build-and-push:
     environment:
       DOCKER_IMAGE: anthony847/thread-clone
@@ -45,6 +48,15 @@ jobs:
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
+
+  deploy:
+    executor: docker/docker
+    steps:
+      - add_ssh_key:
+          fingerprints: SHA256:zYUuIbO2/2dhHPH4WrD7YMkacVSd2nGitTBN/CPYN7s
+      - run:
+          command: ssh -oStrictHostKeyChecking=no root@152.42.200.240 './workspace/thread-clonse/deploy.sh'
+
 workflows:
   build:
     jobs:
@@ -56,3 +68,6 @@ workflows:
             branches:
               only:
                 - master
+      - deploy:
+          requires:
+            - build-and-push
