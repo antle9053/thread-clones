@@ -8,10 +8,6 @@ interface ContentProps {
 }
 
 export const Content: FC<ContentProps> = ({ profileId }) => {
-  const onChange = (key: string) => {
-    console.log(key);
-  };
-
   const items: TabsProps["items"] = [
     {
       key: "threads",
@@ -26,7 +22,7 @@ export const Content: FC<ContentProps> = ({ profileId }) => {
     {
       key: "reposts",
       label: "Reposts",
-      children: "Content of Tab Pane 3",
+      children: <Home pageType="reposts" profileId={profileId} />,
     },
   ];
 
@@ -35,9 +31,8 @@ export const Content: FC<ContentProps> = ({ profileId }) => {
       id="content-tabs"
       centered
       className=""
-      defaultActiveKey="threads"
+      defaultActiveKey="reposts"
       items={items}
-      onChange={onChange}
     />
   );
 };

@@ -24,6 +24,7 @@ import { UserAvatar } from "./User";
 import { ThreadDetailItem } from "../../thread-detail/components/ThreadDetailItem";
 import { ThreadReply } from "./Reply";
 import { Repost } from "./Repost";
+import moment from "moment";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -39,6 +40,7 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     createdAt,
     child,
     likedByUserIds,
+    reposted,
     _count: { child: numOfChilds },
   } = data;
 
@@ -75,6 +77,17 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
       className="w-full bg-white border-b-[0.5px] border-solid border-black/10"
       onClick={() => router.push(`/@${author?.username}/post/${id}`)}
     >
+      {reposted.length > 0 && type === "reposts" ? (
+        <div className="flex gap-3 items-center pt-4 px-4">
+          <div className="basis-[48px] grow-0">
+            <Repeat className="float-end" size={16} color="#999999" />
+          </div>
+          <span className="text-sm text-[#999999] block">
+            {reposted[0].user.username} has reposted{" "}
+            {moment(reposted[0].repostedAt).fromNow()}
+          </span>
+        </div>
+      ) : null}
       <div className="flex gap-3 items-stretch pt-4 px-4 mb-2">
         <div className="basis-[48px] grow-0 flex flex-col">
           <UserAvatar user={author} />

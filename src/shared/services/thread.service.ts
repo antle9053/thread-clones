@@ -105,6 +105,11 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
   include: {
     author: true;
     parent: true;
+    reposted: {
+      include: {
+        user: true;
+      };
+    };
     content: {
       include: {
         files: true;
@@ -153,7 +158,7 @@ export const getThreadsService = async ({
   type,
 }: {
   authorId?: string;
-  userId?: string;
+  userId: string;
   type?: pageType;
 }): Promise<GetThreadResponse[]> => {
   const result = await prisma.threads.findMany({
@@ -164,25 +169,39 @@ export const getThreadsService = async ({
             authorId,
           }
         : {}),
-      ...(userId
-        ? type === "liked"
-          ? {
-              likedByUserIds: {
-                has: userId,
+      ...(type === "liked"
+        ? {
+            likedByUserIds: {
+              has: userId,
+            },
+          }
+        : type === "saved"
+        ? {
+            savedByUserIds: {
+              has: userId,
+            },
+          }
+        : type === "reposts"
+        ? {
+            reposted: {
+              some: {
+                userId,
               },
-            }
-          : type === "saved"
-          ? {
-              savedByUserIds: {
-                has: userId,
-              },
-            }
-          : {}
+            },
+          }
         : {}),
     },
     include: {
       author: true,
       parent: true,
+      reposted: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
       content: {
         include: {
           files: true,
@@ -229,7 +248,8 @@ export const getThreadsService = async ({
 };
 
 export const getThreadByIdService = async (
-  id: string
+  id: string,
+  userId: string
 ): Promise<GetThreadResponse | null> => {
   const result = await prisma.threads.findFirst({
     where: {
@@ -249,6 +269,14 @@ export const getThreadByIdService = async (
         },
       },
       parent: true,
+      reposted: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
       _count: {
         select: {
           child: true,
@@ -436,6 +464,11 @@ export const deleteThreadService = async (threadId: string) => {
 export const getRepliesThread = async (
   userId: string
 ): Promise<GetThreadResponse[]> => {
+  const user = await prisma.users.findUnique({
+    where: {
+      userId,
+    },
+  });
   const threads = await prisma.threads.findMany({
     where: {
       authorId: userId,
@@ -464,6 +497,14 @@ export const getRepliesThread = async (
         },
       },
       parent: true,
+      reposted: {
+        where: {
+          userId: user?.id,
+        },
+        include: {
+          user: true,
+        },
+      },
       _count: {
         select: {
           child: true,

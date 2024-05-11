@@ -10,6 +10,7 @@ import {
 import { message } from "antd";
 import { useEffect, useState } from "react";
 import { pageType } from "..";
+import { getListRepostedsByUser } from "@/src/shared/services/repost.service";
 
 interface UseGetThreadsProps {
   pageType?: pageType;
@@ -31,16 +32,22 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
           if (pageType === "profile")
             result = await getThreadsService({
               authorId: profileId,
+              userId: user?.id as string,
             });
           else if (pageType === "replies") {
             result = await getRepliesThread(profileId);
+          } else if (pageType === "reposts") {
+            result = await getThreadsService({
+              userId: user?.id as string,
+              type: pageType,
+            });
           }
         } else if (pageType && user && user?.id)
           result = await getThreadsService({
             userId: user?.id,
             type: pageType,
           });
-        else result = await getThreadsService({});
+        else result = await getThreadsService({ userId: user?.id as string });
         setThreads(result);
         setLoading(false);
       } catch (error) {

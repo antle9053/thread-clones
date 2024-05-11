@@ -14,6 +14,7 @@ export const Repost: FC<RepostProps> = ({ thread }) => {
   return (
     <div className="h-full w-[36px] flex items-center">
       <Repeat
+        color={thread.reposted.length > 0 ? " #00FF00" : "black"}
         onClick={(e) => {
           e.stopPropagation();
           setOpen(true);
