@@ -2,8 +2,6 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: anthony847/thread-clone
     ports:
       - 3000:3000
