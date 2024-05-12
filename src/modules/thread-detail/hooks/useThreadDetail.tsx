@@ -1,3 +1,5 @@
+import { useAppStore } from "@/src/shared/infra/zustand";
+import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
   GetThreadResponse,
   getThreadByIdService,
@@ -13,9 +15,11 @@ export const useThreadDetail = ({ postId }: UseThreadDetailProps) => {
   const [data, setData] = useState<GetThreadResponse | null>(null);
   const [ancestor, setAncestors] = useState<GetThreadResponse[]>([]);
 
+  const user = useAppStore(authSelectors.user);
+
   useEffect(() => {
     const fetchThread = async () => {
-      const res = await getThreadByIdService(postId);
+      const res = await getThreadByIdService(postId, user?.id as string);
       if (res) {
         setData(res);
       } else {
@@ -23,10 +27,10 @@ export const useThreadDetail = ({ postId }: UseThreadDetailProps) => {
       }
     };
     fetchThread();
-  }, [postId]);
+  }, [postId, user]);
 
   const fetchAncestors = async (parentId: string) => {
-    const res = await getThreadByIdService(parentId);
+    const res = await getThreadByIdService(parentId, user?.id as string);
 
     if (res && res?.parent) {
       const parent = res.parent;
