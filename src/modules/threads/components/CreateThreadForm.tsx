@@ -22,6 +22,7 @@ import { TipTap } from "@/src/shared/components/utils/TipTap";
 import { Tags } from "./Toolbar/Tags";
 import { Render } from "../../home/components/Render";
 import { Poll } from "./Poll";
+import { Quote } from "./Quote";
 
 export type ThreadType = "text" | "media" | "gif" | "poll";
 
@@ -327,6 +328,7 @@ export const CreateThreadForm = forwardRef<
                                 ) : null}
                               </div>
                             )}
+                            <Quote />
                           </div>
                         </div>
                       );

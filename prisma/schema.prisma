@@ -52,13 +52,16 @@ model threads {
   savedByUsers   users[]   @relation("Saves", fields: [savedByUserIds], references: [id])
   savedByUserIds String[]  @db.ObjectId
   reposted       reposts[]
+  quotedThread   threads?  @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quotedThreadId String?   @unique @db.ObjectId
+  quotedByThread threads?  @relation("Quotes")
 }
 
 model reposts {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  thread     threads  @relation(fields: [threadId], references: [id])
+  thread     threads  @relation(fields: [threadId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   threadId   String   @db.ObjectId
-  user       users    @relation(fields: [userId], references: [id])
+  user       users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId     String   @db.ObjectId
   repostedAt DateTime @default(now())
 }

@@ -7,6 +7,7 @@ import {
   deleteRepostThreadService,
   repostThreadService,
 } from "../services/repost.service";
+import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 
 export const useRepost = () => {
   const [isSelf, setIsSelf] = useState<boolean | null>(null);
@@ -17,6 +18,9 @@ export const useRepost = () => {
   const thread = useAppStore(repostSelectors.thread);
 
   const user = useAppStore(authSelectors.user);
+
+  const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
+  const setQuote = useAppStore(threadsSelectors.setQuote);
 
   useEffect(() => {
     if (thread && user?.id) {
@@ -61,6 +65,13 @@ export const useRepost = () => {
     }
   }, [thread, user]);
 
+  const handleSetQuote = useCallback(() => {
+    if (thread) {
+      setQuote(thread);
+      setOpenCreateThread(true);
+    }
+  }, [thread]);
+
   return {
     isOpen,
     isReposted,
@@ -68,5 +79,6 @@ export const useRepost = () => {
     handleClose,
     handleDeleteRepost,
     handleRepost,
+    handleSetQuote,
   };
 };

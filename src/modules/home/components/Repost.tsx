@@ -3,6 +3,7 @@ import { Repeat } from "lucide-react";
 import { FC } from "react";
 import { repostSelectors } from "../zustand/repostSlice";
 import { GetThreadResponse } from "@/src/shared/services/thread.service";
+import clsx from "clsx";
 
 interface RepostProps {
   thread: GetThreadResponse;
@@ -12,9 +13,13 @@ export const Repost: FC<RepostProps> = ({ thread }) => {
   const setOpen = useAppStore(repostSelectors.setOpenRepost);
   const setThread = useAppStore(repostSelectors.setThread);
   return (
-    <div className="h-full w-[36px] flex items-center">
+    <div
+      className={clsx(
+        "h-full w-[36px] flex items-center",
+        thread.reposted.length > 0 ? "text-primary" : "text-black"
+      )}
+    >
       <Repeat
-        color={thread.reposted.length > 0 ? " #00FF00" : "black"}
         onClick={(e) => {
           e.stopPropagation();
           setOpen(true);

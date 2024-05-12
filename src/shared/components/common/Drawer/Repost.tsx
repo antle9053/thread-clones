@@ -4,8 +4,14 @@ import clsx from "clsx";
 import { MessageSquareQuote, Repeat } from "lucide-react";
 
 export const Repost = () => {
-  const { isOpen, isReposted, handleClose, handleRepost, handleDeleteRepost } =
-    useRepost();
+  const {
+    isOpen,
+    isReposted,
+    handleClose,
+    handleRepost,
+    handleDeleteRepost,
+    handleSetQuote,
+  } = useRepost();
 
   return (
     <Drawer
@@ -29,7 +35,7 @@ export const Repost = () => {
           </span>
           <Repeat size={20} color={isReposted ? "#FF3040" : "black"} />
         </List.Item>
-        <List.Item className="!px-4">
+        <List.Item className="!px-4" onClick={handleSetQuote}>
           <span className="font-bold">Quote</span>
           <MessageSquareQuote size={20} />
         </List.Item>
