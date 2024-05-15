@@ -7,6 +7,7 @@ import { pageType } from "@/src/modules/home";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
+  quoteId?: string;
 };
 
 export type CreateContentArg = {
@@ -36,10 +37,11 @@ export const createThreadService = async (
     return;
   }
   const thread = threadArg[0];
-  const { content } = thread;
+  const { content, quoteId } = thread;
   const result = await prisma.threads.create({
     data: {
       authorId: authorId,
+      ...(quoteId ? { quotedThreadId: quoteId } : {}),
       ...(parentId ? { parentId } : {}),
       ...(content
         ? {

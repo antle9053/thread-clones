@@ -3,7 +3,6 @@
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "../zustand/threadsSlice";
 import moment from "moment";
-import { MoreHorizontal } from "lucide-react";
 import { Render } from "../../home/components/Render";
 import { Media } from "../../home/components/Media";
 import { Gif } from "@giphy/react-components";

@@ -37,6 +37,7 @@ export const useCreateThreadForm = ({
   const setOpen = useAppStore(threadsSelectors.setOpenCreateThread);
   const replyTo = useAppStore(threadsSelectors.replyTo);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
+  const quote = useAppStore(threadsSelectors.quote);
 
   const threadsValue = Form.useWatch("threads", form);
 
