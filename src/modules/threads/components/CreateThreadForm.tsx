@@ -328,7 +328,7 @@ export const CreateThreadForm = forwardRef<
                                 ) : null}
                               </div>
                             )}
-                            <Quote />
+                            <Quote type="create" />
                           </div>
                         </div>
                       );

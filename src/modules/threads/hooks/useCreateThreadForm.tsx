@@ -133,6 +133,7 @@ export const useCreateThreadForm = ({
           }));
           listTags.push(...tags.map((tag) => tag.title ?? ""));
           return {
+            ...(quote ? { quoteId: quote.id } : {}),
             content: {
               text: value.text ?? "",
               tags,

@@ -8,15 +8,44 @@ import { Media } from "../../home/components/Media";
 import { Gif } from "@giphy/react-components";
 import { Poll } from "../../home/components/Poll";
 import { useWindowSize } from "usehooks-ts";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { fetchGif } from "@/src/shared/infra/giphy";
+import {
+  GetThreadResponse,
+  getThreadByIdService,
+} from "@/src/shared/services/thread.service";
+import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 
-export const Quote = () => {
-  const quote = useAppStore(threadsSelectors.quote);
+interface QuoteProps {
+  type: "create" | "view";
+  quoteId?: string;
+}
+
+export const Quote: FC<QuoteProps> = ({ type, quoteId }) => {
+  const [quote, setQuote] = useState<GetThreadResponse | null>(null);
+  const quoteState = useAppStore(threadsSelectors.quote);
   const { author, content, createdAt } = quote || {};
   const [gif, setGif] = useState<any>(null);
   const { width = 0 } = useWindowSize();
   const gifWidth = width > 600 ? 568 : width - 32;
+
+  const user = useAppStore(authSelectors.user);
+
+  const fetchQuote = async (quoteId: string) => {
+    return await getThreadByIdService(quoteId, user?.id as string);
+  };
+
+  useEffect(() => {
+    const initQuote = async () => {
+      if (type === "create" && quoteState) {
+        setQuote(quoteState);
+      } else if (type === "view" && quoteId) {
+        const quote = await fetchQuote(quoteId);
+        setQuote(quote);
+      }
+    };
+    initQuote();
+  }, [type, quoteId]);
 
   useEffect(() => {
     const initGif = async () => {
@@ -28,7 +57,7 @@ export const Quote = () => {
     initGif();
   }, [content?.contentType, content?.gif]);
 
-  if (!quote) return null;
+  if (!quote && type === "create") return null;
 
   return (
     <div className="w-full p-3 border border-solid border-slate-200 my-2 rounded-md">

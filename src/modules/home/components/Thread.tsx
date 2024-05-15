@@ -25,6 +25,7 @@ import { ThreadDetailItem } from "../../thread-detail/components/ThreadDetailIte
 import { ThreadReply } from "./Reply";
 import { Repost } from "./Repost";
 import moment from "moment";
+import { Quote } from "../../threads/components/Quote";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -41,8 +42,11 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     child,
     likedByUserIds,
     reposted,
+    quotedThreadId,
     _count: { child: numOfChilds },
   } = data;
+
+  console.log(quotedThreadId);
 
   const [initLike, setInitLike] = useState<number>(likedByUserIds.length);
 
@@ -126,6 +130,11 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
 
           <div className="w-full mb-2">
             {content?.text ? <Render content={content?.text ?? ""} /> : null}
+          </div>
+          <div className="w-full mb-2">
+            {quotedThreadId ? (
+              <Quote type="view" quoteId={quotedThreadId} />
+            ) : null}
           </div>
 
           <div className="w-full">
