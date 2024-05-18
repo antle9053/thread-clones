@@ -51,3 +51,23 @@ export const isFollowedService = async (
   if (user) return true;
   return false;
 };
+
+export const listFollowingsService = async (profileId: string) => {
+  return await prisma.users.findMany({
+    where: {
+      followedByIDs: {
+        has: profileId,
+      },
+    },
+  });
+};
+
+export const listFollowedsService = async (profileId: string) => {
+  return await prisma.users.findMany({
+    where: {
+      followingIDs: {
+        has: profileId,
+      },
+    },
+  });
+};

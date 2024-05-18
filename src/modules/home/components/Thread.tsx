@@ -46,8 +46,6 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     _count: { child: numOfChilds },
   } = data;
 
-  console.log(quotedThreadId);
-
   const [initLike, setInitLike] = useState<number>(likedByUserIds.length);
 
   const router = useRouter();

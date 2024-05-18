@@ -10,6 +10,7 @@ import { useProfile } from "./hooks/useProfile";
 import { useUser } from "../home/hooks/useUser";
 import clsx from "clsx";
 import { Content } from "./components/Content";
+import { useFollow } from "@/src/shared/hooks/useFollows";
 
 export const Profile = () => {
   const params = useParams<{ username: string }>();
@@ -23,6 +24,8 @@ export const Profile = () => {
   const { followed, handleFollow, handleUnfollow } = useUser({
     followedId: profile?.id ?? "",
   });
+
+  const { handleOpen, setProfile } = useFollow();
 
   if (!profile) return <Skeleton />;
 
@@ -53,7 +56,13 @@ export const Profile = () => {
 
       <Row justify="start" align="middle" className="mb-6 px-4">
         <Col span="auto">
-          <p className="text-[15px] hover:underline underline-offset-2 text-[#999999]">
+          <p
+            className="text-[15px] hover:underline underline-offset-2 text-[#999999]"
+            onClick={() => {
+              setProfile(profile);
+              handleOpen();
+            }}
+          >
             {profile.followedByIDs.length} followers
           </p>
         </Col>

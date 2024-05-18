@@ -12,6 +12,7 @@ import { Loading } from "../ui/Loading";
 import { CreateThread } from "@/src/modules/threads/CreateThread";
 import { ThreadAction } from "./Drawer/ThreadAction";
 import { Repost } from "@/src/shared/components/common/Drawer/Repost";
+import { Follows } from "./Drawer/Follows";
 
 const { Header, Content } = Layout;
 
@@ -49,6 +50,7 @@ export const MainLayout = ({
         <CreateThread />
         <ThreadAction />
         <Repost />
+        <Follows />
       </Content>
     </Layout>
   );

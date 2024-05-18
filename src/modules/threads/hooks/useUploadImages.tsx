@@ -50,7 +50,6 @@ export const useUploadImages = () => {
   };
 
   const handleRemoveRow = (key: number) => {
-    console.log(key);
     setFileList((fileList) => {
       return fileList.map((files: UploadFile<any>[], index: number) =>
         index === key ? [] : files
