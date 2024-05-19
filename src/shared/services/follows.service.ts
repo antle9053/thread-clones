@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "../infra/prisma";
+import { Prisma } from "@prisma/client";
 
 export const followUserService = async (userId: string, followedId: string) => {
   await prisma.users.update({
@@ -52,7 +53,11 @@ export const isFollowedService = async (
   return false;
 };
 
-export const listFollowingsService = async (profileId: string) => {
+export type User = Prisma.usersGetPayload<{}>;
+
+export const listFollowingsService = async (
+  profileId: string
+): Promise<User[]> => {
   return await prisma.users.findMany({
     where: {
       followedByIDs: {
@@ -62,7 +67,9 @@ export const listFollowingsService = async (profileId: string) => {
   });
 };
 
-export const listFollowedsService = async (profileId: string) => {
+export const listFollowedsService = async (
+  profileId: string
+): Promise<User[]> => {
   return await prisma.users.findMany({
     where: {
       followingIDs: {
