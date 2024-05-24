@@ -1,3 +1,4 @@
+import { StateCreator } from "zustand";
 import { AppState, getAppState, setAppState } from "../types";
 
 export const arrColors = [
@@ -14,13 +15,15 @@ export interface ThemeSlice {
   changeColor: (_color: themeColor) => void;
 }
 
-export const createThemeSlice = (set: setAppState, get: getAppState) => ({
+export const createThemeSlice: StateCreator<ThemeSlice> = (
+  set: setAppState
+) => ({
   color: "00bbf9" as themeColor,
   changeColor: (_color: themeColor) =>
-    set((state: AppState) => ({ theme: { ...state.theme, color: _color } })),
+    set((state: AppState) => ({ ...state, color: _color })),
 });
 
 export const themeSelectors = {
-  color: (state: AppState) => state.theme.color,
-  changeColor: (state: AppState) => state.theme.changeColor,
+  color: (state: AppState) => state.color,
+  changeColor: (state: AppState) => state.changeColor,
 };

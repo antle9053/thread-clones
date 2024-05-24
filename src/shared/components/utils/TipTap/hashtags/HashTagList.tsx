@@ -61,7 +61,8 @@ export const HashtagList = forwardRef<HashtagListRef, any>((props, ref) => {
   return (
     <div className="bg-white rounded-lg shadow-md text-opacity-80 text-sm overflow-hidden p-1 relative">
       {props.query.length >= 1 &&
-      !props.items.every((item: string) => item === props.query) ? (
+      (!props.items.every((item: string) => item === props.query) ||
+        props.items.length === 0) ? (
         <button
           className={clsx(
             `bg-transparent border border-solid border-transparent rounded-md block m-0 py-1 px-2 text-primary text-left w-full`

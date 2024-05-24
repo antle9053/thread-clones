@@ -5,6 +5,7 @@ import React, {
   useState,
 } from "react";
 import clsx from "clsx";
+import Image from "next/image";
 
 export type MentionListRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean;
@@ -70,9 +71,13 @@ export const MentionList = forwardRef<MentionListRef, any>((props, ref) => {
               key={index}
               onClick={() => selectItem(index)}
             >
-              <div className="w-[36px] h-[36px] rounded-full overflow-hidden">
-                <img src={item.avatar} />
-              </div>
+              <Image
+                src={item.avatar}
+                alt="Avatar"
+                width={36}
+                height={36}
+                className="rounded-full"
+              />
               <div className="flex flex-col gap-1">
                 <span
                   className={clsx(

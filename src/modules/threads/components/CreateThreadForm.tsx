@@ -1,13 +1,6 @@
-import { Button, Dropdown, Form, Modal, Upload } from "antd";
+import { Button, Form, Modal, Upload } from "antd";
 import clsx from "clsx";
-import {
-  AlignLeft,
-  Images,
-  MoreHorizontal,
-  StickyNote,
-  Tag,
-  X,
-} from "lucide-react";
+import { AlignLeft, Images, MoreHorizontal, StickyNote, X } from "lucide-react";
 import { forwardRef, useImperativeHandle } from "react";
 import { useCreateThreadForm } from "../hooks/useCreateThreadForm";
 import moment from "moment";
@@ -23,6 +16,7 @@ import { Tags } from "./Toolbar/Tags";
 import { Render } from "../../home/components/Render";
 import { Poll } from "./Poll";
 import { Quote } from "./Quote";
+import Image from "next/image";
 
 export type ThreadType = "text" | "media" | "gif" | "poll";
 
@@ -127,9 +121,12 @@ export const CreateThreadForm = forwardRef<
             {thread ? (
               <div className="flex gap-3 mt-2 items-stretch">
                 <div className="basis-[48px] grow-0 flex flex-col">
-                  <img
+                  <Image
+                    alt="Author Avatar"
+                    width={48}
+                    height={48}
+                    className="rounded-full"
                     src={thread.author?.avatar || ""}
-                    className="w-[48px] h-[48px] rounded-full"
                   />
                   <div className="grow flex justify-center my-2">
                     <div className="w-[1px] bg-slate-300 h-full min-h-[10px]"></div>
@@ -166,9 +163,12 @@ export const CreateThreadForm = forwardRef<
                       return (
                         <div key={key} className="flex gap-3 items-stretch">
                           <div className="basis-[48px] grow-0 flex flex-col">
-                            <img
+                            <Image
+                              alt="User Avatar"
+                              width={48}
+                              height={48}
+                              className="rounded-full"
                               src={user?.avatar || ""}
-                              className="w-[48px] h-[48px] rounded-full"
                             />
                             <div className="grow flex justify-center my-2">
                               <div className="w-[1px] bg-slate-300 h-full"></div>
@@ -350,9 +350,12 @@ export const CreateThreadForm = forwardRef<
                       }}
                     >
                       <div className="basis-[48px] grow-0 flex justify-center ">
-                        <img
+                        <Image
+                          alt="User Avatar"
+                          width={36}
+                          height={36}
+                          className="rounded-full"
                           src={user?.avatar || ""}
-                          className="w-[36px] h-[36px] rounded-full"
                         />
                       </div>
                       <span className="text-slate-300 text-[14px]">
