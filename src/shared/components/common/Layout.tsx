@@ -11,8 +11,9 @@ import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Loading } from "../ui/Loading";
 import { CreateThread } from "@/src/modules/threads/CreateThread";
 import { ThreadAction } from "./Drawer/ThreadAction";
-import { Repost } from "@/src/shared/components/common/Drawer/Repost";
+import { Repost } from "./Drawer/Repost";
 import { Follows } from "./Drawer/Follows";
+import { Activity } from "./Drawer/Activity";
 
 const { Header, Content } = Layout;
 
@@ -51,6 +52,7 @@ export const MainLayout = ({
         <ThreadAction />
         <Repost />
         <Follows />
+        <Activity />
       </Content>
     </Layout>
   );

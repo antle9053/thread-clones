@@ -1,3 +1,4 @@
+import { createActivitySlice } from "./../../../modules/thread-detail/zustand/activitySlice";
 import { createFollowSlice } from "./../../../modules/profile/zustand/followSlice";
 import { createRepostSlice } from "./../../../modules/home/zustand/repostSlice";
 import { createThreadActionSlice } from "./../../../modules/home/zustand/threadActionSlice";
@@ -22,5 +23,6 @@ export const useAppStore = create<AppState>()(
     ...createThreadActionSlice(set, get, api),
     ...createRepostSlice(set, get, api),
     ...createFollowSlice(set, get, api),
+    ...createActivitySlice(set, get, api),
   })
 );

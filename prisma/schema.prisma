@@ -55,6 +55,7 @@ model threads {
   quotedThread   threads?  @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   quotedThreadId String?   @unique @db.ObjectId
   quotedByThread threads[]  @relation("Quotes")
+  views          Int @default(0)
 }
 
 model reposts {
