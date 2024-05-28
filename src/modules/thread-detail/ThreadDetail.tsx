@@ -6,6 +6,10 @@ import { useWindowSize } from "usehooks-ts";
 import { ThreadDetailItem } from "./components/ThreadDetailItem";
 import { useThreadDetail } from "./hooks/useThreadDetail";
 import { ThreadDetailParentItem } from "./components/ThreadDetailParentItem";
+import { Button } from "antd";
+import { ChevronRight } from "lucide-react";
+import { activitySelectors } from "./zustand/activitySlice";
+import { useAppStore } from "@/src/shared/infra/zustand";
 
 interface ThreadDetailProps {}
 
@@ -24,6 +28,9 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
       scrollToRef.current.scrollIntoView();
     }
   }, [data, scrollToRef, ancestor.length]);
+
+  const setOpen = useAppStore(activitySelectors.setOpenActivity);
+  const setThread = useAppStore(activitySelectors.setActivityThread);
 
   if (!data) return <></>;
 
@@ -69,6 +76,20 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
           numOfChilds={numOfChilds}
           numOfLikes={likedByUserIds.length}
         />
+        <div className="flex justify-between h-[50px] items-center px-4">
+          <span className="font-bold text-base">Replies</span>
+          <Button
+            className="flex items-center text-[#999999] !pr-0"
+            type="text"
+            onClick={() => {
+              setThread(data);
+              setOpen(true);
+            }}
+          >
+            View activity
+            <ChevronRight className="ml-1" size={13} color="#999999" />
+          </Button>
+        </div>
         <div>
           {child.map((item: any, index: number) => (
             <ThreadDetailItem

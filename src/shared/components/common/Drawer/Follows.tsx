@@ -12,7 +12,7 @@ interface UserItemProps {
   userId?: string;
 }
 
-const UserItem: FC<UserItemProps> = ({
+export const UserItem: FC<UserItemProps> = ({
   profile,
   handleFollow,
   handleUnfollow,
