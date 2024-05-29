@@ -82,3 +82,58 @@ export const getListRepostedsByUser = async (userId: string) => {
     });
   return [];
 };
+
+export const getListRepostedsByThread = async (threadId: string) => {
+  return await prisma.reposts.findMany({
+    where: {
+      threadId,
+    },
+    include: {
+      user: true,
+      thread: {
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          parent: true,
+          _count: {
+            select: {
+              child: true,
+              likedByUsers: true,
+            },
+          },
+          child: {
+            include: {
+              author: true,
+              content: {
+                include: {
+                  files: true,
+                  tags: true,
+                  poll: {
+                    include: {
+                      options: true,
+                    },
+                  },
+                },
+              },
+              _count: {
+                select: {
+                  child: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};

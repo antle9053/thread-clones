@@ -10,6 +10,7 @@ interface UserItemProps {
   handleFollow: (followedId: string) => void;
   handleUnfollow: (followedId: string) => void;
   userId?: string;
+  activityType?: string;
 }
 
 export const UserItem: FC<UserItemProps> = ({
@@ -17,14 +18,16 @@ export const UserItem: FC<UserItemProps> = ({
   handleFollow,
   handleUnfollow,
   userId,
+  activityType,
 }) => {
   return (
     <div className="flex p-4 !pb-0">
-      <div className="flex-0 pr-4">
+      <div className="flex-0 pr-4 relative">
         <img
           className="object-cover w-[36px] h-[36px] rounded-full"
           src={profile?.avatar || ""}
         />
+        {activityType ? <div className="absolute">activity</div> : null}
       </div>
       <div className="flex-1 flex justify-between items-center border-b border-solid border-slate-300 pb-4 min-h-[36px]">
         <div className="flex flex-col">

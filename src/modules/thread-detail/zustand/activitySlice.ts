@@ -4,21 +4,21 @@ import { StateCreator } from "zustand";
 
 export interface ActivitySlice {
   isOpenActivity: boolean;
-  activityThread?: GetThreadResponse;
+  activityThread?: GetThreadResponse | null;
 
   setOpenActivity: (_isOpen: boolean) => void;
-  setActivityThread: (_thread: GetThreadResponse) => void;
+  setActivityThread: (_thread: GetThreadResponse | null) => void;
 }
 
 export const createActivitySlice: StateCreator<ActivitySlice> = (
   set: setAppState
 ) => ({
   isOpenActivity: false,
-  activityThread: undefined,
+  activityThread: null,
 
   setOpenActivity: (_isOpen: boolean) =>
     set((state: AppState) => ({ ...state, isOpenActivity: _isOpen })),
-  setActivityThread: (_thread: GetThreadResponse) => {
+  setActivityThread: (_thread: GetThreadResponse | null) => {
     set((state: AppState) => ({ ...state, activityThread: _thread }));
   },
 });

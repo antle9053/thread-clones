@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export const Activity = () => {
-  const { isOpen, handleClose } = useActivity();
+  const { isOpen, handleClose, likes, quotes, requotes, views } = useActivity();
 
   return (
     <Drawer
@@ -41,7 +41,7 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              1,455 <ChevronRight />
+              {views} <ChevronRight />
             </Button>
           </div>
         </div>
@@ -55,7 +55,8 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              1,455 <ChevronRight />
+              {likes}
+              <ChevronRight />
             </Button>
           </div>
         </div>
@@ -69,7 +70,7 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              1,455 <ChevronRight />
+              {requotes} <ChevronRight />
             </Button>
           </div>
         </div>
@@ -83,7 +84,7 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              1,455 <ChevronRight />
+              {quotes} <ChevronRight />
             </Button>
           </div>
         </div>
