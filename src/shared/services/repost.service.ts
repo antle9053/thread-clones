@@ -52,7 +52,7 @@ export const getListRepostedsByUser = async (userId: string) => {
             _count: {
               select: {
                 child: true,
-                likedByUsers: true,
+                likes: true,
               },
             },
             child: {
@@ -108,7 +108,7 @@ export const getListRepostedsByThread = async (threadId: string) => {
           _count: {
             select: {
               child: true,
-              likedByUsers: true,
+              likes: true,
             },
           },
           child: {

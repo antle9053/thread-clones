@@ -40,8 +40,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
     content,
     createdAt,
     child,
-    likedByUserIds,
-    _count: { child: numOfChilds },
+    _count: { child: numOfChilds, likes },
   } = data;
 
   return (
@@ -57,7 +56,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
               createdAt={item.createdAt}
               gifWidth={gifWidth}
               numOfChilds={item.child.length}
-              numOfLikes={item.likedByUserIds.length}
+              numOfLikes={item._count.likes}
             />
           ))}
         </div>
@@ -74,7 +73,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
           createdAt={createdAt}
           gifWidth={gifWidth}
           numOfChilds={numOfChilds}
-          numOfLikes={likedByUserIds.length}
+          numOfLikes={likes}
         />
         <div className="flex justify-between h-[50px] items-center px-4">
           <span className="font-bold text-base">Replies</span>

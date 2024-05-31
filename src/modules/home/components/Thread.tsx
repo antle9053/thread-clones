@@ -21,7 +21,6 @@ import { Like } from "./Like";
 import { threadActionSelectors } from "../zustand/threadActionSlice";
 import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
 import { UserAvatar } from "./User";
-import { ThreadDetailItem } from "../../thread-detail/components/ThreadDetailItem";
 import { ThreadReply } from "./Reply";
 import { Repost } from "./Repost";
 import moment from "moment";
@@ -40,13 +39,12 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     content,
     createdAt,
     child,
-    likedByUserIds,
     reposted,
     quotedThreadId,
-    _count: { child: numOfChilds },
+    _count: { child: numOfChilds, likes },
   } = data;
 
-  const [initLike, setInitLike] = useState<number>(likedByUserIds.length);
+  const [initLike, setInitLike] = useState<number>(likes);
 
   const router = useRouter();
 

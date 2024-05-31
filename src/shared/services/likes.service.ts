@@ -3,47 +3,28 @@
 import { prisma } from "../infra/prisma";
 
 export const likeThreadService = async (threadId: string, userId: string) => {
-  await prisma.threads.update({
-    where: {
-      id: threadId,
-    },
+  await prisma.likes.create({
     data: {
-      likedByUsers: {
-        connect: {
-          id: userId,
-        },
-      },
+      userId,
+      threadId,
     },
   });
 };
 
 export const unlikeThreadService = async (threadId: string, userId: string) => {
-  await prisma.threads.update({
+  await prisma.likes.deleteMany({
     where: {
-      id: threadId,
-    },
-    data: {
-      likedByUsers: {
-        disconnect: {
-          id: userId,
-        },
-      },
+      userId,
+      threadId,
     },
   });
 };
 
-export const isLikedService = async (
-  threadId: string,
-  userId: string
-): Promise<boolean> => {
-  const thread = await prisma.threads.findFirst({
+export const isLikedService = async (threadId: string, userId: string) => {
+  return !!(await prisma.likes.findFirst({
     where: {
-      id: threadId,
-      likedByUserIds: {
-        has: userId,
-      },
+      userId,
+      threadId,
     },
-  });
-  if (thread) return true;
-  return false;
+  }));
 };

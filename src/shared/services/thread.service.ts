@@ -148,7 +148,7 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
     _count: {
       select: {
         child: true;
-        likedByUsers: true;
+        likes: true;
       };
     };
   };
@@ -218,7 +218,7 @@ export const getThreadsService = async ({
       _count: {
         select: {
           child: true,
-          likedByUsers: true,
+          likes: true,
         },
       },
       child: {
@@ -282,7 +282,7 @@ export const getThreadByIdService = async (
       _count: {
         select: {
           child: true,
-          likedByUsers: true,
+          likes: true,
         },
       },
       child: {
@@ -421,25 +421,11 @@ export const deleteThreadService = async (threadId: string) => {
   }
 
   for (const threadId of descendantThreadIds) {
-    const likedUsers = await prisma.users.findMany({
+    await prisma.likes.deleteMany({
       where: {
-        likedThreadIds: {
-          has: threadId,
-        },
+        threadId,
       },
     });
-
-    for (const user of likedUsers) {
-      const { likedThreadIds } = user;
-      await prisma.users.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          likedThreadIds: likedThreadIds.filter((id) => id !== threadId),
-        },
-      });
-    }
   }
 
   await prisma.threads.updateMany({
@@ -510,7 +496,7 @@ export const getRepliesThread = async (
       _count: {
         select: {
           child: true,
-          likedByUsers: true,
+          likes: true,
         },
       },
       child: {
