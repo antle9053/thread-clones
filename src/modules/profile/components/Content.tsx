@@ -31,7 +31,7 @@ export const Content: FC<ContentProps> = ({ profileId }) => {
       id="content-tabs"
       centered
       className=""
-      defaultActiveKey="reposts"
+      defaultActiveKey="threads"
       items={items}
     />
   );

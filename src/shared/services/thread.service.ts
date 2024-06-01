@@ -112,6 +112,11 @@ export type GetThreadResponse = Prisma.threadsGetPayload<{
         user: true;
       };
     };
+    likes: {
+      include: {
+        user: true;
+      };
+    };
     content: {
       include: {
         files: true;
@@ -173,8 +178,10 @@ export const getThreadsService = async ({
         : {}),
       ...(type === "liked"
         ? {
-            likedByUserIds: {
-              has: userId,
+            likes: {
+              some: {
+                userId,
+              },
             },
           }
         : type === "saved"
@@ -197,6 +204,14 @@ export const getThreadsService = async ({
       author: true,
       parent: true,
       reposted: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
+      likes: {
         where: {
           userId,
         },
@@ -279,6 +294,14 @@ export const getThreadByIdService = async (
           user: true,
         },
       },
+      likes: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
       _count: {
         select: {
           child: true,
@@ -288,6 +311,7 @@ export const getThreadByIdService = async (
       child: {
         include: {
           author: true,
+          likes: true,
           content: {
             include: {
               files: true,
@@ -493,6 +517,14 @@ export const getRepliesThread = async (
           user: true,
         },
       },
+      likes: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
       _count: {
         select: {
           child: true,
@@ -502,6 +534,7 @@ export const getRepliesThread = async (
       child: {
         include: {
           author: true,
+          likes: true,
           content: {
             include: {
               files: true,

@@ -28,3 +28,58 @@ export const isLikedService = async (threadId: string, userId: string) => {
     },
   }));
 };
+
+export const getListLikedsByThread = async (threadId: string) => {
+  return await prisma.likes.findMany({
+    where: {
+      threadId,
+    },
+    include: {
+      user: true,
+      thread: {
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          parent: true,
+          _count: {
+            select: {
+              child: true,
+              likes: true,
+            },
+          },
+          child: {
+            include: {
+              author: true,
+              content: {
+                include: {
+                  files: true,
+                  tags: true,
+                  poll: {
+                    include: {
+                      options: true,
+                    },
+                  },
+                },
+              },
+              _count: {
+                select: {
+                  child: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};

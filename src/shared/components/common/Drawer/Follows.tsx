@@ -3,6 +3,8 @@ import { useFollow } from "@/src/shared/hooks/useFollows";
 import { formatNumber } from "@/src/shared/utils/numbers/formatNumber";
 import { Button, Drawer, Tabs } from "antd";
 import type { TabsProps } from "antd";
+import clsx from "clsx";
+import { Heart, Quote, Repeat } from "lucide-react";
 import { FC } from "react";
 
 interface UserItemProps {
@@ -20,14 +22,48 @@ export const UserItem: FC<UserItemProps> = ({
   userId,
   activityType,
 }) => {
+  const renderActivity = (activity: string) => {
+    switch (activity) {
+      case "like": {
+        return (
+          <div className="rounded-full flex justify-center items-center bg-[#fe0169] w-[22px] h-[22px] border-2 border-solid border-white">
+            <Heart color="white" fill="white" size={10} />
+          </div>
+        );
+      }
+      case "repost": {
+        return (
+          <div className="rounded-full flex justify-center items-center bg-[#c329bf] w-[22px] h-[22px] border-2 border-solid border-white">
+            <Repeat color="white" fill="white" size={10} />
+          </div>
+        );
+      }
+      case "quote": {
+        return (
+          <div className="rounded-full flex justify-center items-center bg-[#fe7900] w-[22px] h-[22px] border-2 border-solid border-white">
+            <Quote color="white" fill="white" size={9} />
+          </div>
+        );
+      }
+      default: {
+        return null;
+      }
+    }
+  };
   return (
-    <div className="flex p-4 !pb-0">
-      <div className="flex-0 pr-4 relative">
-        <img
-          className="object-cover w-[36px] h-[36px] rounded-full"
-          src={profile?.avatar || ""}
-        />
-        {activityType ? <div className="absolute">activity</div> : null}
+    <div className={clsx("flex p-4 !pb-0", activityType ? "!px-0" : "")}>
+      <div className="flex-0 pr-4">
+        <div className="relative h-fit w-fit">
+          <img
+            className="object-cover w-[36px] h-[36px] rounded-full"
+            src={profile?.avatar || ""}
+          />
+          {activityType ? (
+            <div className="absolute -bottom-2 -right-2">
+              {renderActivity(activityType)}
+            </div>
+          ) : null}
+        </div>
       </div>
       <div className="flex-1 flex justify-between items-center border-b border-solid border-slate-300 pb-4 min-h-[36px]">
         <div className="flex flex-col">

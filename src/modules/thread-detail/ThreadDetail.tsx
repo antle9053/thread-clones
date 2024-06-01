@@ -99,7 +99,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
               createdAt={item.createdAt}
               gifWidth={gifWidth}
               numOfChilds={item._count.child}
-              numOfLikes={item.likedByUserIds.length}
+              numOfLikes={item.likes.length}
             />
           ))}
         </div>

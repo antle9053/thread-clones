@@ -8,10 +8,19 @@ import {
   MessageSquareQuote,
   Repeat,
 } from "lucide-react";
+import { UserItem } from "./Follows";
 
 export const Activity = () => {
-  const { isOpen, handleClose, likes, quotes, requotes, views } = useActivity();
-
+  const {
+    isOpen,
+    handleClose,
+    likes,
+    quotes,
+    reposts,
+    views,
+    listUsers,
+    userId,
+  } = useActivity();
   return (
     <Drawer
       closable={false}
@@ -55,7 +64,7 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              {likes}
+              {likes.length}
               <ChevronRight />
             </Button>
           </div>
@@ -70,7 +79,7 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              {requotes} <ChevronRight />
+              {reposts.length} <ChevronRight />
             </Button>
           </div>
         </div>
@@ -84,10 +93,22 @@ export const Activity = () => {
               className="flex items-center text-[#999999] !pr-0"
               type="text"
             >
-              {quotes} <ChevronRight />
+              {quotes.length} <ChevronRight />
             </Button>
           </div>
         </div>
+      </div>
+      <div>
+        {listUsers.map((user, index) => (
+          <UserItem
+            key={index}
+            activityType={user.type}
+            handleFollow={() => {}}
+            handleUnfollow={() => {}}
+            profile={user.profile}
+            userId={userId}
+          />
+        ))}
       </div>
     </Drawer>
   );

@@ -23,6 +23,17 @@ export const deleteRepostThreadService = async (
   });
 };
 
+export const getQuotesByThread = async (threadId: string) => {
+  return await prisma.threads.findMany({
+    where: {
+      quotedThreadId: threadId,
+    },
+    include: {
+      author: true,
+    },
+  });
+};
+
 export const getListRepostedsByUser = async (userId: string) => {
   const user = await prisma.users.findUnique({
     where: { userId },
