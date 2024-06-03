@@ -28,7 +28,6 @@ export const useActivity = () => {
     const fetchActivity = async () => {
       if (thread?.id) {
         const threadActivity = await getActivityByThreadId(thread?.id);
-        console.log(threadActivity);
         if (threadActivity) {
           setLikes(threadActivity?.likes);
           setQuotes(threadActivity?.quotedByThread);

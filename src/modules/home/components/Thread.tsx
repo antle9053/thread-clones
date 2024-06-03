@@ -25,6 +25,7 @@ import { ThreadReply } from "./Reply";
 import { Repost } from "./Repost";
 import moment from "moment";
 import { Quote } from "../../threads/components/Quote";
+import { increaseView } from "@/src/shared/services/activity.service";
 
 interface ThreadProps {
   data: GetThreadResponse;
@@ -75,7 +76,9 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
   return (
     <div
       className="w-full bg-white border-b-[0.5px] border-solid border-black/10"
-      onClick={() => router.push(`/@${author?.username}/post/${id}`)}
+      onClick={async () => {
+        router.push(`/@${author?.username}/post/${id}`);
+      }}
     >
       {reposted.length > 0 && type === "reposts" ? (
         <div className="flex gap-3 items-center pt-4 px-4">

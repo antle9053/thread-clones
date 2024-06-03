@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useWindowSize } from "usehooks-ts";
 import { ThreadDetailItem } from "./components/ThreadDetailItem";
@@ -10,6 +10,7 @@ import { Button } from "antd";
 import { ChevronRight } from "lucide-react";
 import { activitySelectors } from "./zustand/activitySlice";
 import { useAppStore } from "@/src/shared/infra/zustand";
+import { increaseView } from "@/src/shared/services/activity.service";
 
 interface ThreadDetailProps {}
 
@@ -28,6 +29,10 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
       scrollToRef.current.scrollIntoView();
     }
   }, [data, scrollToRef, ancestor.length]);
+
+  useEffect(() => {
+    increaseView(params.postId);
+  }, [params.postId]);
 
   const setOpen = useAppStore(activitySelectors.setOpenActivity);
   const setThread = useAppStore(activitySelectors.setActivityThread);
