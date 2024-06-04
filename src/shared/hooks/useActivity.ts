@@ -1,18 +1,25 @@
-import { activitySelectors } from "@/src/modules/thread-detail/zustand/activitySlice";
+import {
+  UserActivity,
+  activitySelectors,
+} from "@/src/modules/thread-detail/zustand/activitySlice";
 import { useAppStore } from "../infra/zustand";
 import { authSelectors } from "../infra/zustand/slices/authSlice";
 import { useEffect, useMemo, useState } from "react";
 import { getActivityByThreadId } from "../services/activity.service";
+import { LikeResponseDTO } from "../dto/likes/LikeResponse.dto";
 
-export type activityType = "like" | "quote" | "repost";
+export type activityType = "all" | "like" | "quote" | "repost";
 
 export const useActivity = () => {
   const isOpen = useAppStore(activitySelectors.isOpenActivity);
   const setOpen = useAppStore(activitySelectors.setOpenActivity);
   const thread = useAppStore(activitySelectors.activityThread);
   const setThread = useAppStore(activitySelectors.setActivityThread);
+  const setListActivities = useAppStore(activitySelectors.setListActivities);
+  const listActivities = useAppStore(activitySelectors.listActivities);
 
-  const [likes, setLikes] = useState<any[]>([]);
+  const [type, setType] = useState<activityType>("all");
+  const [likes, setLikes] = useState<LikeResponseDTO[]>([]);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [reposts, setReposts] = useState<any[]>([]);
   const [views, setViews] = useState<number>(0);
@@ -28,56 +35,74 @@ export const useActivity = () => {
     const fetchActivity = async () => {
       if (thread?.id) {
         const threadActivity = await getActivityByThreadId(thread?.id);
-        if (threadActivity) {
-          setLikes(threadActivity?.likes);
-          setQuotes(threadActivity?.quotedByThread);
-          setReposts(threadActivity?.reposted);
-          setViews(threadActivity?.views);
+
+        if (threadActivity && user) {
+          const { likes, quotedByThread, reposted, views } = threadActivity;
+
+          const userLikes: UserActivity[] = likes.map((like) => {
+            const isFollowed = like.user.followedByIDs.includes(user?.id);
+            return {
+              profile: { ...like.user, isFollowed },
+              timestamp: like.likedAt,
+              type: "like",
+            };
+          });
+          const userReposts: UserActivity[] = reposted.map((repost) => {
+            const isFollowed = repost.user.followedByIDs.includes(user?.id);
+            return {
+              profile: { ...repost.user, isFollowed },
+              timestamp: repost.repostedAt,
+              type: "repost",
+            };
+          });
+          const userQuotes: UserActivity[] = quotedByThread.map((quote) => {
+            const isFollowed = quote.author.followedByIDs.includes(user?.id);
+            return {
+              profile: { ...quote.author, isFollowed },
+              timestamp: quote.createdAt,
+              type: "quote",
+            };
+          });
+
+          const listActivities = [...userLikes, ...userReposts, ...userQuotes];
+          setListActivities(listActivities);
+
+          setViews(views);
         }
       }
     };
     fetchActivity();
-  }, [thread]);
+  }, [thread, user]);
 
-  const listUsers = useMemo(() => {
-    const userLikes = likes.map((like) => {
-      const isFollowing = like.user.followedByIDs.includes(user?.id);
-      return {
-        profile: like.user,
-        timestamp: like.likedAt,
-        isFollowing,
-        type: "like",
-      };
-    });
-    const userReposts = reposts.map((repost) => {
-      const isFollowing = repost.user.followedByIDs.includes(user?.id);
-      return {
-        profile: repost.user,
-        timestamp: repost.repostedAt,
-        isFollowing,
-        type: "repost",
-      };
-    });
-    const userQuotes = quotes.map((quote) => {
-      const isFollowing = quote.author.followedByIDs.includes(user?.id);
-      return {
-        profile: quote.author,
-        timestamp: quote.createdAt,
-        isFollowing,
-        type: "quote",
-      };
-    });
-    return [...userLikes, ...userReposts, ...userQuotes];
-  }, [likes, quotes, reposts]);
+  const filterdListActivities = useMemo(() => {
+    if (type === "all") return listActivities;
+    return listActivities.filter((activity) => activity.type === type);
+  }, [listActivities, type]);
+
+  const numOfLikes = useMemo(
+    () => listActivities.filter((activity) => activity.type === "like").length,
+    [listActivities]
+  );
+  const numOfQuotes = useMemo(
+    () => listActivities.filter((activity) => activity.type === "quote").length,
+    [listActivities]
+  );
+  const numOfReposts = useMemo(
+    () =>
+      listActivities.filter((activity) => activity.type === "repost").length,
+    [listActivities]
+  );
 
   return {
     handleClose,
     isOpen,
-    likes,
-    quotes,
-    reposts,
     views,
-    listUsers,
+    listActivities: filterdListActivities,
+    numOfLikes,
+    numOfQuotes,
+    numOfReposts,
     userId: user?.id,
+    setType,
+    type,
   };
 };

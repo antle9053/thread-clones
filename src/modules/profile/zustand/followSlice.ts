@@ -1,11 +1,5 @@
-import {
-  AppState,
-  getAppState,
-  setAppState,
-} from "@/src/shared/infra/zustand/types";
+import { AppState, setAppState } from "@/src/shared/infra/zustand/types";
 import { User } from "@/src/shared/services/follows.service";
-import { GetThreadResponse } from "@/src/shared/services/thread.service";
-import { Prisma } from "@prisma/client";
 import { StateCreator } from "zustand";
 
 export type UserWithFollow = User & {

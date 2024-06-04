@@ -9,18 +9,49 @@ import {
   Repeat,
 } from "lucide-react";
 import { UserItem } from "./Follows";
+import { useMemo } from "react";
 
 export const Activity = () => {
   const {
     isOpen,
     handleClose,
-    likes,
-    quotes,
-    reposts,
+    numOfLikes,
+    numOfQuotes,
+    numOfReposts,
     views,
-    listUsers,
+    listActivities,
     userId,
+    setType,
+    type,
   } = useActivity();
+
+  const listAction = [
+    {
+      name: "view",
+      icon: <Eye />,
+      value: views,
+      action: null,
+    },
+    {
+      name: "likes",
+      icon: <Heart />,
+      value: numOfLikes,
+      action: () => setType("like"),
+    },
+    {
+      name: "repost",
+      icon: <Repeat />,
+      value: numOfReposts,
+      action: () => setType("repost"),
+    },
+    {
+      name: "quote",
+      icon: <MessageSquareQuote />,
+      value: numOfQuotes,
+      action: () => setType("quote"),
+    },
+  ];
+
   return (
     <Drawer
       closable={false}
@@ -40,66 +71,24 @@ export const Activity = () => {
         </div>
       </div>
       <div>
-        <div className="flex items-center">
-          <div className="basis-[50px]">
-            <Eye />
+        {listAction.map((action, index) => (
+          <div className="flex items-center" key={index}>
+            <div className="basis-[50px]">{action.icon}</div>
+            <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
+              <span className="font-bold">Views</span>
+              <Button
+                className="flex items-center text-[#999999] !pr-0"
+                type="text"
+                onClick={() => action.action?.()}
+              >
+                {action.value} <ChevronRight />
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
-            <span className="font-bold">Views</span>
-            <Button
-              className="flex items-center text-[#999999] !pr-0"
-              type="text"
-            >
-              {views} <ChevronRight />
-            </Button>
-          </div>
-        </div>
-        <div className="flex items-center">
-          <div className="basis-[50px]">
-            <Heart />
-          </div>
-          <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
-            <span className="font-bold">Likes</span>
-            <Button
-              className="flex items-center text-[#999999] !pr-0"
-              type="text"
-            >
-              {likes.length}
-              <ChevronRight />
-            </Button>
-          </div>
-        </div>
-        <div className="flex items-center">
-          <div className="basis-[50px]">
-            <Repeat />
-          </div>
-          <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
-            <span className="font-bold">Requotes</span>
-            <Button
-              className="flex items-center text-[#999999] !pr-0"
-              type="text"
-            >
-              {reposts.length} <ChevronRight />
-            </Button>
-          </div>
-        </div>
-        <div className="flex items-center">
-          <div className="basis-[50px]">
-            <MessageSquareQuote />
-          </div>
-          <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
-            <span className="font-bold">Quotes</span>
-            <Button
-              className="flex items-center text-[#999999] !pr-0"
-              type="text"
-            >
-              {quotes.length} <ChevronRight />
-            </Button>
-          </div>
-        </div>
+        ))}
       </div>
       <div>
-        {listUsers.map((user, index) => (
+        {listActivities.map((user, index) => (
           <UserItem
             key={index}
             activityType={user.type}
