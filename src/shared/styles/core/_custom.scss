@@ -15,7 +15,8 @@
   overflow: hidden;
 }
 
-#follows-drawer {
+#follows-drawer,
+#activities-drawer {
   .ant-drawer-body {
     padding: 0;
   }
@@ -125,23 +126,23 @@
 // ============================= //
 
 // SWIPER
-.swiper {
-  height: 100%;
+// .swiper {
+//   height: 100%;
 
-  .swiper-slide {
-    width: 100%;
-    max-width: 350px;
-    height: auto;
+//   .swiper-slide {
+//     width: 100%;
+//     max-width: 350px;
+//     height: auto;
 
-    img {
-      display: block;
-      width: auto;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
-    }
-  }
-}
+//     img {
+//       display: block;
+//       width: auto;
+//       height: 100%;
+//       object-fit: cover;
+//       border-radius: 12px;
+//     }
+//   }
+// }
 
 // ================================//
 
