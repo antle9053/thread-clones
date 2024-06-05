@@ -6,7 +6,6 @@ import { useAppStore } from "../infra/zustand";
 import { authSelectors } from "../infra/zustand/slices/authSlice";
 import { useEffect, useMemo, useState } from "react";
 import { getActivityByThreadId } from "../services/activity.service";
-import { LikeResponseDTO } from "../dto/likes/LikeResponse.dto";
 
 export type activityType = "all" | "like" | "quote" | "repost";
 
@@ -19,9 +18,6 @@ export const useActivity = () => {
   const listActivities = useAppStore(activitySelectors.listActivities);
 
   const [type, setType] = useState<activityType>("all");
-  const [likes, setLikes] = useState<LikeResponseDTO[]>([]);
-  const [quotes, setQuotes] = useState<any[]>([]);
-  const [reposts, setReposts] = useState<any[]>([]);
   const [views, setViews] = useState<number>(0);
 
   const user = useAppStore(authSelectors.user);
@@ -105,5 +101,6 @@ export const useActivity = () => {
     userId: user?.id,
     setType,
     type,
+    thread,
   };
 };

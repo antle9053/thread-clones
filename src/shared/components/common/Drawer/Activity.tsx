@@ -9,8 +9,34 @@ import {
   Repeat,
 } from "lucide-react";
 import { UserItem } from "./Follows";
-import { useState } from "react";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import { FC, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import clsx from "clsx";
+import { GetThreadResponse } from "@/src/shared/services/thread.service";
+import moment from "moment";
+import { Render } from "@/src/modules/home/components/Render";
+
+const ThreadThumbnail: FC<{ thread: GetThreadResponse }> = ({ thread }) => {
+  return (
+    <div className="w-full rounded-lg border border-solid border-black/15 p-4 mt-4 mb-2">
+      <div className="flex gap-2">
+        <img
+          className="rounded-full w-[22px] h-[22px] object-cover"
+          src={thread?.author?.avatar ?? ""}
+        />
+        <span className="font-bold">{thread?.author?.name}</span>
+        <span className="text-[#999999]">
+          {moment(thread?.createdAt).fromNow()}
+        </span>
+      </div>
+      <div className="w-full mt-2">
+        {thread?.content?.text ? (
+          <Render content={thread?.content?.text ?? ""} />
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 export const Activity = () => {
   const {
@@ -24,6 +50,7 @@ export const Activity = () => {
     userId,
     setType,
     filterdListActivities,
+    thread,
   } = useActivity();
 
   const listAction = [
@@ -67,7 +94,7 @@ export const Activity = () => {
         <SwiperSlide>
           <div className="p-6">
             <div className="flex justify-between items-center mb-2">
-              <div className="w-[50px]">
+              <div className="w-[50px]" onClick={handleClose}>
                 <ArrowLeft />
               </div>
               <div>
@@ -77,6 +104,7 @@ export const Activity = () => {
                 <span className="text-[#999999]">Sort</span>
               </div>
             </div>
+            <ThreadThumbnail thread={thread!} />
             <div>
               {listAction.map((action, index) => (
                 <div className="flex items-center" key={index}>
@@ -87,11 +115,18 @@ export const Activity = () => {
                       className="flex items-center text-[#999999] !pr-0"
                       type="text"
                       onClick={() => {
-                        action.action?.();
-                        swiper.slideTo(1);
+                        if (action.name !== "Views") {
+                          action.action?.();
+                          swiper.slideTo(1);
+                        }
                       }}
                     >
-                      {action.value} <ChevronRight />
+                      {action.value}{" "}
+                      <ChevronRight
+                        className={clsx(
+                          action.name !== "Views" ? "visible" : "invisible"
+                        )}
+                      />
                     </Button>
                   </div>
                 </div>
@@ -130,6 +165,7 @@ export const Activity = () => {
                 <span className="text-[#999999]">Sort</span>
               </div>
             </div>
+            <ThreadThumbnail thread={thread!} />
             <div>
               {filterdListActivities.map((user, index) => (
                 <UserItem
