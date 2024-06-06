@@ -45,6 +45,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
     content,
     createdAt,
     child,
+    quotedThreadId,
     _count: { child: numOfChilds, likes },
   } = data;
 
@@ -71,15 +72,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
         className="w-full bg-white border-b-[0.5px] border-solid border-black/10"
         ref={scrollToRef}
       >
-        <ThreadDetailItem
-          id={id}
-          author={author}
-          content={content}
-          createdAt={createdAt}
-          gifWidth={gifWidth}
-          numOfChilds={numOfChilds}
-          numOfLikes={likes}
-        />
+        <ThreadDetailItem gifWidth={gifWidth} thread={data} />
         <div className="flex justify-between h-[50px] items-center px-4">
           <span className="font-bold text-base">Replies</span>
           <Button
@@ -96,16 +89,7 @@ export const ThreadDetail: FC<ThreadDetailProps> = () => {
         </div>
         <div>
           {child.map((item: any, index: number) => (
-            <ThreadDetailItem
-              key={index}
-              id={item.id}
-              author={item.author}
-              content={item.content}
-              createdAt={item.createdAt}
-              gifWidth={gifWidth}
-              numOfChilds={item._count.child}
-              numOfLikes={item.likes.length}
-            />
+            <ThreadDetailItem key={index} gifWidth={gifWidth} thread={item} />
           ))}
         </div>
       </div>

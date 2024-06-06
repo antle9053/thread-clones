@@ -18,33 +18,32 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 import { Like } from "../../home/components/Like";
+import { Quote } from "../../threads/components/Quote";
+import { Repost } from "../../home/components/Repost";
+import { GetThreadResponse } from "@/src/shared/services/thread.service";
 
 interface ThreadDetailItemProps {
-  id: string;
-  author: Prisma.usersGetPayload<{}>;
-  content: Prisma.contentsGetPayload<{
-    include: {
-      files: true;
-    };
-  }> | null;
-  createdAt: Date;
   gifWidth: number;
-  numOfChilds: number;
-  numOfLikes: number;
+  thread: GetThreadResponse;
 }
 
 export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
-  id,
-  author,
-  content,
-  createdAt,
   gifWidth,
-  numOfChilds,
-  numOfLikes,
+  thread,
 }) => {
   const router = useRouter();
+  const {
+    id,
+    author,
+    content,
+    createdAt,
+    _count: { child },
+    likes,
+    quotedThreadId,
+  } = thread;
+
   const [gif, setGif] = useState<any>(null);
-  const [initLike, setInitLike] = useState<number>(numOfLikes);
+  const [initLike, setInitLike] = useState<number>(likes.length);
 
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
@@ -74,8 +73,20 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
               <img
                 src={author?.avatar || ""}
                 className="w-[36px] h-[36px] rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/@${author?.username}`);
+                }}
               />
-              <span className="font-bold text-base">{author?.username}</span>
+              <span
+                className="font-bold text-base"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/@${author?.username}`);
+                }}
+              >
+                {author?.username}
+              </span>
             </div>
             <div className="flex gap-2">
               <span className="text-[#666666]">
@@ -89,6 +100,11 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
 
           <div className="w-full mb-2">
             {content?.text ? <Render content={content?.text ?? ""} /> : null}
+          </div>
+          <div className="w-full mb-2">
+            {quotedThreadId ? (
+              <Quote type="view" quoteId={quotedThreadId} />
+            ) : null}
           </div>
 
           <div className="w-full">
@@ -115,9 +131,7 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
             >
               <MessageCircle />
             </div>
-            <div className="h-full w-[36px] flex items-center">
-              <Repeat />
-            </div>
+            <Repost thread={thread} />
             <div className="h-full w-[36px] flex items-center">
               <Send />
             </div>
@@ -126,12 +140,12 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
       </div>
       <div className="flex gap-3 items-center">
         <div>
-          {numOfChilds > 0 ? (
+          {child > 0 ? (
             <span className="text-[#888888] text-base">
-              {numOfChilds} {numOfChilds === 1 ? "reply" : "replies"}
+              {child} {child === 1 ? "reply" : "replies"}
             </span>
           ) : null}
-          {numOfChilds > 0 && initLike > 0 ? <span>&nbsp;·&nbsp;</span> : null}
+          {child > 0 && initLike > 0 ? <span>&nbsp;·&nbsp;</span> : null}
           {initLike > 0 ? (
             <span className="text-[#888888] text-base">
               {initLike} {initLike === 1 ? "like" : "likes"}

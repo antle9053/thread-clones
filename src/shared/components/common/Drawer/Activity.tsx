@@ -113,46 +113,47 @@ export const Activity = () => {
           <div className="px-6 overflow-scroll max-h-[calc(100%_-_72px)] mt-[72px]">
             <ThreadThumbnail thread={thread!} />
             <div>
-              {listAction.map((action, index) => (
-                <div className="flex items-center" key={index}>
-                  <div className="basis-[50px]">{action.icon}</div>
-                  <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
-                    <span className="font-bold">{action.name}</span>
-                    <Button
-                      className="flex items-center text-[#999999] !pr-0"
-                      type="text"
-                      onClick={() => {
-                        if (action.name !== "Views") {
-                          action.action?.();
-                          swiper.slideTo(1);
-                        }
-                      }}
-                    >
-                      {action.value}{" "}
-                      <ChevronRight
-                        className={clsx(
-                          action.name !== "Views" ? "visible" : "invisible"
-                        )}
-                      />
-                    </Button>
+              {listAction.map((action, index) => {
+                if (action.value === 0 && action.name !== "Views") return null;
+                return (
+                  <div className="flex items-center" key={index}>
+                    <div className="basis-[50px]">{action.icon}</div>
+                    <div className="flex flex-1 items-center justify-between py-2 border-b-[0.5px] border-solid border-black/15">
+                      <span className="font-bold">{action.name}</span>
+                      <Button
+                        className="flex items-center text-[#999999] !pr-0"
+                        type="text"
+                        onClick={() => {
+                          if (action.name !== "Views") {
+                            action.action?.();
+                            swiper.slideTo(1);
+                          }
+                        }}
+                      >
+                        {action.value}{" "}
+                        <ChevronRight
+                          className={clsx(
+                            action.name !== "Views" ? "visible" : "invisible"
+                          )}
+                        />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div>
-              {[...listActivities, ...listActivities, ...listActivities].map(
-                (user, index) => (
-                  <UserItem
-                    key={index}
-                    activityType={user.type}
-                    handleFollow={handleFollow}
-                    handleUnfollow={handleUnfollow}
-                    handleClose={handleClose}
-                    profile={user.profile}
-                    userId={userId}
-                  />
-                )
-              )}
+              {[...listActivities].map((user, index) => (
+                <UserItem
+                  key={index}
+                  activityType={user.type}
+                  handleFollow={handleFollow}
+                  handleUnfollow={handleUnfollow}
+                  handleClose={handleClose}
+                  profile={user.profile}
+                  userId={userId}
+                />
+              ))}
             </div>
           </div>
         </SwiperSlide>

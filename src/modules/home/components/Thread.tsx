@@ -25,7 +25,6 @@ import { ThreadReply } from "./Reply";
 import { Repost } from "./Repost";
 import moment from "moment";
 import { Quote } from "../../threads/components/Quote";
-import { increaseView } from "@/src/shared/services/activity.service";
 
 interface ThreadProps {
   data: GetThreadResponse;
