@@ -22,6 +22,11 @@
   }
 }
 
+#activities-drawer {
+  height: calc(100vh - 76px);
+  position: relative;
+}
+
 // Modal
 .dark .ant-modal-content {
   background-color: #222222;

@@ -6,11 +6,13 @@ import type { TabsProps } from "antd";
 import clsx from "clsx";
 import { Heart, Quote, Repeat } from "lucide-react";
 import { FC } from "react";
+import { useRouter } from "next/navigation";
 
 interface UserItemProps {
   profile: UserWithFollow;
   handleFollow: (followedId: string) => void;
   handleUnfollow: (followedId: string) => void;
+  handleClose: () => void;
   userId?: string;
   activityType?: string;
 }
@@ -21,7 +23,9 @@ export const UserItem: FC<UserItemProps> = ({
   handleUnfollow,
   userId,
   activityType,
+  handleClose,
 }) => {
+  const router = useRouter();
   const renderActivity = (activity: string) => {
     switch (activity) {
       case "like": {
@@ -68,16 +72,24 @@ export const UserItem: FC<UserItemProps> = ({
       <div className="flex-1 flex justify-between items-center border-b border-solid border-slate-300 pb-4 min-h-[36px]">
         <div className="flex flex-col">
           <span className="font-bold text-black">{profile.name}</span>
-          <span className="font-[400] text-[#999999]">{profile.username}</span>
+          <span
+            className="font-[400] text-[#999999]"
+            onClick={() => {
+              handleClose();
+              router.push(`/@${profile.username}`);
+            }}
+          >
+            {profile.username}
+          </span>
         </div>
         <div>
           {profile.id === userId ? null : (
             <Button
-              onClick={() =>
+              onClick={() => {
                 profile.isFollowed
                   ? handleUnfollow(profile.id)
-                  : handleFollow(profile.id)
-              }
+                  : handleFollow(profile.id);
+              }}
             >
               {profile.isFollowed ? "Following" : "Follow"}
             </Button>
@@ -126,6 +138,7 @@ export const Follows = () => {
                 profile={item}
                 handleFollow={handleFollow}
                 handleUnfollow={handleUnfollow}
+                handleClose={handleClose}
                 userId={userId}
               />
             ))
@@ -158,6 +171,7 @@ export const Follows = () => {
                 profile={item}
                 handleFollow={handleFollow}
                 handleUnfollow={handleUnfollow}
+                handleClose={handleClose}
                 userId={userId}
               />
             ))

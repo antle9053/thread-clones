@@ -51,6 +51,8 @@ export const Activity = () => {
     setType,
     filterdListActivities,
     thread,
+    handleFollow,
+    handleUnfollow,
   } = useActivity();
 
   const listAction = [
@@ -90,20 +92,25 @@ export const Activity = () => {
       open={isOpen}
       placement="bottom"
     >
-      <Swiper allowTouchMove={false} noSwiping onSwiper={setSwiper}>
-        <SwiperSlide>
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div className="w-[50px]" onClick={handleClose}>
-                <ArrowLeft />
-              </div>
-              <div>
-                <span className="font-bold text-base">Post activity</span>
-              </div>
-              <div className="w-[50px] text-right">
-                <span className="text-[#999999]">Sort</span>
-              </div>
+      <Swiper
+        allowTouchMove={false}
+        className="h-full"
+        noSwiping
+        onSwiper={setSwiper}
+      >
+        <SwiperSlide className="max-h-full overflow-scroll">
+          <div className="flex justify-between items-center p-6 absolute top-0 h-[72px] w-full">
+            <div className="w-[50px]" onClick={handleClose}>
+              <ArrowLeft />
             </div>
+            <div>
+              <span className="font-bold text-base">Post activity</span>
+            </div>
+            <div className="w-[50px] text-right">
+              <span className="text-[#999999]">Sort</span>
+            </div>
+          </div>
+          <div className="px-6 overflow-scroll max-h-[calc(100%_-_72px)] mt-[72px]">
             <ThreadThumbnail thread={thread!} />
             <div>
               {listAction.map((action, index) => (
@@ -133,46 +140,50 @@ export const Activity = () => {
               ))}
             </div>
             <div>
-              {listActivities.map((user, index) => (
-                <UserItem
-                  key={index}
-                  activityType={user.type}
-                  handleFollow={() => {}}
-                  handleUnfollow={() => {}}
-                  profile={user.profile}
-                  userId={userId}
-                />
-              ))}
+              {[...listActivities, ...listActivities, ...listActivities].map(
+                (user, index) => (
+                  <UserItem
+                    key={index}
+                    activityType={user.type}
+                    handleFollow={handleFollow}
+                    handleUnfollow={handleUnfollow}
+                    handleClose={handleClose}
+                    profile={user.profile}
+                    userId={userId}
+                  />
+                )
+              )}
             </div>
           </div>
         </SwiperSlide>
-        <SwiperSlide>
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-2">
-              <div
-                className="w-[50px]"
-                onClick={() => {
-                  setType("all");
-                  swiper.slideTo(0);
-                }}
-              >
-                <ArrowLeft />
-              </div>
-              <div>
-                <span className="font-bold text-base">Post activity</span>
-              </div>
-              <div className="w-[50px] text-right">
-                <span className="text-[#999999]">Sort</span>
-              </div>
+        <SwiperSlide className="max-h-full overflow-scroll">
+          <div className="flex justify-between items-center p-6 absolute top-0 h-[72px] w-full">
+            <div
+              className="w-[50px]"
+              onClick={() => {
+                setType("all");
+                swiper.slideTo(0);
+              }}
+            >
+              <ArrowLeft />
             </div>
+            <div>
+              <span className="font-bold text-base">Post activity</span>
+            </div>
+            <div className="w-[50px] text-right">
+              <span className="text-[#999999]">Sort</span>
+            </div>
+          </div>
+          <div className="px-6 overflow-scroll max-h-[calc(100%_-_72px)] mt-[72px]">
             <ThreadThumbnail thread={thread!} />
             <div>
               {filterdListActivities.map((user, index) => (
                 <UserItem
                   key={index}
                   activityType={user.type}
-                  handleFollow={() => {}}
-                  handleUnfollow={() => {}}
+                  handleFollow={handleFollow}
+                  handleUnfollow={handleUnfollow}
+                  handleClose={handleClose}
                   profile={user.profile}
                   userId={userId}
                 />

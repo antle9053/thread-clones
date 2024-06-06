@@ -19,6 +19,7 @@ export interface ActivitySlice {
   setOpenActivity: (_isOpen: boolean) => void;
   setActivityThread: (_thread: GetThreadResponse | null) => void;
   setListActivities: (list: UserActivity[]) => void;
+  updateFollowInActivity: (id: string, isFollowed: boolean) => void;
 }
 
 export const createActivitySlice: StateCreator<ActivitySlice> = (
@@ -36,6 +37,25 @@ export const createActivitySlice: StateCreator<ActivitySlice> = (
   setListActivities: (list: UserActivity[]) => {
     set((state: AppState) => ({ ...state, listActivities: list }));
   },
+  updateFollowInActivity: (id: string, isFollowed: boolean) => {
+    set((state: AppState) => {
+      const { listActivities } = state;
+      return {
+        ...state,
+        listActivities: listActivities.map((followed) =>
+          followed.profile.id === id
+            ? {
+                ...followed,
+                profile: {
+                  ...followed.profile,
+                  isFollowed,
+                },
+              }
+            : followed
+        ),
+      };
+    });
+  },
 });
 
 export const activitySelectors = {
@@ -46,4 +66,5 @@ export const activitySelectors = {
   setOpenActivity: (state: AppState) => state.setOpenActivity,
   setActivityThread: (state: AppState) => state.setActivityThread,
   setListActivities: (state: AppState) => state.setListActivities,
+  updateFollowInActivity: (state: AppState) => state.updateFollowInActivity,
 };

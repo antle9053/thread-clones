@@ -4,8 +4,13 @@ import {
 } from "@/src/modules/thread-detail/zustand/activitySlice";
 import { useAppStore } from "../infra/zustand";
 import { authSelectors } from "../infra/zustand/slices/authSlice";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getActivityByThreadId } from "../services/activity.service";
+import {
+  followUserService,
+  unfollowUserService,
+} from "../services/follows.service";
+import { message } from "antd";
 
 export type activityType = "all" | "like" | "quote" | "repost";
 
@@ -16,6 +21,9 @@ export const useActivity = () => {
   const setThread = useAppStore(activitySelectors.setActivityThread);
   const setListActivities = useAppStore(activitySelectors.setListActivities);
   const listActivities = useAppStore(activitySelectors.listActivities);
+  const updateFollowInActivity = useAppStore(
+    activitySelectors.updateFollowInActivity
+  );
 
   const [type, setType] = useState<activityType>("all");
   const [views, setViews] = useState<number>(0);
@@ -89,6 +97,42 @@ export const useActivity = () => {
     [listActivities]
   );
 
+  const handleFollow = useCallback(
+    async (followedId: string) => {
+      if (followedId && user?.id) {
+        message.open({
+          key: "message-follow-loading",
+          type: "loading",
+          content: "Following...",
+          duration: 0,
+        });
+        updateFollowInActivity(followedId, true);
+        await followUserService(user?.id, followedId);
+        message.destroy("message-follow-loading");
+        await message.success("Followed");
+      }
+    },
+    [user]
+  );
+
+  const handleUnfollow = useCallback(
+    async (followedId: string) => {
+      if (followedId && user?.id) {
+        message.open({
+          key: "message-unfollow-loading",
+          type: "loading",
+          content: "Unfollowing...",
+          duration: 0,
+        });
+        updateFollowInActivity(followedId, false);
+        await unfollowUserService(user?.id, followedId);
+        message.destroy("message-unfollow-loading");
+        await message.success("Unfollowed");
+      }
+    },
+    [user]
+  );
+
   return {
     handleClose,
     isOpen,
@@ -102,5 +146,7 @@ export const useActivity = () => {
     setType,
     type,
     thread,
+    handleFollow,
+    handleUnfollow,
   };
 };

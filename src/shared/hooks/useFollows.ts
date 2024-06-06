@@ -9,7 +9,6 @@ import {
   listFollowingsService,
   unfollowUserService,
 } from "../services/follows.service";
-import type { User } from "../services/follows.service";
 
 export const useFollow = () => {
   const isOpen = useAppStore(followSelectors.isOpenFollow);
