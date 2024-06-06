@@ -12,9 +12,10 @@ interface UserItemProps {
   profile: UserWithFollow;
   handleFollow: (followedId: string) => void;
   handleUnfollow: (followedId: string) => void;
-  handleClose: () => void;
+  handleClose?: () => void;
   userId?: string;
   activityType?: string;
+  showFollow?: boolean;
 }
 
 export const UserItem: FC<UserItemProps> = ({
@@ -24,8 +25,10 @@ export const UserItem: FC<UserItemProps> = ({
   userId,
   activityType,
   handleClose,
+  showFollow,
 }) => {
   const router = useRouter();
+  const numOfFollows = profile?.followedByIDs?.length ?? 0;
   const renderActivity = (activity: string) => {
     switch (activity) {
       case "like": {
@@ -69,32 +72,39 @@ export const UserItem: FC<UserItemProps> = ({
           ) : null}
         </div>
       </div>
-      <div className="flex-1 flex justify-between items-center border-b border-solid border-slate-300 pb-4 min-h-[36px]">
-        <div className="flex flex-col">
-          <span className="font-bold text-black">{profile.name}</span>
-          <span
-            className="font-[400] text-[#999999]"
-            onClick={() => {
-              handleClose();
-              router.push(`/@${profile.username}`);
-            }}
-          >
-            {profile.username}
-          </span>
-        </div>
-        <div>
-          {profile.id === userId ? null : (
-            <Button
+      <div className="flex-1  border-b border-solid border-slate-300 pb-4 min-h-[36px]">
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col">
+            <span className="font-bold text-black">{profile.name}</span>
+            <span
+              className="font-[400] text-[#999999]"
               onClick={() => {
-                profile.isFollowed
-                  ? handleUnfollow(profile.id)
-                  : handleFollow(profile.id);
+                handleClose?.();
+                router.push(`/@${profile.username}`);
               }}
             >
-              {profile.isFollowed ? "Following" : "Follow"}
-            </Button>
-          )}
+              {profile.username}
+            </span>
+          </div>
+          <div>
+            {profile.id === userId ? null : (
+              <Button
+                onClick={() => {
+                  profile.isFollowed
+                    ? handleUnfollow(profile.id)
+                    : handleFollow(profile.id);
+                }}
+              >
+                {profile.isFollowed ? "Following" : "Follow"}
+              </Button>
+            )}
+          </div>
         </div>
+        {showFollow ? (
+          <div className="mt-2">
+            {numOfFollows} follower{numOfFollows > 1 ? "s" : ""}
+          </div>
+        ) : null}
       </div>
     </div>
   );

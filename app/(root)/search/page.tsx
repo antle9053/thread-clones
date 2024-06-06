@@ -1,3 +1,5 @@
-export default function Search() {
-  return <></>;
+import { Search } from "@/src/modules/search/Search";
+
+export default function SearchPage() {
+  return <Search />;
 }

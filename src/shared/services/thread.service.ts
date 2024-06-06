@@ -557,3 +557,71 @@ export const getRepliesThread = async (
   });
   return result;
 };
+
+export const searchThreads = async (search: string) => {
+  return await prisma.threads.findMany({
+    where: {
+      parent: null,
+      content: {
+        text: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    },
+    include: {
+      author: true,
+      parent: true,
+      reposted: {
+        include: {
+          user: true,
+        },
+      },
+      likes: {
+        include: {
+          user: true,
+        },
+      },
+      content: {
+        include: {
+          files: true,
+          tags: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          child: true,
+          likes: true,
+        },
+      },
+      child: {
+        take: 3,
+        include: {
+          author: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              child: true,
+            },
+          },
+        },
+        distinct: ["authorId"],
+      },
+    },
+  });
+};
