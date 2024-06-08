@@ -5,7 +5,10 @@ import { Layout } from "antd";
 import { Navbar } from "./Navbar";
 import { MobileNavbar } from "./MobileNavbar";
 import { useUser } from "@clerk/nextjs";
-import { getUserService } from "../../services/user.service";
+import {
+  getUserService,
+  updateSocketIdService,
+} from "../../services/user.service";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Loading } from "../ui/Loading";
@@ -14,6 +17,7 @@ import { ThreadAction } from "./Drawer/ThreadAction";
 import { Repost } from "./Drawer/Repost";
 import { Follows } from "./Drawer/Follows";
 import { Activity } from "./Drawer/Activity";
+import { socket } from "../../infra/socket.io";
 
 const { Header, Content } = Layout;
 
@@ -28,6 +32,12 @@ export const MainLayout = ({
 
   useEffect(() => {
     const init = async () => {
+      if (isSignedIn) {
+        if (socket.connected && socket.id) {
+          const socketId = socket.id;
+          await updateSocketIdService(user.id, socketId);
+        }
+      }
       if (!userInfo) {
         if (isLoaded && user && isSignedIn) {
           const response = await getUserService(user.id);
@@ -36,7 +46,7 @@ export const MainLayout = ({
       }
     };
     init();
-  }, [isLoaded, isSignedIn, user, userInfo]);
+  }, [isLoaded, isSignedIn, user, userInfo, socket.connected, socket.id]);
 
   if (!user) return <Loading fullPage />;
 

@@ -34,6 +34,8 @@ model users {
   followingIDs   String[]  @db.ObjectId
   reposts        reposts[]
   likes likes[]
+  socketId      String?
+ 
 }
 
 model threads {

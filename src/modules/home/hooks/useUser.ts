@@ -1,3 +1,4 @@
+import { socket } from "@/src/shared/infra/socket.io";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
@@ -42,6 +43,14 @@ export const useUser = ({ followedId }: UseUserProps) => {
         duration: 0,
       });
       await followUserService(user?.id, followedId);
+
+      if (socket.connected) {
+        socket.emit("follow", {
+          followingName: user?.username,
+          followedId,
+        });
+      }
+
       message.destroy("message-follow-loading");
       await fetchFollowed(followedId);
       await message.success("Followed");

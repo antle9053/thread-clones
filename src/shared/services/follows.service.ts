@@ -2,20 +2,10 @@
 
 import { prisma } from "../infra/prisma";
 import { Prisma } from "@prisma/client";
+import { xPrisma } from "../infra/prisma/hooks";
 
 export const followUserService = async (userId: string, followedId: string) => {
-  await prisma.users.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      following: {
-        connect: {
-          id: followedId,
-        },
-      },
-    },
-  });
+  await xPrisma.users.follow(userId, followedId);
 };
 
 export const unfollowUserService = async (

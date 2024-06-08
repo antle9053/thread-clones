@@ -74,3 +74,30 @@ export const getUsersService = async (
     },
   });
 };
+
+export const updateSocketIdService = async (
+  userId: string,
+  socketId: string
+) => {
+  await prisma.users.update({
+    where: {
+      userId,
+    },
+    data: {
+      socketId,
+    },
+  });
+};
+
+export const removeSocketIdService = async (userId: string) => {
+  await prisma.users.update({
+    where: {
+      userId,
+    },
+    data: {
+      socketId: {
+        unset: true,
+      },
+    },
+  });
+};
