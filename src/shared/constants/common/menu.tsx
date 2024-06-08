@@ -25,7 +25,8 @@ export const menu = [
   },
   {
     icon: <Heart />,
-    name: "",
+    name: "notification",
+    link: "/notification",
   },
   {
     icon: <User />,

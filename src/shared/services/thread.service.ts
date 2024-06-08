@@ -476,7 +476,7 @@ export const deleteThreadService = async (threadId: string) => {
 export const getRepliesThread = async (
   userId: string
 ): Promise<GetThreadResponse[]> => {
-  const user = await prisma.users.findUnique({
+  const user = await prisma.users.findFirst({
     where: {
       userId,
     },
@@ -519,7 +519,7 @@ export const getRepliesThread = async (
       },
       likes: {
         where: {
-          userId,
+          userId: user?.id,
         },
         include: {
           user: true,

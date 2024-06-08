@@ -16,7 +16,7 @@ export const Repost: FC<RepostProps> = ({ thread }) => {
     <div
       className={clsx(
         "h-full w-[36px] flex items-center",
-        thread.reposted.length > 0 ? "text-primary" : "text-black"
+        thread?.reposted?.length > 0 ? "text-primary" : "text-black"
       )}
     >
       <Repeat

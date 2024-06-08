@@ -52,6 +52,7 @@ export const MobileNavbar = () => {
                     setOpenEditProfile(true);
                   }
                 } else if (item.link) {
+                  console.log(item.link);
                   router.push(item.link);
                 }
               }}

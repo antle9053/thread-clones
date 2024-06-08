@@ -15,7 +15,6 @@ export const SearchThreads: FC<SearchThreadsProps> = ({ query }) => {
   useEffect(() => {
     const fetchThreads = async () => {
       const threads = await searchThreads(query);
-      console.log(threads);
       setThreads(threads);
     };
     fetchThreads();
