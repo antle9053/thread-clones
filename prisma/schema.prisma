@@ -14,28 +14,50 @@ datasource db {
 }
 
 model users {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String    @unique
-  username       String?
-  name           String
-  avatar         String?
-  bio            String?
-  links          String[]
-  threads        threads[]
-  usedTags       tags[]    @relation(fields: [usedTagIds], references: [id])
-  usedTagIds     String[]  @db.ObjectId
-  votedOptions   options[] @relation(fields: [votedOptionIds], references: [id])
-  votedOptionIds String[]  @db.ObjectId
-  savedThreads   threads[] @relation("Saves", fields: [savedThreadIds], references: [id])
-  savedThreadIds String[]  @db.ObjectId
-  followedBy     users[]   @relation("UserFollows", fields: [followedByIDs], references: [id])
-  followedByIDs  String[]  @db.ObjectId
-  following      users[]   @relation("UserFollows", fields: [followingIDs], references: [id])
-  followingIDs   String[]  @db.ObjectId
-  reposts        reposts[]
-  likes likes[]
-  socketId      String?
- 
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String          @unique
+  username          String?
+  name              String
+  avatar            String?
+  bio               String?
+  links             String[]
+  threads           threads[]
+  usedTags          tags[]          @relation(fields: [usedTagIds], references: [id])
+  usedTagIds        String[]        @db.ObjectId
+  votedOptions      options[]       @relation(fields: [votedOptionIds], references: [id])
+  votedOptionIds    String[]        @db.ObjectId
+  savedThreads      threads[]       @relation("Saves", fields: [savedThreadIds], references: [id])
+  savedThreadIds    String[]        @db.ObjectId
+  followedBy        users[]         @relation("UserFollows", fields: [followedByIDs], references: [id])
+  followedByIDs     String[]        @db.ObjectId
+  following         users[]         @relation("UserFollows", fields: [followingIDs], references: [id])
+  followingIDs      String[]        @db.ObjectId
+  reposts           reposts[]
+  likes             likes[]
+  socketId          String?
+  sendNotifications notifications[]
+  notifications     sends[]
+}
+
+model sends {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  notification   notifications @relation(fields: [notificationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  notificationId String        @db.ObjectId
+  user           users         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId         String        @db.ObjectId
+  sendAt         DateTime      @default(now())
+}
+
+model notifications {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  sender           users   @relation(fields: [senderId], references: [userId])
+  senderId         String
+  notificationType String
+  recievers        sends[]
+  title            String
+  content          String?
+  url              String?
+  read             Boolean @default(false)
 }
 
 model threads {
@@ -51,11 +73,11 @@ model threads {
   savedByUsers   users[]   @relation("Saves", fields: [savedByUserIds], references: [id])
   savedByUserIds String[]  @db.ObjectId
   reposted       reposts[]
-  likes likes[]
+  likes          likes[]
   quotedThread   threads?  @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   quotedThreadId String?   @unique @db.ObjectId
-  quotedByThread threads[]  @relation("Quotes")
-  views          Int @default(0)
+  quotedByThread threads[] @relation("Quotes")
+  views          Int       @default(0)
 }
 
 model reposts {
@@ -68,12 +90,12 @@ model reposts {
 }
 
 model likes {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  thread     threads  @relation(fields: [threadId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  threadId   String   @db.ObjectId
-  user       users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId     String   @db.ObjectId
-  likedAt DateTime @default(now())
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  thread   threads  @relation(fields: [threadId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  threadId String   @db.ObjectId
+  user     users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   String   @db.ObjectId
+  likedAt  DateTime @default(now())
 }
 
 model contents {

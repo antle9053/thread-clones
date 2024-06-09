@@ -1,3 +1,4 @@
+import { sendNotificationService } from "@/src/shared/services/notification.service";
 import { PrismaClient } from "@prisma/client";
 
 export const xPrisma = new PrismaClient().$extends({
@@ -14,6 +15,15 @@ export const xPrisma = new PrismaClient().$extends({
                 id: followedId,
               },
             },
+          },
+        });
+
+        await sendNotificationService({
+          userId: followedId,
+          notification: {
+            senderId: userId,
+            title: "Followed you",
+            notificationType: "follow",
           },
         });
       },
