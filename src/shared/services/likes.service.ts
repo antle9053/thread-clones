@@ -1,14 +1,10 @@
 "use server";
 
 import { prisma } from "../infra/prisma";
+import { xPrisma } from "../infra/prisma/hooks";
 
 export const likeThreadService = async (threadId: string, userId: string) => {
-  await prisma.likes.create({
-    data: {
-      userId,
-      threadId,
-    },
-  });
+  await xPrisma.likes.like(userId, threadId);
 };
 
 export const unlikeThreadService = async (threadId: string, userId: string) => {

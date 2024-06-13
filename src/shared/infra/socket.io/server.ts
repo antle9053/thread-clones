@@ -2,6 +2,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
+import { getAuthorService } from "../../services/thread.service";
 
 const httpServer = createServer();
 
@@ -28,13 +29,31 @@ io.on("connection", async (socket) => {
         },
       });
 
+      const following = await prisma.users.findFirst({
+        where: {
+          username: followingName,
+        },
+      });
+
       if (followedUser && followedUser.socketId) {
         socket.to(followedUser.socketId).emit("followed", {
-          followingName,
+          following,
         });
       }
     }
   );
+
+  socket.on("like", async (data: { threadId: string; liker: any }) => {
+    const { threadId, liker } = data;
+
+    const author = await getAuthorService(threadId);
+
+    if (author && author.socketId) {
+      socket.to(author.socketId).emit("liked", {
+        liker,
+      });
+    }
+  });
 });
 
 httpServer.listen(5000, () => {

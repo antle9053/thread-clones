@@ -15,6 +15,9 @@ export const Notification = () => {
     socket.on("followed", (data) => {
       setNoti((noti) => [...noti, data.followingName]);
     });
+    socket.on("liked", (data) => {
+      console.log(data);
+    });
   }, []);
 
   return (
@@ -25,7 +28,6 @@ export const Notification = () => {
           return (
             <NotificationItem
               key={index}
-              // profile={send.user}
               handleFollow={() => {}}
               handleUnfollow={() => {}}
               notification={send.notification}

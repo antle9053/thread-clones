@@ -1,3 +1,4 @@
+import { socket } from "@/src/shared/infra/socket.io";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
@@ -38,6 +39,12 @@ export const useLike = ({ threadId, setInitLike }: UseLikeProps) => {
       setLiked(true);
       if (user && user?.id) {
         await likeThreadService(threadId, user?.id ?? "");
+        if (socket.connected) {
+          socket.emit("like", {
+            threadId,
+            liker: user,
+          });
+        }
         await fetchLiked(threadId);
       }
     },

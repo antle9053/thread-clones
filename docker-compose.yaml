@@ -5,3 +5,4 @@ services:
     image: anthony847/thread-clone
     ports:
       - 3000:3000
+      - 5000:5000

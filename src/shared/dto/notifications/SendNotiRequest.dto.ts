@@ -1,5 +1,6 @@
 export type notificationType =
   | "follow"
+  | "like"
   | "reply"
   | "mention"
   | "repost"

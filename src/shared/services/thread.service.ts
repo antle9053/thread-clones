@@ -625,3 +625,18 @@ export const searchThreads = async (search: string) => {
     },
   });
 };
+
+export const getAuthorService = async (threadId: string) => {
+  const thread = await prisma.threads.findUnique({
+    where: {
+      id: threadId,
+    },
+    select: {
+      author: true,
+    },
+  });
+  if (thread) {
+    return thread.author;
+  }
+  return null;
+};

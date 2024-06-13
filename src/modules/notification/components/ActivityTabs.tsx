@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const tabs = [
   {
@@ -31,8 +31,9 @@ const tabs = [
 
 export const ActivityTabs = () => {
   const [activeTab, setActiveTab] = useState(0);
+
   return (
-    <div className="min-w-full w-fit flex gap-2 p-2">
+    <div className="w-full flex gap-2 p-2 overflow-x-scroll">
       {tabs.map((tab, index) => {
         return (
           <Button

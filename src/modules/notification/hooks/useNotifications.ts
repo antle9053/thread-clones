@@ -2,8 +2,8 @@ import { SendNotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResp
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { getNotificaitonsService } from "@/src/shared/services/notification.service";
-import { useEffect, useState } from "react";
-import { UserWithFollow } from "../../profile/zustand/followSlice";
+import { useEffect, useRef, useState } from "react";
+import { socket } from "@/src/shared/infra/socket.io";
 
 export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
   notification: {
@@ -17,6 +17,33 @@ export const useNotifications = () => {
   const [sends, setSends] = useState<SendNotiResponseWithFollow[]>([]);
 
   const user = useAppStore(authSelectors.user);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    socket.on("followed", (data) => {
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: data.following,
+          title: "Followed you",
+          notificationType: "follow",
+        },
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
+    });
+
+    socket.on("liked", (data) => {
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: data.liker,
+          title: `Liked your thread`,
+          notificationType: "like",
+        },
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
