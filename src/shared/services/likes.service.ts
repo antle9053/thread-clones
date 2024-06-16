@@ -8,12 +8,7 @@ export const likeThreadService = async (threadId: string, userId: string) => {
 };
 
 export const unlikeThreadService = async (threadId: string, userId: string) => {
-  await prisma.likes.deleteMany({
-    where: {
-      userId,
-      threadId,
-    },
-  });
+  await xPrisma.likes.unlike(userId, threadId);
 };
 
 export const isLikedService = async (threadId: string, userId: string) => {

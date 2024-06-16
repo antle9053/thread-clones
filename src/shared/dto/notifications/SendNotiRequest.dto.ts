@@ -18,3 +18,9 @@ export type SendNotiRequestDTO = {
   userId: string;
   notification: NotificationDTO;
 };
+
+export type DeleteNotiRequestDTO = {
+  type: notificationType;
+  senderId: string;
+  recieverId: string;
+};

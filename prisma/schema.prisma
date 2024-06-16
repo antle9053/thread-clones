@@ -50,8 +50,8 @@ model sends {
 
 model notifications {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  sender           users   @relation(fields: [senderId], references: [userId])
-  senderId         String
+  sender           users   @relation(fields: [senderId], references: [id])
+  senderId         String  @db.ObjectId
   notificationType String
   recievers        sends[]
   title            String

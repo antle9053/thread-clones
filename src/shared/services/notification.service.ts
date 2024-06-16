@@ -1,6 +1,9 @@
 "use server";
 
-import { SendNotiRequestDTO } from "../dto/notifications/SendNotiRequest.dto";
+import {
+  DeleteNotiRequestDTO,
+  SendNotiRequestDTO,
+} from "../dto/notifications/SendNotiRequest.dto";
 import { prisma } from "../infra/prisma";
 
 export const sendNotificationService = async (
@@ -40,4 +43,39 @@ export const getNotificaitonsService = async (userId: string) => {
       },
     },
   });
+};
+
+export const deleteNotificationService = async (
+  deleteNotiRequest: DeleteNotiRequestDTO
+) => {
+  const { type, senderId, recieverId } = deleteNotiRequest;
+
+  const notification = await prisma.notifications.findFirst({
+    where: {
+      notificationType: type,
+      senderId,
+      recievers: {
+        some: {
+          userId: recieverId,
+        },
+      },
+    },
+  });
+
+  if (notification) {
+    await prisma.sends.deleteMany({
+      where: {
+        notificationId: notification.id,
+        userId: recieverId,
+      },
+    });
+
+    if (type === "like" || type === "follow") {
+      await prisma.notifications.delete({
+        where: {
+          id: notification?.id,
+        },
+      });
+    }
+  }
 };

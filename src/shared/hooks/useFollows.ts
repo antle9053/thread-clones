@@ -9,7 +9,6 @@ import {
   listFollowingsService,
   unfollowUserService,
 } from "../services/follows.service";
-import { socket } from "../infra/socket.io";
 
 export const useFollow = () => {
   const isOpen = useAppStore(followSelectors.isOpenFollow);
@@ -37,12 +36,6 @@ export const useFollow = () => {
         });
         updateFollow(followedId, true);
         await followUserService(user?.id, followedId);
-        // if (socket.connected) {
-        //   socket.emit("follow", {
-        //     userId: socket.id,
-        //     followedId,
-        //   });
-        // }
         message.destroy("message-follow-loading");
         await message.success("Followed");
       }

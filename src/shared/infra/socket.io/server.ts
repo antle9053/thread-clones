@@ -3,6 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
 import { getAuthorService } from "../../services/thread.service";
+import { Likes, Unlikes } from "./events.type";
 
 const httpServer = createServer();
 
@@ -43,7 +44,7 @@ io.on("connection", async (socket) => {
     }
   );
 
-  socket.on("like", async (data: { threadId: string; liker: any }) => {
+  socket.on("like", async (data: Likes) => {
     const { threadId, liker } = data;
 
     const author = await getAuthorService(threadId);
@@ -53,6 +54,10 @@ io.on("connection", async (socket) => {
         liker,
       });
     }
+  });
+
+  socket.on("unlike", async (data: Unlikes) => {
+    const { threadId, likerId } = data;
   });
 });
 

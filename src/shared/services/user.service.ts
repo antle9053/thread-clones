@@ -26,12 +26,12 @@ export const createUserService = async (args: CreateUserArg): Promise<void> => {
 export type GetUserResponse = Prisma.usersGetPayload<{}>;
 
 export const getUserService = async (
-  userId?: string,
+  id?: string,
   username?: string
 ): Promise<GetUserResponse | null> => {
   const user = await prisma.users.findFirst({
     where: {
-      ...(userId ? { userId } : {}),
+      ...(id ? { id } : {}),
       ...(username ? { username } : {}),
     },
   });

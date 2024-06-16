@@ -9,7 +9,7 @@ const tabs = [
   },
   {
     index: 1,
-    label: "Followes",
+    label: "Followers",
   },
   {
     index: 2,
