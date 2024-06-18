@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import { prisma } from "../prisma";
 import { getAuthorService } from "../../services/thread.service";
 import { Likes, Unlikes } from "./events.type";
+import { nanoid } from "nanoid";
 
 const httpServer = createServer();
 
@@ -36,8 +37,11 @@ io.on("connection", async (socket) => {
         },
       });
 
+      const notiId = nanoid();
+
       if (followedUser && followedUser.socketId) {
         socket.to(followedUser.socketId).emit("followed", {
+          notiId,
           following,
         });
       }
@@ -48,9 +52,11 @@ io.on("connection", async (socket) => {
     const { threadId, liker } = data;
 
     const author = await getAuthorService(threadId);
+    const notiId = nanoid();
 
     if (author && author.socketId) {
       socket.to(author.socketId).emit("liked", {
+        notiId,
         liker,
       });
     }
@@ -58,6 +64,16 @@ io.on("connection", async (socket) => {
 
   socket.on("unlike", async (data: Unlikes) => {
     const { threadId, likerId } = data;
+
+    const author = await getAuthorService(threadId);
+    const notiId = nanoid();
+    if (author && author.socketId) {
+      socket.to(author.socketId).emit("unliked", {
+        likerId,
+        authorId: author.id,
+        notiId,
+      });
+    }
   });
 });
 

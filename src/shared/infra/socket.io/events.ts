@@ -1,22 +1,26 @@
 import { socket } from "@/src/shared/infra/socket.io";
-import { Likes, Unlikes } from "./events.type";
+import { Follows, Likes, Unfollows, Unlikes } from "./events.type";
 
 export const likeEvent = (payload: Likes) => {
-  const { threadId, liker } = payload;
   if (socket.connected) {
-    socket.emit("like", {
-      threadId,
-      liker,
-    });
+    socket.emit("like", payload);
   }
 };
 
 export const unlikeEvent = (payload: Unlikes) => {
-  const { threadId, likerId } = payload;
   if (socket.connected) {
-    socket.emit("unlike", {
-      threadId,
-      likerId,
-    });
+    socket.emit("unlike", payload);
+  }
+};
+
+export const followEvent = (payload: Follows) => {
+  if (socket.connected) {
+    socket.emit("follow", payload);
+  }
+};
+
+export const unfollowEvent = (payload: Unfollows) => {
+  if (socket.connected) {
+    socket.emit("unfollow", payload);
   }
 };

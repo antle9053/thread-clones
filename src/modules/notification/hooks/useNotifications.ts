@@ -2,7 +2,7 @@ import { SendNotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResp
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { getNotificaitonsService } from "@/src/shared/services/notification.service";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { socket } from "@/src/shared/infra/socket.io";
 
 export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
@@ -11,13 +11,13 @@ export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
       isFollowed: boolean;
     };
   };
+  notiId?: string;
 };
 
 export const useNotifications = () => {
   const [sends, setSends] = useState<SendNotiResponseWithFollow[]>([]);
 
   const user = useAppStore(authSelectors.user);
-  const initialized = useRef(false);
 
   useEffect(() => {
     socket.on("followed", (data) => {
@@ -28,6 +28,7 @@ export const useNotifications = () => {
           title: "Followed you",
           notificationType: "follow",
         },
+        notiId: data.notiId,
       } as SendNotiResponseWithFollow;
       setSends((sends) => [newNoti, ...sends]);
     });
@@ -40,10 +41,27 @@ export const useNotifications = () => {
           title: `Liked your thread`,
           notificationType: "like",
         },
+        notiId: data.notiId,
       } as SendNotiResponseWithFollow;
       setSends((sends) => [newNoti, ...sends]);
     });
-  }, []);
+
+    socket.on("unliked", (data) => {
+      const { likerId, authorId } = data;
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+
+          const isDeleted =
+            notification.notificationType === "like" &&
+            notification.senderId === likerId &&
+            userId === authorId;
+          return isDeleted;
+        })
+      );
+    });
+  }, [sends]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -68,7 +86,15 @@ export const useNotifications = () => {
     };
     fetchNotifications();
   }, [user?.id]);
+
+  const filteredSends = useMemo(() => {
+    return [...sends].filter((send, index, self) => {
+      if (!send.notiId) return true;
+      return index === self.findIndex((o) => o.notiId === send.notiId);
+    });
+  }, [sends]);
+
   return {
-    sends,
+    sends: filteredSends,
   };
 };

@@ -13,18 +13,22 @@ const tabs = [
   },
   {
     index: 2,
-    label: "Replies",
+    label: "Likes",
   },
   {
     index: 3,
-    label: "Mentions",
+    label: "Replies",
   },
   {
     index: 4,
-    label: "Quotes",
+    label: "Mentions",
   },
   {
     index: 5,
+    label: "Quotes",
+  },
+  {
+    index: 6,
     label: "Reposts",
   },
 ];

@@ -32,6 +32,27 @@ export const xPrisma = new PrismaClient().$extends({
           },
         });
       },
+
+      async unfollow(userId: string, followedId: string) {
+        await xPrisma.users.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            following: {
+              disconnect: {
+                id: followedId,
+              },
+            },
+          },
+        });
+
+        await deleteNotificationService({
+          type: "follow",
+          senderId: userId,
+          recieverId: followedId,
+        });
+      },
     },
     likes: {
       async like(userId: string, threadId: string) {

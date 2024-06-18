@@ -14,7 +14,7 @@ const options: HTMLReactParserOptions = {
     if (attribs["data-type"] === "mention") {
       return (
         <Link
-          href={`/search?q=${attribs["data-id"]}`}
+          href={`/@${attribs["data-id"]}`}
           className="text-[#0095F6]"
           onClick={(e) => e.stopPropagation()}
         >

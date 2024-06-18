@@ -122,16 +122,24 @@ export const useCreateThreadForm = ({
 
       const parser = new DOMParser();
       const listTags: string[] = [];
+      const listMentions: string[] = [];
 
       const arg: CreateThreadArg[] = values.threads
         .filter((value: any) => value.text !== undefined)
         .map((value: any, index: number) => {
           const doc = parser.parseFromString(value.text, "text/html");
-          const tagNodes = doc.querySelectorAll("[data-type='mention']");
+          const tagNodes = doc.querySelectorAll("[data-type='hashtag']");
           const tags = Array.from(tagNodes).map((node) => ({
             title: node.getAttribute("data-id"),
           }));
           listTags.push(...tags.map((tag) => tag.title ?? ""));
+
+          const mentionNodes = doc.querySelectorAll("[data-type='mention']");
+          const mentions = Array.from(mentionNodes).map((node) => ({
+            title: node.getAttribute("data-id"),
+          }));
+          listMentions.push(...mentions.map((tag) => tag.title ?? ""));
+
           return {
             ...(quote ? { quoteId: quote.id } : {}),
             content: {

@@ -16,8 +16,8 @@ datasource db {
 model users {
   id                String          @id @default(auto()) @map("_id") @db.ObjectId
   userId            String          @unique
-  username          String?
-  name              String
+  username          String          @unique
+  name              String          
   avatar            String?
   bio               String?
   links             String[]

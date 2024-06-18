@@ -9,3 +9,13 @@ export type Unlikes = {
   threadId: string;
   likerId: string;
 };
+
+export type Follows = {
+  follower: User;
+  followedId: string;
+};
+
+export type Unfollows = {
+  followerId: string;
+  followedId: string;
+};

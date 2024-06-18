@@ -1,4 +1,8 @@
 import { socket } from "@/src/shared/infra/socket.io";
+import {
+  followEvent,
+  unfollowEvent,
+} from "@/src/shared/infra/socket.io/events";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
@@ -44,12 +48,10 @@ export const useUser = ({ followedId }: UseUserProps) => {
       });
       await followUserService(user?.id, followedId);
 
-      if (socket.connected) {
-        socket.emit("follow", {
-          followingName: user?.username,
-          followedId,
-        });
-      }
+      followEvent({
+        follower: user,
+        followedId,
+      });
 
       message.destroy("message-follow-loading");
       await fetchFollowed(followedId);
@@ -66,6 +68,12 @@ export const useUser = ({ followedId }: UseUserProps) => {
         duration: 0,
       });
       await unfollowUserService(user?.id, followedId);
+
+      unfollowEvent({
+        followerId: user.id,
+        followedId,
+      });
+
       message.destroy("message-unfollow-loading");
       await fetchFollowed(followedId);
       await message.success("Unfollowed");
