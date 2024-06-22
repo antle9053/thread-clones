@@ -9,7 +9,7 @@ import { prisma } from "../infra/prisma";
 export const sendNotificationService = async (
   sendNotiRequest: SendNotiRequestDTO
 ) => {
-  const { userId, notification } = sendNotiRequest;
+  const { userIds, notification } = sendNotiRequest;
   const newNotification = await prisma.notifications.create({
     data: {
       ...notification,
@@ -21,11 +21,11 @@ export const sendNotificationService = async (
       },
     },
   });
-  const result = await prisma.sends.create({
-    data: {
+  const result = await prisma.sends.createMany({
+    data: userIds.map((userId) => ({
       userId,
       notificationId: newNotification.id,
-    },
+    })),
   });
   return result;
 };

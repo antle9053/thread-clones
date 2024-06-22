@@ -11,6 +11,7 @@ import {
 } from "@/src/shared/services/thread.service";
 import { ThreadType } from "../components/CreateThreadForm";
 import { addTags } from "@/src/shared/services/tags.service";
+import { mentionService } from "@/src/shared/services/mention.service";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
@@ -187,6 +188,11 @@ export const useCreateThreadForm = ({
         }
 
         await addTags(user?.id, listTags);
+        await mentionService({
+          mentionerId: user.id,
+          mentionedUsernames: listMentions,
+          content: "",
+        });
 
         message.destroy("message-loading");
         await message.success("Posted");

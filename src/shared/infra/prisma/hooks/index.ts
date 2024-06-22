@@ -24,7 +24,7 @@ export const xPrisma = new PrismaClient().$extends({
         });
 
         await sendNotificationService({
-          userId: followedId,
+          userIds: [followedId],
           notification: {
             senderId: userId,
             title: "Followed you",
@@ -68,7 +68,7 @@ export const xPrisma = new PrismaClient().$extends({
         console.log(userId);
         if (author && user) {
           await sendNotificationService({
-            userId: author?.id,
+            userIds: [author?.id],
             notification: {
               senderId: user?.id,
               title: `Liked your thread`,

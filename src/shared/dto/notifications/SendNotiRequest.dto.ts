@@ -15,7 +15,7 @@ export type NotificationDTO = {
 };
 
 export type SendNotiRequestDTO = {
-  userId: string;
+  userIds: string[];
   notification: NotificationDTO;
 };
 
