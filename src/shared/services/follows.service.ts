@@ -32,7 +32,7 @@ export const isFollowedService = async (
 ): Promise<boolean> => {
   const user = await prisma.users.findFirst({
     where: {
-      id: followingUserId,
+      userId: followingUserId,
       followingIDs: {
         has: followedUserId,
       },

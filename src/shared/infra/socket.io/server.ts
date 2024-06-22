@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
 import { getAuthorService } from "../../services/thread.service";
-import { Likes, Unlikes } from "./events.type";
+import { Likes, Unlikes, Mentions } from "./events.type";
 import { nanoid } from "nanoid";
 
 const httpServer = createServer();
@@ -58,6 +58,7 @@ io.on("connection", async (socket) => {
       socket.to(author.socketId).emit("liked", {
         notiId,
         liker,
+        userId: author.id,
       });
     }
   });
@@ -74,6 +75,32 @@ io.on("connection", async (socket) => {
         notiId,
       });
     }
+  });
+
+  socket.on("mention", async (data: Mentions) => {
+    const { mentionedUsernames, mentioner, content } = data;
+    const socketIds = await prisma.users.findMany({
+      where: {
+        username: {
+          in: mentionedUsernames,
+        },
+      },
+      select: {
+        socketId: true,
+      },
+    });
+    const notiId = nanoid();
+    socket
+      .to(
+        socketIds
+          .map((item) => item.socketId)
+          .filter((id): id is string => typeof id === "string")
+      )
+      .emit("mentioned", {
+        mentioner,
+        notiId,
+        content,
+      });
   });
 });
 

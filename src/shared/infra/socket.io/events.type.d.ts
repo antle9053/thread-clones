@@ -19,3 +19,11 @@ export type Unfollows = {
   followerId: string;
   followedId: string;
 };
+
+export type Mentions = {
+  mentioner: User;
+  mentionedUsernames: string[];
+  content: string;
+};
+
+export type UnMentions = {};

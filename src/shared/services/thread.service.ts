@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
 import { PollArg } from "./polls.service";
 import { pageType } from "@/src/modules/home";
+import { deleteNotificationService } from "./notification.service";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -469,6 +470,11 @@ export const deleteThreadService = async (threadId: string) => {
         in: descendantThreadIds,
       },
     },
+  });
+
+  await deleteNotificationService({
+    type: "mention",
+    senderId: mainThread.authorId,
   });
   return true;
 };

@@ -12,6 +12,7 @@ import {
 import { ThreadType } from "../components/CreateThreadForm";
 import { addTags } from "@/src/shared/services/tags.service";
 import { mentionService } from "@/src/shared/services/mention.service";
+import { mentionEvent } from "@/src/shared/infra/socket.io/events";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
@@ -178,21 +179,29 @@ export const useCreateThreadForm = ({
           };
         });
 
-      if (user?.userId) {
+      if (user) {
         setOpen(false);
 
         if (thread) {
-          await createThreadService(arg, user?.userId, thread.id);
+          await createThreadService(arg, user.id, thread.id);
         } else {
-          await createThreadService(arg, user?.userId);
+          await createThreadService(arg, user.id);
         }
 
         await addTags(user?.id, listTags);
-        await mentionService({
-          mentionerId: user.id,
-          mentionedUsernames: listMentions,
-          content: "",
-        });
+        if (listMentions.length > 0) {
+          await mentionService({
+            mentionerId: user.id,
+            mentionedUsernames: listMentions,
+            content: "",
+          });
+
+          mentionEvent({
+            mentioner: user,
+            mentionedUsernames: listMentions,
+            content: "",
+          });
+        }
 
         message.destroy("message-loading");
         await message.success("Posted");
@@ -202,7 +211,7 @@ export const useCreateThreadForm = ({
       await message.error("Error when posting");
     } finally {
       resetForm();
-      location.reload();
+      // location.reload();
     }
   };
 

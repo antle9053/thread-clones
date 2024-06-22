@@ -6,7 +6,7 @@ import { prisma } from "../infra/prisma";
 export type CreateUserArg = {
   userId: string;
   name: string;
-  username?: string;
+  username: string;
   avatar?: string;
   bio?: string;
   links?: string[];
@@ -24,6 +24,17 @@ export const createUserService = async (args: CreateUserArg): Promise<void> => {
 };
 
 export type GetUserResponse = Prisma.usersGetPayload<{}>;
+
+export const getUserByUserIdService = async (
+  userId: string
+): Promise<GetUserResponse | null> => {
+  const user = await prisma.users.findFirst({
+    where: {
+      userId,
+    },
+  });
+  return user;
+};
 
 export const getUserService = async (
   id?: string,

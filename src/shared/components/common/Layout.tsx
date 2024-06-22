@@ -6,7 +6,7 @@ import { Navbar } from "./Navbar";
 import { MobileNavbar } from "./MobileNavbar";
 import { useUser } from "@clerk/nextjs";
 import {
-  getUserService,
+  getUserByUserIdService,
   updateSocketIdService,
 } from "../../services/user.service";
 import { useAppStore } from "../../infra/zustand";
@@ -40,7 +40,7 @@ export const MainLayout = ({
       }
       if (!userInfo) {
         if (isLoaded && user && isSignedIn) {
-          const response = await getUserService(user.id);
+          const response = await getUserByUserIdService(user.id);
           setUser(response);
         }
       }

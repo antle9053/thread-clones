@@ -49,16 +49,17 @@ export const deleteNotificationService = async (
   deleteNotiRequest: DeleteNotiRequestDTO
 ) => {
   const { type, senderId, recieverId } = deleteNotiRequest;
-
   const notification = await prisma.notifications.findFirst({
     where: {
       notificationType: type,
       senderId,
-      recievers: {
-        some: {
-          userId: recieverId,
+      ...(recieverId && {
+        recievers: {
+          some: {
+            userId: recieverId,
+          },
         },
-      },
+      }),
     },
   });
 
@@ -66,11 +67,13 @@ export const deleteNotificationService = async (
     await prisma.sends.deleteMany({
       where: {
         notificationId: notification.id,
-        userId: recieverId,
+        ...(recieverId && {
+          userId: recieverId,
+        }),
       },
     });
 
-    if (type === "like" || type === "follow") {
+    if (type === "like" || type === "follow" || type === "mention") {
       await prisma.notifications.delete({
         where: {
           id: notification?.id,

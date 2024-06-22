@@ -62,8 +62,8 @@ model notifications {
 
 model threads {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  authorId       String
-  author         users     @relation(fields: [authorId], references: [userId])
+  authorId       String    @db.ObjectId
+  author         users     @relation(fields: [authorId], references: [id])
   content        contents?
   parentId       String?   @db.ObjectId
   parent         threads?  @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

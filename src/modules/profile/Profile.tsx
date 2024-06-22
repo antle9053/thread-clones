@@ -100,7 +100,7 @@ export const Profile = () => {
           </Button>
         </div>
       )}
-      <Content profileId={profile.userId} />
+      <Content profileId={profile.id} />
       {isSelf ? (
         <EditProfile isOpen={isOpenEditProfile} setOpen={setOpenEditProfile} />
       ) : null}

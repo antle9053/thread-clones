@@ -65,7 +65,6 @@ export const xPrisma = new PrismaClient().$extends({
 
         const author = await getAuthorService(threadId);
         const user = await getUserService(userId);
-        console.log(userId);
         if (author && user) {
           await sendNotificationService({
             userIds: [author?.id],

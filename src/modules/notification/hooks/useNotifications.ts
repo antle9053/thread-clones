@@ -34,14 +34,16 @@ export const useNotifications = () => {
     });
 
     socket.on("liked", (data) => {
+      const { liker, notiId, userId } = data;
       const newNoti = {
         sendAt: new Date(),
         notification: {
-          sender: data.liker,
+          sender: liker,
           title: `Liked your thread`,
           notificationType: "like",
         },
-        notiId: data.notiId,
+        notiId: notiId,
+        userId: userId,
       } as SendNotiResponseWithFollow;
       setSends((sends) => [newNoti, ...sends]);
     });
@@ -52,14 +54,29 @@ export const useNotifications = () => {
       setSends((sends) =>
         [...sends].filter((send) => {
           const { notification, userId } = send;
-
           const isDeleted =
             notification.notificationType === "like" &&
-            notification.senderId === likerId &&
+            notification.sender.id === likerId &&
             userId === authorId;
-          return isDeleted;
+          return !isDeleted;
         })
       );
+    });
+
+    socket.on("mentioned", (data) => {
+      const { mentioner, notiId, content } = data;
+
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: mentioner,
+          title: `Mentiond you`,
+          notificationType: "mention",
+          content,
+        },
+        notiId: notiId,
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
     });
   }, [sends]);
 
@@ -93,7 +110,6 @@ export const useNotifications = () => {
       return index === self.findIndex((o) => o.notiId === send.notiId);
     });
   }, [sends]);
-
   return {
     sends: filteredSends,
   };
