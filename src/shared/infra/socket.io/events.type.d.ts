@@ -26,4 +26,13 @@ export type Mentions = {
   content: string;
 };
 
-export type UnMentions = {};
+export type UnMentions = {
+  mentionerId: string;
+  mentionedUsernames: string[];
+};
+
+export type Reposts = {
+  reposter: User;
+  repostedId: string;
+  content: string;
+};

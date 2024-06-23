@@ -73,12 +73,10 @@ export const deleteNotificationService = async (
       },
     });
 
-    if (type === "like" || type === "follow" || type === "mention") {
-      await prisma.notifications.delete({
-        where: {
-          id: notification?.id,
-        },
-      });
-    }
+    await prisma.notifications.delete({
+      where: {
+        id: notification?.id,
+      },
+    });
   }
 };

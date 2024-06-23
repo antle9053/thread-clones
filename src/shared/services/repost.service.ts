@@ -1,6 +1,11 @@
 "use server";
 
 import { prisma } from "../infra/prisma";
+import {
+  deleteNotificationService,
+  sendNotificationService,
+} from "./notification.service";
+import { getAuthorService } from "./thread.service";
 
 export const repostThreadService = async (threadId: string, userId: string) => {
   await prisma.reposts.create({
@@ -9,6 +14,17 @@ export const repostThreadService = async (threadId: string, userId: string) => {
       threadId,
     },
   });
+  const author = await getAuthorService(threadId);
+  if (author) {
+    await sendNotificationService({
+      userIds: [author?.id],
+      notification: {
+        senderId: userId,
+        title: "Reposted your thread",
+        notificationType: "repost",
+      },
+    });
+  }
 };
 
 export const deleteRepostThreadService = async (
@@ -21,6 +37,14 @@ export const deleteRepostThreadService = async (
       threadId,
     },
   });
+  const author = await getAuthorService(threadId);
+  if (author) {
+    await deleteNotificationService({
+      type: "repost",
+      senderId: userId,
+      recieverId: author?.id,
+    });
+  }
 };
 
 export const getQuotesByThread = async (threadId: string) => {
