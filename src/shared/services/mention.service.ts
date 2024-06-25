@@ -5,7 +5,7 @@ import { prisma } from "../infra/prisma";
 import { sendNotificationService } from "./notification.service";
 
 export const mentionService = async (mentionRequest: MentionRequestDTO) => {
-  const { mentionedUsernames, mentionerId, content } = mentionRequest;
+  const { mentionedUsernames, mentionerId, threadId } = mentionRequest;
   const mentioned = await prisma.users.findMany({
     where: {
       username: {
@@ -19,7 +19,9 @@ export const mentionService = async (mentionRequest: MentionRequestDTO) => {
     notification: {
       senderId: mentionerId,
       title: "Mentioned you",
-      content,
+      content: {
+        threadId,
+      },
       notificationType: "mention",
     },
   });

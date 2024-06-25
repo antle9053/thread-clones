@@ -6,11 +6,16 @@ export type notificationType =
   | "repost"
   | "quote";
 
+export type NotificationContentDTO = {
+  threadId?: string;
+  content?: string;
+};
+
 export type NotificationDTO = {
   senderId: string;
   notificationType: notificationType;
   title: string;
-  content?: string;
+  content?: NotificationContentDTO;
   url?: string;
 };
 

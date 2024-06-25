@@ -23,12 +23,13 @@ export type Unfollows = {
 export type Mentions = {
   mentioner: User;
   mentionedUsernames: string[];
-  content: string;
+  threadId: string;
 };
 
 export type UnMentions = {
   mentionerId: string;
   mentionedUsernames: string[];
+  threadId: string;
 };
 
 export type Reposts = {

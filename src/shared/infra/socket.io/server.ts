@@ -3,7 +3,14 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
 import { getAuthorService } from "../../services/thread.service";
-import { Likes, Unlikes, Mentions, Reposts } from "./events.type";
+import {
+  Likes,
+  Unlikes,
+  Mentions,
+  Reposts,
+  Unfollows,
+  UnMentions,
+} from "./events.type";
 import { nanoid } from "nanoid";
 
 const httpServer = createServer();
@@ -48,6 +55,22 @@ io.on("connection", async (socket) => {
     }
   );
 
+  socket.on("unfollow", async (data: Unfollows) => {
+    const { followerId, followedId } = data;
+
+    const followedUser = await prisma.users.findUnique({
+      where: {
+        id: followedId,
+      },
+    });
+    if (followedUser && followedUser.socketId) {
+      socket.to(followedUser.socketId).emit("unfollowed", {
+        followerId,
+        followedId,
+      });
+    }
+  });
+
   socket.on("like", async (data: Likes) => {
     const { threadId, liker } = data;
 
@@ -67,18 +90,16 @@ io.on("connection", async (socket) => {
     const { threadId, likerId } = data;
 
     const author = await getAuthorService(threadId);
-    const notiId = nanoid();
     if (author && author.socketId) {
       socket.to(author.socketId).emit("unliked", {
         likerId,
         authorId: author.id,
-        notiId,
       });
     }
   });
 
   socket.on("mention", async (data: Mentions) => {
-    const { mentionedUsernames, mentioner, content } = data;
+    const { mentionedUsernames, mentioner, threadId } = data;
     const socketIds = await prisma.users.findMany({
       where: {
         username: {
@@ -99,7 +120,30 @@ io.on("connection", async (socket) => {
       .emit("mentioned", {
         mentioner,
         notiId,
-        content,
+        threadId,
+      });
+  });
+
+  socket.on("unmention", async (data: UnMentions) => {
+    const { mentionedUsernames, mentionerId } = data;
+    const socketIds = await prisma.users.findMany({
+      where: {
+        username: {
+          in: mentionedUsernames,
+        },
+      },
+      select: {
+        socketId: true,
+      },
+    });
+    socket
+      .to(
+        socketIds
+          .map((item) => item.socketId)
+          .filter((id): id is string => typeof id === "string")
+      )
+      .emit("mentioned", {
+        mentionerId,
       });
   });
 
@@ -115,7 +159,7 @@ io.on("connection", async (socket) => {
     });
     const notiId = nanoid();
     if (repostedUser && repostedUser.socketId) {
-      socket.to(repostedUser?.socketId).emit("mentioned", {
+      socket.to(repostedUser?.socketId).emit("reposted", {
         reposter,
         notiId,
         content,

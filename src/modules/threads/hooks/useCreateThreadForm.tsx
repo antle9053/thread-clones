@@ -181,25 +181,28 @@ export const useCreateThreadForm = ({
 
       if (user) {
         setOpen(false);
+        let id: string;
 
         if (thread) {
-          await createThreadService(arg, user.id, thread.id);
+          id = await createThreadService(arg, user.id, thread.id);
         } else {
-          await createThreadService(arg, user.id);
+          id = await createThreadService(arg, user.id);
         }
+
+        console.log(id);
 
         await addTags(user?.id, listTags);
         if (listMentions.length > 0) {
           await mentionService({
             mentionerId: user.id,
             mentionedUsernames: listMentions,
-            content: "",
+            threadId: id,
           });
 
           mentionEvent({
             mentioner: user,
             mentionedUsernames: listMentions,
-            content: "",
+            threadId: id,
           });
         }
 

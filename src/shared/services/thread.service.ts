@@ -103,7 +103,9 @@ export const createThreadService = async (
   const id = result.id;
 
   await createThreadService(threadArg.slice(1), authorId, id);
+  return id;
 };
+
 export type GetThreadResponse = Prisma.threadsGetPayload<{
   include: {
     author: true;

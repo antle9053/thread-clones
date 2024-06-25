@@ -33,6 +33,21 @@ export const useNotifications = () => {
       setSends((sends) => [newNoti, ...sends]);
     });
 
+    socket.on("unfollowed", (data) => {
+      const { followerId, followedId } = data;
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+          const isDeleted =
+            notification.notificationType === "follow" &&
+            notification.sender.id === followerId &&
+            userId === followedId;
+          return !isDeleted;
+        })
+      );
+    });
+
     socket.on("liked", (data) => {
       const { liker, notiId, userId } = data;
       const newNoti = {

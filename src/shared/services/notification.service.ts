@@ -10,9 +10,29 @@ export const sendNotificationService = async (
   sendNotiRequest: SendNotiRequestDTO
 ) => {
   const { userIds, notification } = sendNotiRequest;
+  const { content } = notification;
+
+  const newNotificationContent = await prisma.notificationContents.create({
+    data: {
+      ...(content?.threadId && {
+        thread: {
+          connect: {
+            id: content?.threadId,
+          },
+        },
+      }),
+      content: content?.content,
+    },
+  });
+
   const newNotification = await prisma.notifications.create({
     data: {
       ...notification,
+      notificationContent: {
+        connect: {
+          id: newNotificationContent.id,
+        },
+      },
       senderId: undefined,
       sender: {
         connect: {
