@@ -2,7 +2,10 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
-import { getAuthorService } from "../../services/thread.service";
+import {
+  getAuthorService,
+  getThreadByIdService,
+} from "../../services/thread.service";
 import {
   Likes,
   Unlikes,
@@ -52,7 +55,7 @@ io.on("connection", async (socket) => {
           following,
         });
       }
-    }
+    },
   );
 
   socket.on("unfollow", async (data: Unfollows) => {
@@ -110,22 +113,28 @@ io.on("connection", async (socket) => {
         socketId: true,
       },
     });
+
+    const thread = await prisma.threads.findUnique({
+      where: {
+        id: threadId,
+      },
+    });
     const notiId = nanoid();
     socket
       .to(
         socketIds
           .map((item) => item.socketId)
-          .filter((id): id is string => typeof id === "string")
+          .filter((id): id is string => typeof id === "string"),
       )
       .emit("mentioned", {
         mentioner,
         notiId,
-        threadId,
+        thread,
       });
   });
 
   socket.on("unmention", async (data: UnMentions) => {
-    const { mentionedUsernames, mentionerId } = data;
+    const { mentionedUsernames, mentionerId, threadId } = data;
     const socketIds = await prisma.users.findMany({
       where: {
         username: {
@@ -140,10 +149,11 @@ io.on("connection", async (socket) => {
       .to(
         socketIds
           .map((item) => item.socketId)
-          .filter((id): id is string => typeof id === "string")
+          .filter((id): id is string => typeof id === "string"),
       )
-      .emit("mentioned", {
+      .emit("unmentioned", {
         mentionerId,
+        threadId,
       });
   });
 

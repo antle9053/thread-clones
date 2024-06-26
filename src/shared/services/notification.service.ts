@@ -7,21 +7,21 @@ import {
 import { prisma } from "../infra/prisma";
 
 export const sendNotificationService = async (
-  sendNotiRequest: SendNotiRequestDTO
+  sendNotiRequest: SendNotiRequestDTO,
 ) => {
   const { userIds, notification } = sendNotiRequest;
-  const { content } = notification;
+  const { notificationContent } = notification;
 
   const newNotificationContent = await prisma.notificationContents.create({
     data: {
-      ...(content?.threadId && {
+      ...(notificationContent?.threadId && {
         thread: {
           connect: {
-            id: content?.threadId,
+            id: notificationContent?.threadId,
           },
         },
       }),
-      content: content?.content,
+      content: notificationContent?.content,
     },
   });
 
@@ -59,6 +59,12 @@ export const getNotificaitonsService = async (userId: string) => {
       notification: {
         include: {
           sender: true,
+          notificationContent: {
+            include: {
+              thread: true,
+              notification: true,
+            },
+          },
         },
       },
     },
@@ -66,9 +72,9 @@ export const getNotificaitonsService = async (userId: string) => {
 };
 
 export const deleteNotificationService = async (
-  deleteNotiRequest: DeleteNotiRequestDTO
+  deleteNotiRequest: DeleteNotiRequestDTO,
 ) => {
-  const { type, senderId, recieverId } = deleteNotiRequest;
+  const { type, senderId, recieverId, threadId } = deleteNotiRequest;
   const notification = await prisma.notifications.findFirst({
     where: {
       notificationType: type,
@@ -77,6 +83,13 @@ export const deleteNotificationService = async (
         recievers: {
           some: {
             userId: recieverId,
+          },
+        },
+      }),
+      ...(threadId && {
+        notificationContent: {
+          thread: {
+            id: threadId,
           },
         },
       }),

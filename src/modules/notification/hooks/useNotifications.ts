@@ -44,7 +44,7 @@ export const useNotifications = () => {
             notification.sender.id === followerId &&
             userId === followedId;
           return !isDeleted;
-        })
+        }),
       );
     });
 
@@ -74,34 +74,53 @@ export const useNotifications = () => {
             notification.sender.id === likerId &&
             userId === authorId;
           return !isDeleted;
-        })
+        }),
       );
     });
 
     socket.on("mentioned", (data) => {
-      const { mentioner, notiId, content } = data;
+      const { mentioner, notiId, thread } = data;
 
       const newNoti = {
         sendAt: new Date(),
         notification: {
           sender: mentioner,
-          title: `Mentiond you`,
+          title: `Mentioned you`,
           notificationType: "mention",
-          content,
+          notificationContent: {
+            thread,
+          },
         },
         notiId: notiId,
       } as SendNotiResponseWithFollow;
       setSends((sends) => [newNoti, ...sends]);
+    });
+
+    socket.on("unmentioned", (data) => {
+      const { mentionerId, threadId } = data;
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+          
+          const isDeleted =
+            notification.notificationType === "mention" &&
+            notification.sender.id === mentionerId &&
+            notification.notificationContent?.thread?.id === threadId;
+          return !isDeleted;
+        }),
+      );
     });
   }, [sends]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const response = await getNotificaitonsService(user?.id!);
+      console.log(response);
       setSends(
         [...response].map((send) => {
           const isFollowed = send.notification.sender.followedByIDs.includes(
-            user?.id!
+            user?.id!,
           );
           return {
             ...send,
@@ -113,7 +132,7 @@ export const useNotifications = () => {
               },
             },
           };
-        })
+        }),
       );
     };
     fetchNotifications();

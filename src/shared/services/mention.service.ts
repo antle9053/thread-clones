@@ -19,7 +19,7 @@ export const mentionService = async (mentionRequest: MentionRequestDTO) => {
     notification: {
       senderId: mentionerId,
       title: "Mentioned you",
-      content: {
+      notificationContent: {
         threadId,
       },
       notificationType: "mention",

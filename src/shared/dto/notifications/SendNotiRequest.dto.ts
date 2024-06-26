@@ -15,7 +15,7 @@ export type NotificationDTO = {
   senderId: string;
   notificationType: notificationType;
   title: string;
-  content?: NotificationContentDTO;
+  notificationContent?: NotificationContentDTO;
   url?: string;
 };
 
@@ -28,4 +28,5 @@ export type DeleteNotiRequestDTO = {
   type: notificationType;
   senderId: string;
   recieverId?: string;
+  threadId?: string;
 };

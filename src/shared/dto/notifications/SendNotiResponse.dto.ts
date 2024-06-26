@@ -5,6 +5,12 @@ export type SendNotiResponseDTO = Prisma.sendsGetPayload<{
     notification: {
       include: {
         sender: true;
+        notificationContent: {
+          include: {
+            thread: true;
+            notification: true;
+          };
+        };
       };
     };
   };
@@ -13,5 +19,11 @@ export type SendNotiResponseDTO = Prisma.sendsGetPayload<{
 export type NotiResponseDTO = Prisma.notificationsGetPayload<{
   include: {
     sender: true;
+    notificationContent: {
+      include: {
+        thread: true;
+        notification: true;
+      };
+    };
   };
 }>;

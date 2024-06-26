@@ -1,5 +1,12 @@
 import { socket } from "@/src/shared/infra/socket.io";
-import { Follows, Likes, Mentions, Unfollows, Unlikes } from "./events.type";
+import {
+  Follows,
+  Likes,
+  Mentions,
+  Unfollows,
+  Unlikes,
+  UnMentions,
+} from "./events.type";
 
 export const likeEvent = (payload: Likes) => {
   if (socket.connected) {
@@ -28,5 +35,11 @@ export const unfollowEvent = (payload: Unfollows) => {
 export const mentionEvent = (payload: Mentions) => {
   if (socket.connected) {
     socket.emit("mention", payload);
+  }
+};
+
+export const unmentionEvent = (payload: UnMentions) => {
+  if (socket.connected) {
+    socket.emit("unmention", payload);
   }
 };
