@@ -13,6 +13,7 @@ import {
   Reposts,
   Unfollows,
   UnMentions,
+  UnReposts,
 } from "./events.type";
 import { nanoid } from "nanoid";
 
@@ -158,21 +159,33 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("repost", async (data: Reposts) => {
-    const { reposter, repostedId, content } = data;
-    const repostedUser = await prisma.users.findUnique({
+    const { reposter, threadId } = data;
+    const author = await getAuthorService(threadId);
+
+    const thread = await prisma.threads.findUnique({
       where: {
-        id: repostedId,
-      },
-      select: {
-        socketId: true,
+        id: threadId,
       },
     });
     const notiId = nanoid();
-    if (repostedUser && repostedUser.socketId) {
-      socket.to(repostedUser?.socketId).emit("reposted", {
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("reposted", {
         reposter,
         notiId,
-        content,
+        thread,
+      });
+    }
+  });
+
+  socket.on("unrepost", async (data: UnReposts) => {
+    const { reposterId, threadId } = data;
+    const author = await getAuthorService(threadId);
+
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("unreposted", {
+        reposterId,
+        repostedId: author?.id!,
+        threadId,
       });
     }
   });

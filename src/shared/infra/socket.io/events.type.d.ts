@@ -34,6 +34,15 @@ export type UnMentions = {
 
 export type Reposts = {
   reposter: User;
-  repostedId: string;
-  content: string;
+  threadId: string;
+};
+
+export type UnReposts = {
+  reposterId: string;
+  threadId: string;
+};
+
+export type Quotes = {
+  quoter: User;
+  quotedThreadId: string;
 };

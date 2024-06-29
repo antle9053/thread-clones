@@ -22,6 +22,9 @@ export const repostThreadService = async (threadId: string, userId: string) => {
         senderId: userId,
         title: "Reposted your thread",
         notificationType: "repost",
+        notificationContent: {
+          threadId,
+        },
       },
     });
   }
@@ -29,7 +32,7 @@ export const repostThreadService = async (threadId: string, userId: string) => {
 
 export const deleteRepostThreadService = async (
   threadId: string,
-  userId: string
+  userId: string,
 ) => {
   await prisma.reposts.deleteMany({
     where: {

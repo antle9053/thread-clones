@@ -8,6 +8,10 @@ import {
   repostThreadService,
 } from "../services/repost.service";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
+import {
+  repostEvent,
+  unrepostEvent,
+} from "@/src/shared/infra/socket.io/events";
 
 export const useRepost = () => {
   const [isSelf, setIsSelf] = useState<boolean | null>(null);
@@ -42,6 +46,10 @@ export const useRepost = () => {
         duration: 0,
       });
       await repostThreadService(thread?.id, user?.id);
+      repostEvent({
+        reposter: user,
+        threadId: thread?.id,
+      });
       setOpen(false);
       message.destroy("message-repost-loading");
       setIsReposted(true);
@@ -58,6 +66,10 @@ export const useRepost = () => {
         duration: 0,
       });
       await deleteRepostThreadService(thread?.id, user?.id);
+      unrepostEvent({
+        reposterId: user?.id!,
+        threadId: thread?.id!,
+      });
       setOpen(false);
       message.destroy("message-delete-repost-loading");
       setIsReposted(false);

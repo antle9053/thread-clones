@@ -101,12 +101,48 @@ export const useNotifications = () => {
 
       setSends((sends) =>
         [...sends].filter((send) => {
-          const { notification, userId } = send;
-          
+          const { notification } = send;
+
           const isDeleted =
             notification.notificationType === "mention" &&
             notification.sender.id === mentionerId &&
             notification.notificationContent?.thread?.id === threadId;
+          return !isDeleted;
+        }),
+      );
+    });
+
+    socket.on("reposted", (data) => {
+      const { reposter, notiId, thread } = data;
+
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: reposter,
+          title: `Reposted your thread`,
+          notificationType: "repost",
+          notificationContent: {
+            thread,
+          },
+        },
+        notiId: notiId,
+        userId: thread.authorId!,
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
+    });
+
+    socket.on("unreposted", (data) => {
+      const { reposterId, repostedId, threadId } = data;
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+
+          const isDeleted =
+            notification.notificationType === "repost" &&
+            notification.sender.id === reposterId &&
+            notification.notificationContent?.thread?.id === threadId &&
+            userId === repostedId;
           return !isDeleted;
         }),
       );
@@ -116,7 +152,7 @@ export const useNotifications = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       const response = await getNotificaitonsService(user?.id!);
-      console.log(response);
+
       setSends(
         [...response].map((send) => {
           const isFollowed = send.notification.sender.followedByIDs.includes(
@@ -144,6 +180,7 @@ export const useNotifications = () => {
       return index === self.findIndex((o) => o.notiId === send.notiId);
     });
   }, [sends]);
+
   return {
     sends: filteredSends,
   };
