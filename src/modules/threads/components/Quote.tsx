@@ -45,7 +45,7 @@ export const Quote: FC<QuoteProps> = ({ type, quoteId }) => {
       }
     };
     initQuote();
-  }, [type, quoteId]);
+  }, [type, quoteId, quoteState]);
 
   useEffect(() => {
     const initGif = async () => {

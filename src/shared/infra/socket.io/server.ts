@@ -1,11 +1,9 @@
-"use server";
+import { Unquotes } from "./events.type.d";
+("use server");
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { prisma } from "../prisma";
-import {
-  getAuthorService,
-  getThreadByIdService,
-} from "../../services/thread.service";
+import { getAuthorService } from "../../services/thread.service";
 import {
   Likes,
   Unlikes,
@@ -14,6 +12,7 @@ import {
   Unfollows,
   UnMentions,
   UnReposts,
+  Quotes,
 } from "./events.type";
 import { nanoid } from "nanoid";
 
@@ -54,9 +53,10 @@ io.on("connection", async (socket) => {
         socket.to(followedUser.socketId).emit("followed", {
           notiId,
           following,
+          userId: followedId,
         });
       }
-    },
+    }
   );
 
   socket.on("unfollow", async (data: Unfollows) => {
@@ -125,7 +125,7 @@ io.on("connection", async (socket) => {
       .to(
         socketIds
           .map((item) => item.socketId)
-          .filter((id): id is string => typeof id === "string"),
+          .filter((id): id is string => typeof id === "string")
       )
       .emit("mentioned", {
         mentioner,
@@ -150,7 +150,7 @@ io.on("connection", async (socket) => {
       .to(
         socketIds
           .map((item) => item.socketId)
-          .filter((id): id is string => typeof id === "string"),
+          .filter((id): id is string => typeof id === "string")
       )
       .emit("unmentioned", {
         mentionerId,
@@ -185,6 +185,46 @@ io.on("connection", async (socket) => {
       socket.to(author?.socketId).emit("unreposted", {
         reposterId,
         repostedId: author?.id!,
+        threadId,
+      });
+    }
+  });
+
+  socket.on("quote", async (data: Quotes) => {
+    const { quoter, threadId } = data;
+
+    const thread = await prisma.threads.findUnique({
+      where: {
+        id: threadId,
+      },
+    });
+    const quotedThreadId = thread?.quotedThreadId;
+    const author = await getAuthorService(quotedThreadId!);
+
+    const notiId = nanoid();
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("quoted", {
+        quoter,
+        notiId,
+        thread,
+      });
+    }
+  });
+
+  socket.on("unquote", async (data: Unquotes) => {
+    const { quoterId, threadId } = data;
+    const thread = await prisma.threads.findUnique({
+      where: {
+        id: threadId,
+      },
+    });
+    const quotedThreadId = thread?.quotedThreadId;
+    const author = await getAuthorService(quotedThreadId!);
+
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("unquoted", {
+        quoterId,
+        quotedId: author?.id!,
         threadId,
       });
     }

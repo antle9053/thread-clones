@@ -63,31 +63,31 @@ model notifications {
 
 model notificationContents {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  thread       threads?
+  thread       threads?       @relation(fields: [threadId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   content      String?
   notification notifications?
+  threadId     String?        @db.ObjectId
 }
 
 model threads {
-  id                    String                @id @default(auto()) @map("_id") @db.ObjectId
-  authorId              String                @db.ObjectId
-  author                users                 @relation(fields: [authorId], references: [id])
-  content               contents?
-  parentId              String?               @db.ObjectId
-  parent                threads?              @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  child                 threads[]             @relation("ParentChilds")
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  savedByUsers          users[]               @relation("Saves", fields: [savedByUserIds], references: [id])
-  savedByUserIds        String[]              @db.ObjectId
-  reposted              reposts[]
-  likes                 likes[]
-  quotedThread          threads?              @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  quotedThreadId        String?               @unique @db.ObjectId
-  quotedByThread        threads[]             @relation("Quotes")
-  views                 Int                   @default(0)
-  notificationContent   notificationContents? @relation(fields: [notificationContentId], references: [id])
-  notificationContentId String?               @unique @db.ObjectId
+  id                  String                 @id @default(auto()) @map("_id") @db.ObjectId
+  authorId            String                 @db.ObjectId
+  author              users                  @relation(fields: [authorId], references: [id])
+  content             contents?
+  parentId            String?                @db.ObjectId
+  parent              threads?               @relation("ParentChilds", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  child               threads[]              @relation("ParentChilds")
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  savedByUsers        users[]                @relation("Saves", fields: [savedByUserIds], references: [id])
+  savedByUserIds      String[]               @db.ObjectId
+  reposted            reposts[]
+  likes               likes[]
+  quotedThread        threads?               @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quotedThreadId      String?                @db.ObjectId
+  quotedByThread      threads[]              @relation("Quotes")
+  views               Int                    @default(0)
+  notificationContent notificationContents[]
 }
 
 model reposts {

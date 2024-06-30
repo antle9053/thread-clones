@@ -3,10 +3,12 @@ import {
   Follows,
   Likes,
   Mentions,
+  Quotes,
   Reposts,
   Unfollows,
   Unlikes,
   UnMentions,
+  Unquotes,
   UnReposts,
 } from "./events.type";
 
@@ -55,5 +57,17 @@ export const repostEvent = (payload: Reposts) => {
 export const unrepostEvent = (payload: UnReposts) => {
   if (socket.connected) {
     socket.emit("unrepost", payload);
+  }
+};
+
+export const quoteEvent = (payload: Quotes) => {
+  if (socket.connected) {
+    socket.emit("quote", payload);
+  }
+};
+
+export const unquoteEvent = (payload: Unquotes) => {
+  if (socket.connected) {
+    socket.emit("unquote", payload);
   }
 };

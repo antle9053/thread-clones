@@ -44,5 +44,10 @@ export type UnReposts = {
 
 export type Quotes = {
   quoter: User;
-  quotedThreadId: string;
+  threadId: string;
+};
+
+export type Unquotes = {
+  quoterId: string;
+  threadId: string;
 };

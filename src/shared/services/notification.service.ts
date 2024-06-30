@@ -7,7 +7,7 @@ import {
 import { prisma } from "../infra/prisma";
 
 export const sendNotificationService = async (
-  sendNotiRequest: SendNotiRequestDTO,
+  sendNotiRequest: SendNotiRequestDTO
 ) => {
   const { userIds, notification } = sendNotiRequest;
   const { notificationContent } = notification;
@@ -72,7 +72,7 @@ export const getNotificaitonsService = async (userId: string) => {
 };
 
 export const deleteNotificationService = async (
-  deleteNotiRequest: DeleteNotiRequestDTO,
+  deleteNotiRequest: DeleteNotiRequestDTO
 ) => {
   const { type, senderId, recieverId, threadId } = deleteNotiRequest;
   const notification = await prisma.notifications.findFirst({
@@ -88,9 +88,7 @@ export const deleteNotificationService = async (
       }),
       ...(threadId && {
         notificationContent: {
-          thread: {
-            id: threadId,
-          },
+          threadId,
         },
       }),
     },

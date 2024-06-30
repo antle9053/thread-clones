@@ -9,7 +9,10 @@ import {
   saveThreadService,
   unsaveThreadService,
 } from "../services/save.service";
-import { unmentionEvent } from "@/src/shared/infra/socket.io/events";
+import {
+  unmentionEvent,
+  unquoteEvent,
+} from "@/src/shared/infra/socket.io/events";
 
 export const useThreadAction = () => {
   const [isSelf, setIsSelf] = useState<boolean | null>(null);
@@ -36,12 +39,17 @@ export const useThreadAction = () => {
         content: "Deleting...",
         duration: 0,
       });
-      await deleteThreadService(thread?.id);
       unmentionEvent({
         mentionerId: user?.id!,
-        threadId: thread?.id,
+        threadId: thread.id,
         mentionedUsernames: [],
       });
+      unquoteEvent({
+        quoterId: user?.id!,
+        threadId: thread.id,
+      });
+      await deleteThreadService(thread.id);
+
       setOpen(false);
       message.destroy("message-loading");
       await message.success("Deleted");
@@ -87,7 +95,7 @@ export const useThreadAction = () => {
         return res;
       }
     },
-    [thread, user],
+    [thread, user]
   );
 
   useEffect(() => {

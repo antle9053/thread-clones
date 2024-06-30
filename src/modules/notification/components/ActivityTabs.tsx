@@ -1,41 +1,17 @@
 import { Button } from "antd";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { FC } from "react";
+import { tabs } from "../hooks/useNotifications";
 
-const tabs = [
-  {
-    index: 0,
-    label: "All",
-  },
-  {
-    index: 1,
-    label: "Followers",
-  },
-  {
-    index: 2,
-    label: "Likes",
-  },
-  {
-    index: 3,
-    label: "Replies",
-  },
-  {
-    index: 4,
-    label: "Mentions",
-  },
-  {
-    index: 5,
-    label: "Quotes",
-  },
-  {
-    index: 6,
-    label: "Reposts",
-  },
-];
+interface ActivityTabsProps {
+  activeTab: number;
+  setActiveTab: (tab: number) => void;
+}
 
-export const ActivityTabs = () => {
-  const [activeTab, setActiveTab] = useState(0);
-
+export const ActivityTabs: FC<ActivityTabsProps> = ({
+  activeTab,
+  setActiveTab,
+}) => {
   return (
     <div className="w-full flex gap-2 p-2 overflow-x-scroll">
       {tabs.map((tab, index) => {

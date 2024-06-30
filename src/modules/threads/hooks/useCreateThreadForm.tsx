@@ -12,7 +12,7 @@ import {
 import { ThreadType } from "../components/CreateThreadForm";
 import { addTags } from "@/src/shared/services/tags.service";
 import { mentionService } from "@/src/shared/services/mention.service";
-import { mentionEvent } from "@/src/shared/infra/socket.io/events";
+import { mentionEvent, quoteEvent } from "@/src/shared/infra/socket.io/events";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
@@ -40,6 +40,7 @@ export const useCreateThreadForm = ({
   const replyTo = useAppStore(threadsSelectors.replyTo);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
   const quote = useAppStore(threadsSelectors.quote);
+  const setQuote = useAppStore(threadsSelectors.setQuote);
 
   const threadsValue = Form.useWatch("threads", form);
 
@@ -99,6 +100,7 @@ export const useCreateThreadForm = ({
     setThreadTypes(["text"]);
     removeAllGifs?.();
     afterSubmit?.();
+    setQuote(undefined);
   };
 
   const changeThreadType = (key: number, type: ThreadType) => {
@@ -189,8 +191,6 @@ export const useCreateThreadForm = ({
           id = await createThreadService(arg, user.id);
         }
 
-        console.log(id);
-
         await addTags(user?.id, listTags);
         if (listMentions.length > 0) {
           await mentionService({
@@ -202,6 +202,13 @@ export const useCreateThreadForm = ({
           mentionEvent({
             mentioner: user,
             mentionedUsernames: listMentions,
+            threadId: id,
+          });
+        }
+
+        if (quote) {
+          quoteEvent({
+            quoter: user,
             threadId: id,
           });
         }

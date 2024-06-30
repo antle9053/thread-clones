@@ -5,6 +5,44 @@ import { getNotificaitonsService } from "@/src/shared/services/notification.serv
 import { useEffect, useMemo, useState } from "react";
 import { socket } from "@/src/shared/infra/socket.io";
 
+export const tabs = [
+  {
+    index: 0,
+    label: "All",
+    value: "all",
+  },
+  {
+    index: 1,
+    label: "Followers",
+    value: "follow",
+  },
+  {
+    index: 2,
+    label: "Likes",
+    value: "like",
+  },
+  {
+    index: 3,
+    label: "Replies",
+    value: "reply",
+  },
+  {
+    index: 4,
+    label: "Mentions",
+    value: "mention",
+  },
+  {
+    index: 5,
+    label: "Quotes",
+    value: "quote",
+  },
+  {
+    index: 6,
+    label: "Reposts",
+    value: "repost",
+  },
+];
+
 export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
   notification: {
     sender: {
@@ -16,6 +54,7 @@ export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
 
 export const useNotifications = () => {
   const [sends, setSends] = useState<SendNotiResponseWithFollow[]>([]);
+  const [activeTab, setActiveTab] = useState(0);
 
   const user = useAppStore(authSelectors.user);
 
@@ -29,6 +68,7 @@ export const useNotifications = () => {
           notificationType: "follow",
         },
         notiId: data.notiId,
+        userId: data.userId,
       } as SendNotiResponseWithFollow;
       setSends((sends) => [newNoti, ...sends]);
     });
@@ -44,7 +84,7 @@ export const useNotifications = () => {
             notification.sender.id === followerId &&
             userId === followedId;
           return !isDeleted;
-        }),
+        })
       );
     });
 
@@ -74,13 +114,12 @@ export const useNotifications = () => {
             notification.sender.id === likerId &&
             userId === authorId;
           return !isDeleted;
-        }),
+        })
       );
     });
 
     socket.on("mentioned", (data) => {
       const { mentioner, notiId, thread } = data;
-
       const newNoti = {
         sendAt: new Date(),
         notification: {
@@ -108,7 +147,7 @@ export const useNotifications = () => {
             notification.sender.id === mentionerId &&
             notification.notificationContent?.thread?.id === threadId;
           return !isDeleted;
-        }),
+        })
       );
     });
 
@@ -144,7 +183,43 @@ export const useNotifications = () => {
             notification.notificationContent?.thread?.id === threadId &&
             userId === repostedId;
           return !isDeleted;
-        }),
+        })
+      );
+    });
+
+    socket.on("quoted", (data) => {
+      const { quoter, notiId, thread } = data;
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: quoter,
+          title: `Quoted your thread`,
+          notificationType: "quote",
+          notificationContent: {
+            thread,
+          },
+        },
+        notiId: notiId,
+        userId: thread.authorId!,
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
+    });
+
+    socket.on("unquoted", (data) => {
+      const { quoterId, quotedId, threadId } = data;
+      console.log(data);
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+
+          const isDeleted =
+            notification.notificationType === "quote" &&
+            notification.sender.id === quoterId &&
+            notification.notificationContent?.thread?.id === threadId &&
+            userId === quotedId;
+          return !isDeleted;
+        })
       );
     });
   }, [sends]);
@@ -156,7 +231,7 @@ export const useNotifications = () => {
       setSends(
         [...response].map((send) => {
           const isFollowed = send.notification.sender.followedByIDs.includes(
-            user?.id!,
+            user?.id!
           );
           return {
             ...send,
@@ -168,20 +243,27 @@ export const useNotifications = () => {
               },
             },
           };
-        }),
+        })
       );
     };
     fetchNotifications();
   }, [user?.id]);
 
   const filteredSends = useMemo(() => {
-    return [...sends].filter((send, index, self) => {
-      if (!send.notiId) return true;
-      return index === self.findIndex((o) => o.notiId === send.notiId);
-    });
-  }, [sends]);
+    return [...sends]
+      .filter((send, index, self) => {
+        if (!send.notiId) return true;
+        return index === self.findIndex((o) => o.notiId === send.notiId);
+      })
+      .filter((item) => {
+        if (activeTab === 0) return true;
+        return item.notification.notificationType === tabs[activeTab].value;
+      });
+  }, [sends, activeTab]);
 
   return {
     sends: filteredSends,
+    activeTab,
+    setActiveTab,
   };
 };

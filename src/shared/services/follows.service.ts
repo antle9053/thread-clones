@@ -12,18 +12,7 @@ export const unfollowUserService = async (
   userId: string,
   followedId: string
 ) => {
-  await prisma.users.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      following: {
-        disconnect: {
-          id: followedId,
-        },
-      },
-    },
-  });
+  await xPrisma.users.unfollow(userId, followedId);
 };
 
 export const isFollowedService = async (
@@ -32,7 +21,7 @@ export const isFollowedService = async (
 ): Promise<boolean> => {
   const user = await prisma.users.findFirst({
     where: {
-      userId: followingUserId,
+      id: followingUserId,
       followingIDs: {
         has: followedUserId,
       },

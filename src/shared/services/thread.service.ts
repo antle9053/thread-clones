@@ -4,7 +4,10 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../infra/prisma";
 import { PollArg } from "./polls.service";
 import { pageType } from "@/src/modules/home";
-import { deleteNotificationService } from "./notification.service";
+import {
+  deleteNotificationService,
+  sendNotificationService,
+} from "./notification.service";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -101,6 +104,23 @@ export const createThreadService = async (
   });
 
   const id = result.id;
+
+  if (quoteId) {
+    const author = await getAuthorService(quoteId);
+    if (author && author?.id) {
+      await sendNotificationService({
+        userIds: [author.id],
+        notification: {
+          senderId: authorId,
+          notificationType: "quote",
+          title: "Quoted your thread",
+          notificationContent: {
+            threadId: id,
+          },
+        },
+      });
+    }
+  }
 
   await createThreadService(threadArg.slice(1), authorId, id);
   return id;
@@ -466,6 +486,20 @@ export const deleteThreadService = async (threadId: string) => {
     },
   });
 
+  await deleteNotificationService({
+    type: "mention",
+    senderId: mainThread.authorId,
+    threadId: mainThread.id,
+  });
+
+  if (mainThread.quotedThreadId) {
+    await deleteNotificationService({
+      type: "quote",
+      senderId: mainThread.authorId,
+      threadId: mainThread.id,
+    });
+  }
+
   await prisma.threads.deleteMany({
     where: {
       id: {
@@ -474,10 +508,6 @@ export const deleteThreadService = async (threadId: string) => {
     },
   });
 
-  await deleteNotificationService({
-    type: "mention",
-    senderId: mainThread.authorId,
-  });
   return true;
 };
 

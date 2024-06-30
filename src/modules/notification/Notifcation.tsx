@@ -5,11 +5,11 @@ import { NotificationItem } from "./components/NotificationItem";
 import { useNotifications } from "./hooks/useNotifications";
 
 export const Notification = () => {
-  const { sends } = useNotifications();
+  const { sends, activeTab, setActiveTab } = useNotifications();
 
   return (
     <div className="bg-white min-h-full">
-      <ActivityTabs />
+      <ActivityTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <div>
         {sends.map((send, index) => {
           return (
