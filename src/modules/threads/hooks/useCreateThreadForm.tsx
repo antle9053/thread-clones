@@ -12,7 +12,11 @@ import {
 import { ThreadType } from "../components/CreateThreadForm";
 import { addTags } from "@/src/shared/services/tags.service";
 import { mentionService } from "@/src/shared/services/mention.service";
-import { mentionEvent, quoteEvent } from "@/src/shared/infra/socket.io/events";
+import {
+  mentionEvent,
+  quoteEvent,
+  replyEvent,
+} from "@/src/shared/infra/socket.io/events";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
@@ -186,26 +190,34 @@ export const useCreateThreadForm = ({
         let id: string;
 
         if (thread) {
+          // Reply a thread
           id = await createThreadService(arg, user.id, thread.id);
+          replyEvent({
+            replier: user,
+            threadId: thread.id,
+          });
         } else {
+          // Create a new thread
           id = await createThreadService(arg, user.id);
         }
 
         await addTags(user?.id, listTags);
+        // If thead contains mentions
         if (listMentions.length > 0) {
+          // Call mention api
           await mentionService({
             mentionerId: user.id,
             mentionedUsernames: listMentions,
             threadId: id,
           });
-
+          // Emit mention event
           mentionEvent({
             mentioner: user,
             mentionedUsernames: listMentions,
             threadId: id,
           });
         }
-
+        // If the current thread is quote a thread, emit a thread event
         if (quote) {
           quoteEvent({
             quoter: user,

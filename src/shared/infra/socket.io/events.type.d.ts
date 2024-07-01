@@ -51,3 +51,13 @@ export type Unquotes = {
   quoterId: string;
   threadId: string;
 };
+
+export type Replies = {
+  replier: User;
+  threadId: string;
+};
+
+export type Unreplies = {
+  replierId: string;
+  threadId: string;
+};

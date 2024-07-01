@@ -4,6 +4,7 @@ import {
   Likes,
   Mentions,
   Quotes,
+  Replies,
   Reposts,
   Unfollows,
   Unlikes,
@@ -69,5 +70,11 @@ export const quoteEvent = (payload: Quotes) => {
 export const unquoteEvent = (payload: Unquotes) => {
   if (socket.connected) {
     socket.emit("unquote", payload);
+  }
+};
+
+export const replyEvent = (payload: Replies) => {
+  if (socket.connected) {
+    socket.emit("reply", payload);
   }
 };

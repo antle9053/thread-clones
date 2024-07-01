@@ -1,4 +1,4 @@
-import { Unquotes } from "./events.type.d";
+import { Replies, Unquotes, Unreplies } from "./events.type.d";
 ("use server");
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -225,6 +225,38 @@ io.on("connection", async (socket) => {
       socket.to(author?.socketId).emit("unquoted", {
         quoterId,
         quotedId: author?.id!,
+        threadId,
+      });
+    }
+  });
+
+  socket.on("reply", async (data: Replies) => {
+    const { replier, threadId } = data;
+    const author = await getAuthorService(threadId);
+
+    const thread = await prisma.threads.findUnique({
+      where: {
+        id: threadId,
+      },
+    });
+    const notiId = nanoid();
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("replied", {
+        replier,
+        notiId,
+        thread,
+      });
+    }
+  });
+
+  socket.on("unreply", async (data: Unreplies) => {
+    const { replierId, threadId } = data;
+    const author = await getAuthorService(threadId);
+
+    if (author && author.socketId) {
+      socket.to(author?.socketId).emit("unreplied", {
+        replierId,
+        repostedId: author?.id!,
         threadId,
       });
     }
