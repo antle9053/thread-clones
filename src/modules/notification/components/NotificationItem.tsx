@@ -1,7 +1,14 @@
 import { Button } from "antd";
 import { FC } from "react";
 import { useRouter } from "next/navigation";
-import { AtSign, Heart, Quote, Repeat, User } from "lucide-react";
+import {
+  AtSign,
+  Heart,
+  MessageCircle,
+  Quote,
+  Repeat,
+  User,
+} from "lucide-react";
 import { NotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResponse.dto";
 
 interface NotificationItemProps {
@@ -52,6 +59,13 @@ export const NotificationItem: FC<NotificationItemProps> = ({
         return (
           <div className="rounded-full flex justify-center items-center bg-[#6E3DEF] w-[22px] h-[22px] border-2 border-solid border-white">
             <User color="white" fill="white" size={9} />
+          </div>
+        );
+      }
+      case "reply": {
+        return (
+          <div className="rounded-full flex justify-center items-center bg-[#3AA6B9] w-[22px] h-[22px] border-2 border-solid border-white">
+            <MessageCircle color="white" size={9} />
           </div>
         );
       }

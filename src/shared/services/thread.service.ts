@@ -8,6 +8,7 @@ import {
   deleteNotificationService,
   sendNotificationService,
 } from "./notification.service";
+import send from "send";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -35,7 +36,7 @@ export type TagArg = {
 export const createThreadService = async (
   threadArg: CreateThreadArg[],
   authorId: string,
-  parentId?: string
+  parentId?: string,
 ): Promise<any> => {
   if (threadArg.length === 0) {
     return;
@@ -114,6 +115,23 @@ export const createThreadService = async (
           senderId: authorId,
           notificationType: "quote",
           title: "Quoted your thread",
+          notificationContent: {
+            threadId: id,
+          },
+        },
+      });
+    }
+  }
+
+  if (parentId) {
+    const author = await getAuthorService(parentId);
+    if (author && author?.id && author?.id !== authorId) {
+      await sendNotificationService({
+        userIds: [author?.id],
+        notification: {
+          senderId: authorId,
+          notificationType: "reply",
+          title: "Replied your thread",
           notificationContent: {
             threadId: id,
           },
@@ -208,20 +226,20 @@ export const getThreadsService = async ({
             },
           }
         : type === "saved"
-        ? {
-            savedByUserIds: {
-              has: userId,
-            },
-          }
-        : type === "reposts"
-        ? {
-            reposted: {
-              some: {
-                userId,
+          ? {
+              savedByUserIds: {
+                has: userId,
               },
-            },
-          }
-        : {}),
+            }
+          : type === "reposts"
+            ? {
+                reposted: {
+                  some: {
+                    userId,
+                  },
+                },
+              }
+            : {}),
     },
     include: {
       author: true,
@@ -289,7 +307,7 @@ export const getThreadsService = async ({
 
 export const getThreadByIdService = async (
   id: string,
-  userId: string
+  userId: string,
 ): Promise<GetThreadResponse | null> => {
   const result = await prisma.threads.findFirst({
     where: {
@@ -366,7 +384,7 @@ export type GetReplyThreadResponse = Prisma.threadsGetPayload<{
 }>;
 
 export const getThreadService = async (
-  id: string
+  id: string,
 ): Promise<GetReplyThreadResponse | null> => {
   const result = await prisma.threads.findUnique({
     where: {
@@ -427,7 +445,7 @@ export const deleteThreadService = async (threadId: string) => {
   ];
 
   const descendantContentIds = [mainThread, ...descendantThreads].map(
-    (thread) => thread.content?.id
+    (thread) => thread.content?.id,
   );
 
   for (const contentId of descendantContentIds) {
@@ -460,7 +478,7 @@ export const deleteThreadService = async (threadId: string) => {
         },
         data: {
           votedOptionIds: votedOptionIds.filter(
-            (id) => !optionIds.includes(id)
+            (id) => !optionIds.includes(id),
           ),
         },
       });
@@ -500,6 +518,14 @@ export const deleteThreadService = async (threadId: string) => {
     });
   }
 
+  if (mainThread.parentId) {
+    await deleteNotificationService({
+      type: "reply",
+      senderId: mainThread.authorId,
+      threadId: mainThread.id,
+    });
+  }
+
   await prisma.threads.deleteMany({
     where: {
       id: {
@@ -512,7 +538,7 @@ export const deleteThreadService = async (threadId: string) => {
 };
 
 export const getRepliesThread = async (
-  userId: string
+  userId: string,
 ): Promise<GetThreadResponse[]> => {
   const user = await prisma.users.findFirst({
     where: {
