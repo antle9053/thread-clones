@@ -21,6 +21,7 @@ import { Like } from "../../home/components/Like";
 import { Quote } from "../../threads/components/Quote";
 import { Repost } from "../../home/components/Repost";
 import { GetThreadResponse } from "@/src/shared/services/thread.service";
+import { threadActionSelectors } from "../../home/zustand/threadActionSlice";
 
 interface ThreadDetailItemProps {
   gifWidth: number;
@@ -48,6 +49,11 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
 
+  const setOpenThreadAction = useAppStore(
+    threadActionSelectors.setOpenThreadAction
+  );
+  const setThread = useAppStore(threadActionSelectors.setThread);
+
   useEffect(() => {
     const initGif = async () => {
       if (content?.contentType === "gif" && content?.gif) {
@@ -63,7 +69,7 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
       className="border-b border-solid border-slate-200 p-4"
       onClick={(e) => {
         e.stopPropagation();
-        router.push(`/${author?.username}/post/${id}`);
+        router.push(`/@${author?.username}/post/${id}`);
       }}
     >
       <div className="flex gap-3 items-stretch mb-2">
@@ -92,7 +98,14 @@ export const ThreadDetailItem: FC<ThreadDetailItemProps> = ({
               <span className="text-[#666666]">
                 {moment(createdAt).fromNow()}
               </span>
-              <div className="text-black/50">
+              <div
+                className="text-black/50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setThread(thread);
+                  setOpenThreadAction(true);
+                }}
+              >
                 <MoreHorizontal />
               </div>
             </div>

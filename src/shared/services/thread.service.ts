@@ -8,7 +8,6 @@ import {
   deleteNotificationService,
   sendNotificationService,
 } from "./notification.service";
-import send from "send";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -36,7 +35,7 @@ export type TagArg = {
 export const createThreadService = async (
   threadArg: CreateThreadArg[],
   authorId: string,
-  parentId?: string,
+  parentId?: string
 ): Promise<any> => {
   if (threadArg.length === 0) {
     return;
@@ -226,20 +225,20 @@ export const getThreadsService = async ({
             },
           }
         : type === "saved"
-          ? {
-              savedByUserIds: {
-                has: userId,
+        ? {
+            savedByUserIds: {
+              has: userId,
+            },
+          }
+        : type === "reposts"
+        ? {
+            reposted: {
+              some: {
+                userId,
               },
-            }
-          : type === "reposts"
-            ? {
-                reposted: {
-                  some: {
-                    userId,
-                  },
-                },
-              }
-            : {}),
+            },
+          }
+        : {}),
     },
     include: {
       author: true,
@@ -307,7 +306,7 @@ export const getThreadsService = async ({
 
 export const getThreadByIdService = async (
   id: string,
-  userId: string,
+  userId: string
 ): Promise<GetThreadResponse | null> => {
   const result = await prisma.threads.findFirst({
     where: {
@@ -384,7 +383,7 @@ export type GetReplyThreadResponse = Prisma.threadsGetPayload<{
 }>;
 
 export const getThreadService = async (
-  id: string,
+  id: string
 ): Promise<GetReplyThreadResponse | null> => {
   const result = await prisma.threads.findUnique({
     where: {
@@ -445,8 +444,20 @@ export const deleteThreadService = async (threadId: string) => {
   ];
 
   const descendantContentIds = [mainThread, ...descendantThreads].map(
-    (thread) => thread.content?.id,
+    (thread) => thread.content?.id
   );
+
+  await prisma.threads.updateMany({
+    where: {
+      quotedThreadId: {
+        in: descendantThreadIds,
+      },
+    },
+    data: {
+      quotedThreadId: null,
+      isQuotedThreadDeleted: true,
+    },
+  });
 
   for (const contentId of descendantContentIds) {
     const poll = await prisma.polls.findFirst({
@@ -478,7 +489,7 @@ export const deleteThreadService = async (threadId: string) => {
         },
         data: {
           votedOptionIds: votedOptionIds.filter(
-            (id) => !optionIds.includes(id),
+            (id) => !optionIds.includes(id)
           ),
         },
       });
@@ -538,7 +549,7 @@ export const deleteThreadService = async (threadId: string) => {
 };
 
 export const getRepliesThread = async (
-  userId: string,
+  userId: string
 ): Promise<GetThreadResponse[]> => {
   const user = await prisma.users.findFirst({
     where: {

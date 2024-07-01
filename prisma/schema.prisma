@@ -86,6 +86,7 @@ model threads {
   quotedThread        threads?               @relation("Quotes", fields: [quotedThreadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   quotedThreadId      String?                @db.ObjectId
   quotedByThread      threads[]              @relation("Quotes")
+  isQuotedThreadDeleted Boolean              @default(false)
   views               Int                    @default(0)
   notificationContent notificationContents[]
 }

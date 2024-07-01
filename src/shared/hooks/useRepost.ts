@@ -29,7 +29,7 @@ export const useRepost = () => {
   useEffect(() => {
     if (thread && user?.id) {
       setIsSelf(thread?.author.id === user?.id);
-      setIsReposted(thread.reposted.length > 0);
+      setIsReposted(thread?.reposted?.length > 0);
     }
   }, [thread, user?.id]);
 
