@@ -18,6 +18,7 @@ export const Notification = () => {
               handleFollow={() => {}}
               handleUnfollow={() => {}}
               notification={send.notification}
+              time={send.sendAt}
             />
           );
         })}

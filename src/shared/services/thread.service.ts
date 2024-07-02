@@ -529,11 +529,11 @@ export const deleteThreadService = async (threadId: string) => {
     });
   }
 
-  if (mainThread.parentId) {
+  for (const thread of descendantThreads) {
     await deleteNotificationService({
       type: "reply",
-      senderId: mainThread.authorId,
-      threadId: mainThread.id,
+      senderId: thread.authorId,
+      threadId: thread.id,
     });
   }
 

@@ -256,7 +256,7 @@ io.on("connection", async (socket) => {
     if (author && author.socketId) {
       socket.to(author?.socketId).emit("unreplied", {
         replierId,
-        repostedId: author?.id!,
+        repliedId: author?.id!,
         threadId,
       });
     }

@@ -222,6 +222,42 @@ export const useNotifications = () => {
         })
       );
     });
+
+    socket.on("replied", (data) => {
+      const { replier, notiId, thread } = data;
+
+      const newNoti = {
+        sendAt: new Date(),
+        notification: {
+          sender: replier,
+          title: `Replied your thread`,
+          notificationType: "reply",
+          notificationContent: {
+            thread,
+          },
+        },
+        notiId: notiId,
+        userId: thread.authorId!,
+      } as SendNotiResponseWithFollow;
+      setSends((sends) => [newNoti, ...sends]);
+    });
+
+    socket.on("unreplied", (data) => {
+      const { replierId, repliedId, threadId } = data;
+
+      setSends((sends) =>
+        [...sends].filter((send) => {
+          const { notification, userId } = send;
+
+          const isDeleted =
+            notification.notificationType === "repost" &&
+            notification.sender.id === replierId &&
+            notification.notificationContent?.thread?.id === threadId &&
+            userId === repliedId;
+          return !isDeleted;
+        })
+      );
+    });
   }, [sends]);
 
   useEffect(() => {
@@ -260,6 +296,8 @@ export const useNotifications = () => {
         return item.notification.notificationType === tabs[activeTab].value;
       });
   }, [sends, activeTab]);
+
+  console.log(filteredSends);
 
   return {
     sends: filteredSends,

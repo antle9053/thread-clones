@@ -5,12 +5,13 @@ import {
   SendNotiRequestDTO,
 } from "../dto/notifications/SendNotiRequest.dto";
 import { prisma } from "../infra/prisma";
+import { getUserService } from "./user.service";
 
 export const sendNotificationService = async (
   sendNotiRequest: SendNotiRequestDTO
 ) => {
   const { userIds, notification } = sendNotiRequest;
-  const { notificationContent } = notification;
+  const { notificationContent, senderId } = notification;
 
   const newNotificationContent = await prisma.notificationContents.create({
     data: {

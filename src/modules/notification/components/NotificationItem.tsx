@@ -10,11 +10,15 @@ import {
   User,
 } from "lucide-react";
 import { NotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResponse.dto";
+import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
+import { useAppStore } from "@/src/shared/infra/zustand";
+import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 
 interface NotificationItemProps {
   notification: NotiResponseDTO & { sender: { isFollowed: boolean } };
   handleFollow: (followedId: string) => void;
   handleUnfollow: (followedId: string) => void;
+  time: Date;
   userId?: string;
 }
 
@@ -22,6 +26,7 @@ export const NotificationItem: FC<NotificationItemProps> = ({
   handleFollow,
   handleUnfollow,
   userId,
+  time,
   notification,
 }) => {
   const router = useRouter();
@@ -75,8 +80,39 @@ export const NotificationItem: FC<NotificationItemProps> = ({
     }
   };
 
+  const user = useAppStore(authSelectors.user);
+
+  const generateUrl = (notification: NotiResponseDTO) => {
+    const senderUserName = notification.sender.username;
+    const threadId =
+      notification.notificationContent?.threadId ??
+      notification.notificationContent?.thread?.id;
+
+    switch (notification.notificationType) {
+      case "follow":
+        return `/@${senderUserName}`;
+      case "like":
+        return `/@${user?.username}/post/${threadId}`;
+      case "mention":
+        return `/@${senderUserName}/post/${threadId}`;
+      case "quote":
+        return `/@${senderUserName}/post/${threadId}`;
+      case "reply":
+        return `/@${senderUserName}/post/${threadId}`;
+      case "repost":
+        return `/@${senderUserName}/post/${threadId}`;
+      default:
+        return "";
+    }
+  };
+
   return (
-    <div className="flex p-4 !pb-0">
+    <div
+      className="flex p-4 !pb-0"
+      onClick={() => {
+        router.push(generateUrl(notification));
+      }}
+    >
       <div className="flex-0 pr-4">
         <div className="relative h-fit w-fit">
           <img
@@ -93,9 +129,12 @@ export const NotificationItem: FC<NotificationItemProps> = ({
       <div className="flex-1  border-b border-solid border-slate-300 pb-4 min-h-[36px]">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
-            <span className="font-bold text-black">
-              {notification.sender.username}
-            </span>
+            <div className="flex gap-1 items-center">
+              <span className="font-bold text-black">
+                {notification.sender.username}
+              </span>
+              <span className="text-[#999999]">{formatFromNow(time)}</span>
+            </div>
             <span className="font-[400] text-[#999999]">
               {notification.title}
             </span>
