@@ -10,7 +10,7 @@ import { useProfile } from "./hooks/useProfile";
 import { useUser } from "../home/hooks/useUser";
 import clsx from "clsx";
 import { Content } from "./components/Content";
-import { useFollow } from "@/src/shared/hooks/useFollows";
+import { useFollow } from "./hooks/useFollow";
 
 export const Profile = () => {
   const params = useParams<{ username: string }>();

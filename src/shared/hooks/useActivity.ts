@@ -11,6 +11,7 @@ import {
   unfollowUserService,
 } from "../services/follows.service";
 import { message } from "antd";
+import { useHandleFollow } from "./useHandleFollow";
 
 export type activityType = "all" | "like" | "quote" | "repost";
 
@@ -97,41 +98,21 @@ export const useActivity = () => {
     [listActivities]
   );
 
-  const handleFollow = useCallback(
-    async (followedId: string) => {
-      if (followedId && user?.id) {
-        message.open({
-          key: "message-follow-loading",
-          type: "loading",
-          content: "Following...",
-          duration: 0,
-        });
-        updateFollowInActivity(followedId, true);
-        await followUserService(user?.id, followedId);
-        message.destroy("message-follow-loading");
-        await message.success("Followed");
-      }
-    },
-    [user]
-  );
+  const { handleFollow, handleUnfollow } = useHandleFollow();
 
-  const handleUnfollow = useCallback(
-    async (followedId: string) => {
-      if (followedId && user?.id) {
-        message.open({
-          key: "message-unfollow-loading",
-          type: "loading",
-          content: "Unfollowing...",
-          duration: 0,
-        });
-        updateFollowInActivity(followedId, false);
-        await unfollowUserService(user?.id, followedId);
-        message.destroy("message-unfollow-loading");
-        await message.success("Unfollowed");
-      }
-    },
-    [user]
-  );
+  const follow = async (followedId: string) => {
+    if (user) {
+      await handleFollow(followedId, user);
+      updateFollowInActivity(followedId, true);
+    }
+  };
+
+  const unfollow = async (followedId: string) => {
+    if (user) {
+      await handleUnfollow(followedId, user);
+      updateFollowInActivity(followedId, true);
+    }
+  };
 
   return {
     handleClose,
@@ -146,7 +127,7 @@ export const useActivity = () => {
     setType,
     type,
     thread,
-    handleFollow,
-    handleUnfollow,
+    handleFollow: follow,
+    handleUnfollow: unfollow,
   };
 };

@@ -8,7 +8,7 @@ import {
   MessageSquareQuote,
   Repeat,
 } from "lucide-react";
-import { UserItem } from "./Follows";
+import { UserItem } from "@/src/modules/profile/components/FollowDrawer";
 import { FC, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import clsx from "clsx";

@@ -1,5 +1,5 @@
-import { UserWithFollow } from "@/src/modules/profile/zustand/followSlice";
-import { useFollow } from "@/src/shared/hooks/useFollows";
+import { UserWithFollow } from "../zustand/followSlice";
+import { useFollow } from "../hooks/useFollow";
 import { formatNumber } from "@/src/shared/utils/numbers/formatNumber";
 import { Button, Drawer, Tabs } from "antd";
 import type { TabsProps } from "antd";
@@ -110,7 +110,7 @@ export const UserItem: FC<UserItemProps> = ({
   );
 };
 
-export const Follows = () => {
+export const FollowDrawer = () => {
   const {
     isOpen,
     handleClose,

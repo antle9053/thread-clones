@@ -1,6 +1,6 @@
-import { useAppStore } from "../infra/zustand";
+import { useAppStore } from "@/src/shared/infra/zustand";
 import { useCallback, useEffect, useState } from "react";
-import { authSelectors } from "../infra/zustand/slices/authSlice";
+import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { message } from "antd";
 import { followSelectors } from "@/src/modules/profile/zustand/followSlice";
 import {
@@ -8,7 +8,8 @@ import {
   listFollowedsService,
   listFollowingsService,
   unfollowUserService,
-} from "../services/follows.service";
+} from "@/src/shared/services/follows.service";
+import { useHandleFollow } from "@/src/shared/hooks/useHandleFollow";
 
 export const useFollow = () => {
   const isOpen = useAppStore(followSelectors.isOpenFollow);
@@ -25,41 +26,21 @@ export const useFollow = () => {
 
   const user = useAppStore(authSelectors.user);
 
-  const handleFollow = useCallback(
-    async (followedId: string) => {
-      if (followedId && user?.id) {
-        message.open({
-          key: "message-follow-loading",
-          type: "loading",
-          content: "Following...",
-          duration: 0,
-        });
-        updateFollow(followedId, true);
-        await followUserService(user?.id, followedId);
-        message.destroy("message-follow-loading");
-        await message.success("Followed");
-      }
-    },
-    [user]
-  );
+  const { handleFollow, handleUnfollow } = useHandleFollow();
 
-  const handleUnfollow = useCallback(
-    async (followedId: string) => {
-      if (followedId && user?.id) {
-        message.open({
-          key: "message-unfollow-loading",
-          type: "loading",
-          content: "Unfollowing...",
-          duration: 0,
-        });
-        updateFollow(followedId, false);
-        await unfollowUserService(user?.id, followedId);
-        message.destroy("message-unfollow-loading");
-        await message.success("Unfollowed");
-      }
-    },
-    [user]
-  );
+  const follow = async (followedId: string) => {
+    if (user) {
+      await handleFollow(followedId, user);
+      updateFollow(followedId, true);
+    }
+  };
+
+  const unfollow = async (followedId: string) => {
+    if (user) {
+      await handleUnfollow(followedId, user);
+      updateFollow(followedId, false);
+    }
+  };
 
   useEffect(() => {
     const initFollows = async () => {
@@ -99,9 +80,9 @@ export const useFollow = () => {
   return {
     isOpen,
     handleClose,
-    handleFollow,
+    handleFollow: follow,
     handleOpen,
-    handleUnfollow,
+    handleUnfollow: unfollow,
     listFolloweds,
     listFollowings,
     profile,

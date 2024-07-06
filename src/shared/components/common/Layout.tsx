@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Layout } from "antd";
 import { Navbar } from "./Navbar";
 import { MobileNavbar } from "./MobileNavbar";
@@ -15,9 +15,9 @@ import { Loading } from "../ui/Loading";
 import { CreateThread } from "@/src/modules/threads/CreateThread";
 import { ThreadAction } from "./Drawer/ThreadAction";
 import { Repost } from "./Drawer/Repost";
-import { Follows } from "./Drawer/Follows";
 import { Activity } from "./Drawer/Activity";
 import { socket } from "../../infra/socket.io";
+import { FollowDrawer } from "@/src/modules/profile/components/FollowDrawer";
 
 const { Header, Content } = Layout;
 
@@ -61,7 +61,7 @@ export const MainLayout = ({
         <CreateThread />
         <ThreadAction />
         <Repost />
-        <Follows />
+        <FollowDrawer />
         <Activity />
       </Content>
     </Layout>

@@ -3,7 +3,7 @@
 import { Input } from "antd";
 import { ChevronRight, SearchIcon } from "lucide-react";
 import { useSearch } from "./hooks/useSearch";
-import { UserItem } from "@/src/shared/components/common/Drawer/Follows";
+import { UserItem } from "@/src/modules/profile/components/FollowDrawer";
 import _ from "lodash";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { SearchThreads } from "./SearchThreads";

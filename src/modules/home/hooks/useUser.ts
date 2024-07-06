@@ -1,3 +1,4 @@
+import { useHandleFollow } from "@/src/shared/hooks/useHandleFollow";
 import { socket } from "@/src/shared/infra/socket.io";
 import {
   followEvent,
@@ -38,51 +39,25 @@ export const useUser = ({ followedId }: UseUserProps) => {
     [followedId, user?.id]
   );
 
-  const handleFollow = useCallback(async () => {
-    if (followedId && user?.id) {
-      message.open({
-        key: "message-follow-loading",
-        type: "loading",
-        content: "Following...",
-        duration: 0,
-      });
-      await followUserService(user?.id, followedId);
+  const { handleFollow, handleUnfollow } = useHandleFollow();
 
-      followEvent({
-        follower: user,
-        followedId,
-      });
-
-      message.destroy("message-follow-loading");
+  const follow = async () => {
+    if (user) {
+      await handleFollow(followedId, user);
       await fetchFollowed(followedId);
-      await message.success("Followed");
     }
-  }, [followedId, user]);
+  };
 
-  const handleUnfollow = useCallback(async () => {
-    if (followedId && user?.id) {
-      message.open({
-        key: "message-unfollow-loading",
-        type: "loading",
-        content: "Unfollowing...",
-        duration: 0,
-      });
-      await unfollowUserService(user?.id, followedId);
-
-      unfollowEvent({
-        followerId: user.id,
-        followedId,
-      });
-
-      message.destroy("message-unfollow-loading");
+  const unfollow = async () => {
+    if (user) {
+      await handleUnfollow(followedId, user);
       await fetchFollowed(followedId);
-      await message.success("Unfollowed");
     }
-  }, [followedId, user]);
+  };
 
   useEffect(() => {
     fetchFollowed(followedId);
   }, [followedId]);
 
-  return { followed, handleFollow, handleUnfollow, isSelf };
+  return { followed, handleFollow: follow, handleUnfollow: unfollow, isSelf };
 };
