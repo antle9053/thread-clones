@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { EditProfile } from "./Modal/EditProfile";
 import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
-import { message } from "antd";
+import { Badge, message } from "antd";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
 
 export const MobileNavbar = () => {
@@ -25,6 +25,11 @@ export const MobileNavbar = () => {
             pathname === `/@${username}`
               ? item.name === "user"
               : item.link === pathname;
+          const icon = cloneElement(item.icon, {
+            size: 24,
+            strokeWidth: 2,
+            className: isActive ? "text-white" : "text-primary",
+          });
           return (
             <div
               key={index}
@@ -56,7 +61,13 @@ export const MobileNavbar = () => {
                 }
               }}
             >
-              {cloneElement(item.icon, { size: 24, strokeWidth: 2 })}
+              {item.name === "notification" ? (
+                <Badge count={1} size="small">
+                  {icon}
+                </Badge>
+              ) : (
+                icon
+              )}
             </div>
           );
         })}

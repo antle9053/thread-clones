@@ -13,6 +13,7 @@ import { NotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResponse
 import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
+import { updateReadNotification } from "@/src/shared/services/notification.service";
 
 interface NotificationItemProps {
   notification: NotiResponseDTO & { sender: { isFollowed: boolean } };
@@ -109,7 +110,8 @@ export const NotificationItem: FC<NotificationItemProps> = ({
   return (
     <div
       className="flex p-4 !pb-0"
-      onClick={() => {
+      onClick={async () => {
+        await updateReadNotification(notification.id);
         router.push(generateUrl(notification));
       }}
     >

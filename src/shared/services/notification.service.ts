@@ -5,7 +5,6 @@ import {
   SendNotiRequestDTO,
 } from "../dto/notifications/SendNotiRequest.dto";
 import { prisma } from "../infra/prisma";
-import { getUserService } from "./user.service";
 
 export const sendNotificationService = async (
   sendNotiRequest: SendNotiRequestDTO
@@ -111,4 +110,15 @@ export const deleteNotificationService = async (
       },
     });
   }
+};
+
+export const updateReadNotification = async (id: string) => {
+  await prisma.notifications.update({
+    where: {
+      id,
+    },
+    data: {
+      read: true,
+    },
+  });
 };
