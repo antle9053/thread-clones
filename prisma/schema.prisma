@@ -46,6 +46,7 @@ model sends {
   user           users         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId         String        @db.ObjectId
   sendAt         DateTime      @default(now())
+   read                  Boolean               @default(false)
 }
 
 model notifications {
@@ -56,7 +57,6 @@ model notifications {
   recievers             sends[]
   title                 String
   url                   String?
-  read                  Boolean               @default(false)
   notificationContent   notificationContents? @relation(fields: [notificationContentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   notificationContentId String                @unique @db.ObjectId
 }

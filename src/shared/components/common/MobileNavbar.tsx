@@ -7,6 +7,7 @@ import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Badge, message } from "antd";
 import { threadsSelectors } from "@/src/modules/threads/zustand/threadsSlice";
+import { notificationSelectors } from "../../infra/zustand/slices/notificationSlice";
 
 export const MobileNavbar = () => {
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false);
@@ -15,6 +16,8 @@ export const MobileNavbar = () => {
 
   const user = useAppStore(authSelectors.user);
   const setOpenCreateThread = useAppStore(threadsSelectors.setOpenCreateThread);
+
+  const unreadCount = useAppStore(notificationSelectors.unreadCount);
 
   return (
     <>
@@ -62,7 +65,7 @@ export const MobileNavbar = () => {
               }}
             >
               {item.name === "notification" ? (
-                <Badge count={1} size="small">
+                <Badge count={unreadCount()} size="small">
                   {icon}
                 </Badge>
               ) : (

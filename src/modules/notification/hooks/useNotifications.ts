@@ -1,9 +1,13 @@
-import { SendNotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResponse.dto";
+import {
+  notificationSelectors,
+  SendNotiResponseWithFollow,
+} from "@/src/shared/infra/zustand/slices/notificationSlice";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import { getNotificaitonsService } from "@/src/shared/services/notification.service";
 import { useEffect, useMemo, useState } from "react";
 import { socket } from "@/src/shared/infra/socket.io";
+import { updateReadNotificationService } from "@/src/shared/services/notification.service";
 
 export const tabs = [
   {
@@ -43,20 +47,16 @@ export const tabs = [
   },
 ];
 
-export type SendNotiResponseWithFollow = SendNotiResponseDTO & {
-  notification: {
-    sender: {
-      isFollowed: boolean;
-    };
-  };
-  notiId?: string;
-};
-
 export const useNotifications = () => {
-  const [sends, setSends] = useState<SendNotiResponseWithFollow[]>([]);
   const [activeTab, setActiveTab] = useState(0);
 
   const user = useAppStore(authSelectors.user);
+
+  const sends = useAppStore(notificationSelectors.sends);
+  const setSends = useAppStore(notificationSelectors.setSends);
+  const updateReadNotification = useAppStore(
+    notificationSelectors.updateReadStatus
+  );
 
   useEffect(() => {
     socket.on("followed", (data) => {
@@ -70,13 +70,13 @@ export const useNotifications = () => {
         notiId: data.notiId,
         userId: data.userId,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unfollowed", (data) => {
       const { followerId, followedId } = data;
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification, userId } = send;
           const isDeleted =
@@ -100,13 +100,13 @@ export const useNotifications = () => {
         notiId: notiId,
         userId: userId,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unliked", (data) => {
       const { likerId, authorId } = data;
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification, userId } = send;
           const isDeleted =
@@ -132,13 +132,13 @@ export const useNotifications = () => {
         },
         notiId: notiId,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unmentioned", (data) => {
       const { mentionerId, threadId } = data;
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification } = send;
 
@@ -167,13 +167,13 @@ export const useNotifications = () => {
         notiId: notiId,
         userId: thread.authorId!,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unreposted", (data) => {
       const { reposterId, repostedId, threadId } = data;
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification, userId } = send;
 
@@ -202,14 +202,14 @@ export const useNotifications = () => {
         notiId: notiId,
         userId: thread.authorId!,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unquoted", (data) => {
       const { quoterId, quotedId, threadId } = data;
       console.log(data);
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification, userId } = send;
 
@@ -239,13 +239,13 @@ export const useNotifications = () => {
         notiId: notiId,
         userId: thread.authorId!,
       } as SendNotiResponseWithFollow;
-      setSends((sends) => [newNoti, ...sends]);
+      setSends([newNoti, ...sends]);
     });
 
     socket.on("unreplied", (data) => {
       const { replierId, repliedId, threadId } = data;
 
-      setSends((sends) =>
+      setSends(
         [...sends].filter((send) => {
           const { notification, userId } = send;
 
@@ -286,7 +286,7 @@ export const useNotifications = () => {
   }, [user?.id]);
 
   const filteredSends = useMemo(() => {
-    return [...sends]
+    return ([...sends] ?? [])
       .filter((send, index, self) => {
         if (!send.notiId) return true;
         return index === self.findIndex((o) => o.notiId === send.notiId);
@@ -297,11 +297,15 @@ export const useNotifications = () => {
       });
   }, [sends, activeTab]);
 
-  console.log(filteredSends);
+  const handleReadNotification = async (sendId: string) => {
+    updateReadNotification(sendId);
+    await updateReadNotificationService(sendId);
+  };
 
   return {
     sends: filteredSends,
     activeTab,
     setActiveTab,
+    handleReadNotification,
   };
 };

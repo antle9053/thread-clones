@@ -10,6 +10,7 @@ import { AppState, getAppState, setAppState } from "./types";
 import { createThemeSlice } from "./slices/themeSlice";
 import { createAuthSlice } from "./slices/authSlice";
 import { createThreadsSlice } from "@/src/modules/threads/zustand/threadsSlice";
+import { createNotificationSlice } from "./slices/notificationSlice";
 
 export const useAppStore = create<AppState>()(
   (set: setAppState, get: getAppState, api: StoreApi<AppState>) => ({
@@ -24,5 +25,6 @@ export const useAppStore = create<AppState>()(
     ...createRepostSlice(set, get, api),
     ...createFollowSlice(set, get, api),
     ...createActivitySlice(set, get, api),
+    ...createNotificationSlice(set, get, api),
   })
 );

@@ -5,7 +5,8 @@ import { NotificationItem } from "./components/NotificationItem";
 import { useNotifications } from "./hooks/useNotifications";
 
 export const Notification = () => {
-  const { sends, activeTab, setActiveTab } = useNotifications();
+  const { sends, activeTab, setActiveTab, handleReadNotification } =
+    useNotifications();
 
   return (
     <div className="bg-white min-h-full">
@@ -19,6 +20,8 @@ export const Notification = () => {
               handleUnfollow={() => {}}
               notification={send.notification}
               time={send.sendAt}
+              handleReadNotification={() => handleReadNotification(send.id)}
+              read={send.read}
             />
           );
         })}

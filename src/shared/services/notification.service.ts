@@ -112,12 +112,23 @@ export const deleteNotificationService = async (
   }
 };
 
-export const updateReadNotification = async (id: string) => {
-  await prisma.notifications.update({
+export const updateReadNotificationService = async (id: string) => {
+  await prisma.sends.update({
     where: {
       id,
     },
     data: {
+      read: true,
+    },
+  });
+};
+
+export const getNotificationCount = async (userId: string) => {
+  return prisma.sends.findFirst({
+    where: {
+      userId,
+    },
+    select: {
       read: true,
     },
   });

@@ -3,6 +3,7 @@ import { FC } from "react";
 import { useRouter } from "next/navigation";
 import {
   AtSign,
+  CheckCheck,
   Heart,
   MessageCircle,
   Quote,
@@ -13,7 +14,7 @@ import { NotiResponseDTO } from "@/src/shared/dto/notifications/SendNotiResponse
 import { formatFromNow } from "@/src/shared/utils/moment/formatFromNow";
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
-import { updateReadNotification } from "@/src/shared/services/notification.service";
+import clsx from "clsx";
 
 interface NotificationItemProps {
   notification: NotiResponseDTO & { sender: { isFollowed: boolean } };
@@ -21,6 +22,8 @@ interface NotificationItemProps {
   handleUnfollow: (followedId: string) => void;
   time: Date;
   userId?: string;
+  handleReadNotification: () => Promise<void>;
+  read: boolean;
 }
 
 export const NotificationItem: FC<NotificationItemProps> = ({
@@ -29,6 +32,8 @@ export const NotificationItem: FC<NotificationItemProps> = ({
   userId,
   time,
   notification,
+  handleReadNotification,
+  read,
 }) => {
   const router = useRouter();
   const renderActivity = (activity: string) => {
@@ -109,9 +114,14 @@ export const NotificationItem: FC<NotificationItemProps> = ({
 
   return (
     <div
-      className="flex p-4 !pb-0"
+      className={clsx(
+        "flex p-4 !pb-0 m-2 rounded-md",
+        read ? "bg-black/10" : "border-black/10 border border-solid"
+      )}
       onClick={async () => {
-        await updateReadNotification(notification.id);
+        if (!read) {
+          await handleReadNotification();
+        }
         router.push(generateUrl(notification));
       }}
     >
@@ -128,7 +138,7 @@ export const NotificationItem: FC<NotificationItemProps> = ({
           ) : null}
         </div>
       </div>
-      <div className="flex-1  border-b border-solid border-slate-300 pb-4 min-h-[36px]">
+      <div className="flex-1 pb-4 min-h-[36px]">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
             <div className="flex gap-1 items-center">
@@ -140,11 +150,19 @@ export const NotificationItem: FC<NotificationItemProps> = ({
             <span className="font-[400] text-[#999999]">
               {notification.title}
             </span>
+            {read ? (
+              <div className="flex items-center gap-1">
+                <span className="text-primary font-bold">Seen</span>
+                <CheckCheck className="text-primary" />
+              </div>
+            ) : null}
           </div>
           <div>
             {notification.sender.id === userId ? null : (
               <Button
-                onClick={() => {
+                className="bg-white"
+                onClick={(e) => {
+                  e.stopPropagation();
                   notification.sender.isFollowed
                     ? handleUnfollow(notification.sender.id)
                     : handleFollow(notification.sender.id);
