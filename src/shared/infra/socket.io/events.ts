@@ -1,4 +1,4 @@
-import { socket } from "@/src/shared/infra/socket.io";
+import { createSocketConnection } from "@/src/shared/infra/socket.io";
 import {
   Follows,
   Likes,
@@ -13,68 +13,79 @@ import {
   UnReposts,
 } from "./events.type";
 
-export const likeEvent = (payload: Likes) => {
-  if (socket.connected) {
+export const likeEvent = async (payload: Likes) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("like", payload);
   }
 };
 
-export const unlikeEvent = (payload: Unlikes) => {
-  if (socket.connected) {
+export const unlikeEvent = async (payload: Unlikes) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("unlike", payload);
   }
 };
 
-export const followEvent = (payload: Follows) => {
-  if (socket.connected) {
+export const followEvent = async (payload: Follows) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("follow", payload);
   }
 };
 
-export const unfollowEvent = (payload: Unfollows) => {
-  if (socket.connected) {
+export const unfollowEvent = async (payload: Unfollows) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("unfollow", payload);
   }
 };
 
-export const mentionEvent = (payload: Mentions) => {
-  if (socket.connected) {
+export const mentionEvent = async (payload: Mentions) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("mention", payload);
   }
 };
 
-export const unmentionEvent = (payload: UnMentions) => {
-  if (socket.connected) {
+export const unmentionEvent = async (payload: UnMentions) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("unmention", payload);
   }
 };
 
-export const repostEvent = (payload: Reposts) => {
-  if (socket.connected) {
+export const repostEvent = async (payload: Reposts) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("repost", payload);
   }
 };
 
-export const unrepostEvent = (payload: UnReposts) => {
-  if (socket.connected) {
+export const unrepostEvent = async (payload: UnReposts) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("unrepost", payload);
   }
 };
 
-export const quoteEvent = (payload: Quotes) => {
-  if (socket.connected) {
+export const quoteEvent = async (payload: Quotes) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("quote", payload);
   }
 };
 
-export const unquoteEvent = (payload: Unquotes) => {
-  if (socket.connected) {
+export const unquoteEvent = async (payload: Unquotes) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("unquote", payload);
   }
 };
 
-export const replyEvent = (payload: Replies) => {
-  if (socket.connected) {
+export const replyEvent = async (payload: Replies) => {
+  const socket = await createSocketConnection();
+  if (socket?.connected) {
     socket.emit("reply", payload);
   }
 };

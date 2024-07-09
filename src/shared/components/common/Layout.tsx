@@ -16,7 +16,7 @@ import { CreateThread } from "@/src/modules/threads/CreateThread";
 import { ThreadAction } from "./Drawer/ThreadAction";
 import { Repost } from "./Drawer/Repost";
 import { Activity } from "./Drawer/Activity";
-import { socket } from "../../infra/socket.io";
+import { createSocketConnection } from "../../infra/socket.io";
 import { FollowDrawer } from "@/src/modules/profile/components/FollowDrawer";
 
 const { Header, Content } = Layout;
@@ -32,8 +32,9 @@ export const MainLayout = ({
 
   useEffect(() => {
     const init = async () => {
+      const socket = await createSocketConnection();
       if (isSignedIn) {
-        if (socket.connected && socket.id) {
+        if (socket?.connected && socket?.id) {
           const socketId = socket.id;
           await updateSocketIdService(user.id, socketId);
         }
@@ -46,7 +47,7 @@ export const MainLayout = ({
       }
     };
     init();
-  }, [isLoaded, isSignedIn, user, userInfo, socket.connected, socket.id]);
+  }, [isLoaded, isSignedIn, user, userInfo]);
 
   if (!user) return <Loading fullPage />;
 
