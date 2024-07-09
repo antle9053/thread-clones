@@ -19,9 +19,11 @@ export const useSearch = () => {
     setUsers([
       ...data.map((item) => {
         const isFollowed = item.followedByIDs.includes(user?.id!);
+        const isFollowing = item.followingIDs.includes(user?.id!);
         return {
           ...item,
           isFollowed,
+          isFollowing,
         };
       }),
     ]);

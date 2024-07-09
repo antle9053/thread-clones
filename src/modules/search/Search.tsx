@@ -3,14 +3,16 @@
 import { Input } from "antd";
 import { ChevronRight, SearchIcon } from "lucide-react";
 import { useSearch } from "./hooks/useSearch";
-import { UserItem } from "@/src/modules/profile/components/FollowDrawer";
 import _ from "lodash";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { SearchThreads } from "./SearchThreads";
+import { UserItem } from "@/src/shared/components/others/UserItem/UserItem";
+import { useHandleFollow } from "@/src/shared/hooks/useHandleFollow";
 
 export const Search = () => {
   const { focus, setFocus, searchText, setSearchText, users, handleChange } =
     useSearch();
+  const { handleFollow, handleUnfollow } = useHandleFollow();
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -65,8 +67,8 @@ export const Search = () => {
               <UserItem
                 key={index}
                 profile={user}
-                handleFollow={() => {}}
-                handleUnfollow={() => {}}
+                handleFollow={handleFollow}
+                handleUnfollow={handleUnfollow}
                 showFollow
               />
             );

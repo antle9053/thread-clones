@@ -30,21 +30,21 @@ export const useFollow = () => {
 
   const follow = async (followedId: string) => {
     if (user) {
-      await handleFollow(followedId, user);
       updateFollow(followedId, true);
+      await handleFollow(followedId);
     }
   };
 
   const unfollow = async (followedId: string) => {
     if (user) {
-      await handleUnfollow(followedId, user);
       updateFollow(followedId, false);
+      await handleUnfollow(followedId);
     }
   };
 
   useEffect(() => {
     const initFollows = async () => {
-      if (profile?.id) {
+      if (profile?.id && user) {
         const listFollowings = await listFollowingsService(profile.id);
         const listFolloweds = await listFollowedsService(profile.id);
 
@@ -52,7 +52,8 @@ export const useFollow = () => {
           listFollowings.map((following) => {
             return {
               ...following,
-              isFollowed: following.followedByIDs.includes(user?.id as string),
+              isFollowed: following.followedByIDs.includes(user.id),
+              isFollowing: following.followingIDs.includes(user.id),
             };
           })
         );
@@ -60,7 +61,8 @@ export const useFollow = () => {
           listFolloweds.map((followed) => {
             return {
               ...followed,
-              isFollowed: followed.followedByIDs.includes(user?.id as string),
+              isFollowed: followed.followedByIDs.includes(user.id),
+              isFollowing: followed.followingIDs.includes(user.id),
             };
           })
         );

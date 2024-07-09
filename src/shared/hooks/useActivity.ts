@@ -46,24 +46,27 @@ export const useActivity = () => {
 
           const userLikes: UserActivity[] = likes.map((like) => {
             const isFollowed = like.user.followedByIDs.includes(user?.id);
+            const isFollowing = like.user.followingIDs.includes(user?.id);
             return {
-              profile: { ...like.user, isFollowed },
+              profile: { ...like.user, isFollowed, isFollowing },
               timestamp: like.likedAt,
               type: "like",
             };
           });
           const userReposts: UserActivity[] = reposted.map((repost) => {
             const isFollowed = repost.user.followedByIDs.includes(user?.id);
+            const isFollowing = repost.user.followingIDs.includes(user?.id);
             return {
-              profile: { ...repost.user, isFollowed },
+              profile: { ...repost.user, isFollowed, isFollowing },
               timestamp: repost.repostedAt,
               type: "repost",
             };
           });
           const userQuotes: UserActivity[] = quotedByThread.map((quote) => {
             const isFollowed = quote.author.followedByIDs.includes(user?.id);
+            const isFollowing = quote.author.followingIDs.includes(user?.id);
             return {
-              profile: { ...quote.author, isFollowed },
+              profile: { ...quote.author, isFollowed, isFollowing },
               timestamp: quote.createdAt,
               type: "quote",
             };
@@ -102,14 +105,14 @@ export const useActivity = () => {
 
   const follow = async (followedId: string) => {
     if (user) {
-      await handleFollow(followedId, user);
+      await handleFollow(followedId);
       updateFollowInActivity(followedId, true);
     }
   };
 
   const unfollow = async (followedId: string) => {
     if (user) {
-      await handleUnfollow(followedId, user);
+      await handleUnfollow(followedId);
       updateFollowInActivity(followedId, true);
     }
   };

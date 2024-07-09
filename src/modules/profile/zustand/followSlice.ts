@@ -4,6 +4,7 @@ import { StateCreator } from "zustand";
 
 export type UserWithFollow = User & {
   isFollowed: boolean;
+  isFollowing?: boolean;
 };
 
 export interface FollowSlice {

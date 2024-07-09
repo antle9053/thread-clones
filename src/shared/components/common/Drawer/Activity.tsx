@@ -8,13 +8,13 @@ import {
   MessageSquareQuote,
   Repeat,
 } from "lucide-react";
-import { UserItem } from "@/src/modules/profile/components/FollowDrawer";
 import { FC, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import clsx from "clsx";
 import { GetThreadResponse } from "@/src/shared/services/thread.service";
 import moment from "moment";
 import { Render } from "@/src/modules/home/components/Render";
+import { UserItem } from "../../others/UserItem/UserItem";
 
 const ThreadThumbnail: FC<{ thread: GetThreadResponse }> = ({ thread }) => {
   return (

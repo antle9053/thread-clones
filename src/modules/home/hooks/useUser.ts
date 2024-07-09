@@ -43,14 +43,14 @@ export const useUser = ({ followedId }: UseUserProps) => {
 
   const follow = async () => {
     if (user) {
-      await handleFollow(followedId, user);
+      await handleFollow(followedId);
       await fetchFollowed(followedId);
     }
   };
 
   const unfollow = async () => {
     if (user) {
-      await handleUnfollow(followedId, user);
+      await handleUnfollow(followedId);
       await fetchFollowed(followedId);
     }
   };
