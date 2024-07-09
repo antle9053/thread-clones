@@ -17,6 +17,7 @@ import {
   quoteEvent,
   replyEvent,
 } from "@/src/shared/infra/socket.io/events";
+import { themeSelectors } from "@/src/shared/infra/zustand/slices/themeSlice";
 
 interface UseThreadFormProps {
   afterSubmit?: () => void;
@@ -45,6 +46,7 @@ export const useCreateThreadForm = ({
   const setReplyTo = useAppStore(threadsSelectors.setReplyTo);
   const quote = useAppStore(threadsSelectors.quote);
   const setQuote = useAppStore(threadsSelectors.setQuote);
+  const setMention = useAppStore(threadsSelectors.setMention);
 
   const threadsValue = Form.useWatch("threads", form);
 
@@ -105,6 +107,7 @@ export const useCreateThreadForm = ({
     removeAllGifs?.();
     afterSubmit?.();
     setQuote(undefined);
+    setMention(undefined);
   };
 
   const changeThreadType = (key: number, type: ThreadType) => {

@@ -17,7 +17,7 @@ export const Profile = () => {
   const { username } = params;
   const [isOpenEditProfile, setOpenEditProfile] = useState<boolean>(false);
 
-  const { isSelf, profile, refetch } = useProfile({
+  const { isSelf, handleMention, profile, refetch } = useProfile({
     username: username.replace("%40", ""),
   });
 
@@ -95,7 +95,11 @@ export const Profile = () => {
           >
             {followed ? "Following" : "Follow"}
           </Button>
-          <Button type="primary" className="bg-primary w-1/2">
+          <Button
+            type="primary"
+            className="bg-primary w-1/2"
+            onClick={handleMention}
+          >
             Mention
           </Button>
         </div>

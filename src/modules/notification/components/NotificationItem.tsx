@@ -114,10 +114,7 @@ export const NotificationItem: FC<NotificationItemProps> = ({
 
   return (
     <div
-      className={clsx(
-        "flex p-4 !pb-0 m-2 rounded-md",
-        read ? "bg-black/10" : "border-black/10 border border-solid"
-      )}
+      className="flex p-4 !pb-0 m-2 rounded-md"
       onClick={async () => {
         if (!read) {
           await handleReadNotification();
@@ -138,7 +135,7 @@ export const NotificationItem: FC<NotificationItemProps> = ({
           ) : null}
         </div>
       </div>
-      <div className="flex-1 pb-4 min-h-[36px]">
+      <div className="flex-1 pb-4 min-h-[36px] border-b border-solid border-slate-300">
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
             <div className="flex gap-1 items-center">
@@ -151,9 +148,9 @@ export const NotificationItem: FC<NotificationItemProps> = ({
               {notification.title}
             </span>
             {read ? (
-              <div className="flex items-center gap-1">
-                <span className="text-primary font-bold">Seen</span>
-                <CheckCheck className="text-primary" />
+              <div className="flex items-center gap-0.5">
+                <span className="text-[#AAAAAA] text-[11px]">Seen</span>
+                <CheckCheck className="text-[#AAAAAA]" size={11} />
               </div>
             ) : null}
           </div>

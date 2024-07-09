@@ -1,15 +1,11 @@
-import { EditorContent } from "@tiptap/react";
+import { Editor, EditorContent } from "@tiptap/react";
 import React, { FC } from "react";
-import { useTipTap } from "./hooks/useTipTap";
 
 interface TipTapProps {
-  name: number;
-  onChange: any;
+  editor: Editor | null;
 }
 
-export const TipTap: FC<TipTapProps> = ({ name, onChange }) => {
-  const { editor } = useTipTap({ name, onChange });
-
+export const TipTap: FC<TipTapProps> = ({ editor }) => {
   if (!editor) {
     return null;
   }

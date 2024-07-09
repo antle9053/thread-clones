@@ -1,23 +1,20 @@
-import { useTipTap } from "@/src/shared/components/utils/TipTap/hooks/useTipTap";
 import {
   GetTagsResponse,
   getUsedTagsService,
 } from "@/src/shared/services/tags.service";
+import { Editor } from "@tiptap/react";
 import { Dropdown, message } from "antd";
 import { Tag } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 
 interface TagsProps {
+  editor: Editor | null;
   userId: string;
-  name: number;
-  onChange: any;
 }
 
-export const Tags: FC<TagsProps> = ({ userId, name, onChange }) => {
+export const Tags: FC<TagsProps> = ({ editor, userId }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [usedTags, setUsedTags] = useState<GetTagsResponse[]>([]);
-
-  const { editor } = useTipTap({ name, onChange });
 
   useEffect(() => {
     const init = async () => {
@@ -48,20 +45,19 @@ export const Tags: FC<TagsProps> = ({ userId, name, onChange }) => {
               label: (
                 <div
                   onClick={() => {
-                    // if (editor) {
-                    //   editor
-                    //     .chain()
-                    //     .focus()
-                    //     .insertContent({
-                    //       type: "mention",
-                    //       attrs: {
-                    //         id: tag.title,
-                    //       },
-                    //     })
-                    //     .insertContent(" ")
-                    //     .run();
-                    // }
-                    // insertMention?.(tag.title);
+                    if (editor) {
+                      editor
+                        .chain()
+                        .focus()
+                        .insertContent({
+                          type: "hashtag",
+                          attrs: {
+                            id: tag.title,
+                          },
+                        })
+                        .insertContent(" ")
+                        .run();
+                    }
                   }}
                 >
                   {tag.title}

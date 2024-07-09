@@ -1,4 +1,4 @@
-import { useEditor } from "@tiptap/react";
+import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { hashtagConfigure } from "../hashtags/hashtagSuggestion";
@@ -10,7 +10,7 @@ interface UseTipTapProps {
 }
 
 export const useTipTap = ({ name, onChange }: UseTipTapProps) => {
-  const editor = useEditor({
+  const editor: Editor | null = useEditor({
     extensions: [
       StarterKit,
       hashtagConfigure,
