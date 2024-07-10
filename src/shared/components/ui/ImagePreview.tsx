@@ -1,5 +1,4 @@
 import { Modal } from "antd";
-import clsx from "clsx";
 import { X } from "lucide-react";
 import { CSSProperties, FC, useState } from "react";
 

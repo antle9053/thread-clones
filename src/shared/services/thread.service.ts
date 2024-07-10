@@ -8,6 +8,10 @@ import {
   deleteNotificationService,
   sendNotificationService,
 } from "./notification.service";
+import {
+  ThreadRepyResponseDTO,
+  ThreadResponseDTO,
+} from "../dto/threads/ThreadResponse.dto";
 
 export type CreateThreadArg = {
   content?: CreateContentArg;
@@ -203,11 +207,13 @@ export const getThreadsService = async ({
   authorId,
   userId,
   type,
+  page = 0,
 }: {
   authorId?: string;
   userId: string;
   type?: pageType;
-}): Promise<GetThreadResponse[]> => {
+  page?: number;
+}): Promise<ThreadResponseDTO[]> => {
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
@@ -300,6 +306,13 @@ export const getThreadsService = async ({
         distinct: ["authorId"],
       },
     },
+    skip: 5 * page,
+    take: 5,
+    orderBy: {
+      ...(type === "home" && {
+        createdAt: "desc",
+      }),
+    },
   });
   return result;
 };
@@ -307,7 +320,7 @@ export const getThreadsService = async ({
 export const getThreadByIdService = async (
   id: string,
   userId: string
-): Promise<GetThreadResponse | null> => {
+): Promise<ThreadResponseDTO | null> => {
   const result = await prisma.threads.findFirst({
     where: {
       id,
@@ -384,7 +397,7 @@ export type GetReplyThreadResponse = Prisma.threadsGetPayload<{
 
 export const getThreadService = async (
   id: string
-): Promise<GetReplyThreadResponse | null> => {
+): Promise<ThreadRepyResponseDTO | null> => {
   const result = await prisma.threads.findUnique({
     where: {
       id,
@@ -550,7 +563,7 @@ export const deleteThreadService = async (threadId: string) => {
 
 export const getRepliesThread = async (
   userId: string
-): Promise<GetThreadResponse[]> => {
+): Promise<ThreadResponseDTO[]> => {
   const user = await prisma.users.findFirst({
     where: {
       userId,
@@ -714,4 +727,15 @@ export const getAuthorService = async (threadId: string) => {
     return thread.author;
   }
   return null;
+};
+
+export const checkNewPosts = async (lastChecked: string): Promise<boolean> => {
+  const numOfNewPosts = await prisma.threads.count({
+    where: {
+      createdAt: {
+        gt: new Date(lastChecked),
+      },
+    },
+  });
+  return numOfNewPosts > 0;
 };

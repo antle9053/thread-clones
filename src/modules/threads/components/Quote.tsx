@@ -15,6 +15,8 @@ import {
   getThreadByIdService,
 } from "@/src/shared/services/thread.service";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
+import Image from "next/image";
+import { Skeleton } from "antd";
 
 interface QuoteProps {
   type: "create" | "view";
@@ -65,10 +67,17 @@ export const Quote: FC<QuoteProps> = ({ type, quoteId }) => {
         <div className="basis-0 grow">
           <div className="w-full flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
-              <img
-                src={author?.avatar || ""}
-                className="w-[36px] h-[36px] rounded-full"
-              />
+              {author?.avatar ? (
+                <Image
+                  alt="Avatar"
+                  src={author?.avatar || ""}
+                  className="rounded-full"
+                  width={36}
+                  height={36}
+                />
+              ) : (
+                <Skeleton.Avatar size={36} />
+              )}
               <span className="font-bold text-base">{author?.username}</span>
             </div>
             <div className="flex gap-2">

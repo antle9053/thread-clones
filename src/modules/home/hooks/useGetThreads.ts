@@ -3,14 +3,14 @@
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
-  GetThreadResponse,
+  checkNewPosts,
   getRepliesThread,
   getThreadsService,
 } from "@/src/shared/services/thread.service";
-import { message } from "antd";
+import { Button, message } from "antd";
 import { useEffect, useState } from "react";
 import { pageType } from "..";
-import { getListRepostedsByUser } from "@/src/shared/services/repost.service";
+import { homeSelectors } from "../zustand/homeSlice";
 
 interface UseGetThreadsProps {
   pageType?: pageType;
@@ -19,7 +19,13 @@ interface UseGetThreadsProps {
 
 export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [threads, setThreads] = useState<GetThreadResponse[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  const threads = useAppStore(homeSelectors.threads);
+  const setThreads = useAppStore(homeSelectors.setThreads);
+
+  const page = useAppStore(homeSelectors.page);
+  const setPage = useAppStore(homeSelectors.setPage);
 
   const user = useAppStore(authSelectors.user);
 
@@ -28,27 +34,35 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
       try {
         setLoading(true);
         let result: any;
-        if (profileId) {
-          if (pageType === "profile")
+        if (user) {
+          if (profileId) {
+            if (pageType === "profile") {
+              result = await getThreadsService({
+                authorId: profileId,
+                userId: user.id,
+                page,
+              });
+            } else if (pageType === "replies") {
+              result = await getRepliesThread(profileId);
+            } else if (pageType === "reposts") {
+              result = await getThreadsService({
+                userId: user.id,
+                type: pageType,
+                page,
+              });
+            }
+          } else if (pageType && user && user?.id) {
             result = await getThreadsService({
-              authorId: profileId,
-              userId: user?.id as string,
-            });
-          else if (pageType === "replies") {
-            result = await getRepliesThread(profileId);
-          } else if (pageType === "reposts") {
-            result = await getThreadsService({
-              userId: user?.id as string,
+              userId: user.id,
               type: pageType,
+              page,
             });
+          } else {
+            result = await getThreadsService({ userId: user.id, page });
           }
-        } else if (pageType && user && user?.id)
-          result = await getThreadsService({
-            userId: user?.id,
-            type: pageType,
-          });
-        else result = await getThreadsService({ userId: user?.id as string });
+        }
         setThreads(result);
+        setHasMore(result.length !== 0);
         setLoading(false);
       } catch (error) {
         message.error("Error");
@@ -56,10 +70,27 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
       }
     };
     init();
-  }, [user]);
+  }, [user, page]);
+
+  const handleNextPage = () => {
+    setPage(page + 1);
+  };
+
+  const setLastCheckedTime = () => {
+    const currentTime = new Date().toISOString();
+    localStorage.setItem("lastChecked", currentTime);
+  };
+
+  const getLastCheckedTime = () => {
+    return localStorage.getItem("lastChecked") || new Date().toISOString(); // Default to epoch if not found
+  };
 
   return {
     loading,
     threads,
+    handleNextPage,
+    hasMore,
+    setLastCheckedTime,
+    getLastCheckedTime,
   };
 };

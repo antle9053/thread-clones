@@ -7,6 +7,7 @@ import { RepostSlice } from "@/src/modules/home/zustand/repostSlice";
 import { FollowSlice } from "@/src/modules/profile/zustand/followSlice";
 import { ActivitySlice } from "@/src/modules/thread-detail/zustand/activitySlice";
 import { NotificationSlice } from "./slices/notificationSlice";
+import { HomeSlice } from "@/src/modules/home/zustand/homeSlice";
 
 export type AppState = ThemeSlice &
   AuthSlice &
@@ -15,7 +16,8 @@ export type AppState = ThemeSlice &
   ThreadActionSlice &
   RepostSlice &
   FollowSlice &
-  ActivitySlice;
+  ActivitySlice &
+  HomeSlice;
 
 export type setAppState = StoreApi<AppState>["setState"];
 export type getAppState = StoreApi<AppState>["getState"];

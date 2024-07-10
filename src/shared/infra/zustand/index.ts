@@ -11,6 +11,7 @@ import { createThemeSlice } from "./slices/themeSlice";
 import { createAuthSlice } from "./slices/authSlice";
 import { createThreadsSlice } from "@/src/modules/threads/zustand/threadsSlice";
 import { createNotificationSlice } from "./slices/notificationSlice";
+import { createHomeSlice } from "@/src/modules/home/zustand/homeSlice";
 
 export const useAppStore = create<AppState>()(
   (set: setAppState, get: getAppState, api: StoreApi<AppState>) => ({
@@ -26,5 +27,6 @@ export const useAppStore = create<AppState>()(
     ...createFollowSlice(set, get, api),
     ...createActivitySlice(set, get, api),
     ...createNotificationSlice(set, get, api),
+    ...createHomeSlice(set, get, api),
   })
 );
