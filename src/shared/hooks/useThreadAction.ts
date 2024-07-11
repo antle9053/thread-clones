@@ -13,6 +13,8 @@ import {
   unmentionEvent,
   unquoteEvent,
 } from "@/src/shared/infra/socket.io/events";
+import { useHandlePin } from "./useHandlePin";
+import { homeSelectors } from "@/src/modules/home/zustand/homeSlice";
 
 export const useThreadAction = () => {
   const [isSelf, setIsSelf] = useState<boolean | null>(null);
@@ -23,6 +25,9 @@ export const useThreadAction = () => {
   const setOpen = useAppStore(threadActionSelectors.setOpenThreadAction);
   const thread = useAppStore(threadActionSelectors.thread);
 
+  const pinThread = useAppStore(homeSelectors.pinThread);
+  const unpinThread = useAppStore(homeSelectors.unpinThread);
+
   const user = useAppStore(authSelectors.user);
 
   useEffect(() => {
@@ -30,6 +35,8 @@ export const useThreadAction = () => {
       setIsSelf(thread?.author.id === user?.id);
     }
   }, [thread, user?.id]);
+
+  const { handleUnpin, handlePin } = useHandlePin();
 
   const handleDelete = useCallback(async () => {
     if (thread && thread?.id) {
@@ -102,6 +109,8 @@ export const useThreadAction = () => {
     fetchSaved(thread?.id);
   }, [thread]);
 
+  const isPinned = useMemo(() => thread?.pinned, [thread]);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -115,15 +124,32 @@ export const useThreadAction = () => {
     setOpenConfirmDelete(false);
   };
 
+  const pin = useCallback(async () => {
+    if (thread) {
+      pinThread(thread.id);
+      await handlePin(thread.id);
+    }
+  }, [thread]);
+
+  const unpin = useCallback(async () => {
+    if (thread) {
+      unpinThread();
+      await handleUnpin(thread.id);
+    }
+  }, [thread]);
+
   return {
     isOpen,
+    isPinned,
     isSelf,
     isSaved,
     handleClose,
     handleOpenConfirmDelete,
     handleCloseConfirmDelete,
     handleDelete,
+    handlePin: pin,
     handleSave,
+    handleUnpin: unpin,
     handleUnsave,
     openConfirmDelete,
   };

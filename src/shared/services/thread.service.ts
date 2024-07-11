@@ -217,11 +217,12 @@ export const getThreadsService = async ({
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
-      ...(authorId
-        ? {
-            authorId,
-          }
-        : {}),
+      ...(type === "profile" && {
+        pinned: false,
+      }),
+      ...(authorId && {
+        authorId,
+      }),
       ...(type === "liked"
         ? {
             likes: {
@@ -308,12 +309,13 @@ export const getThreadsService = async ({
     },
     skip: 5 * page,
     take: 5,
-    orderBy: {
-      ...(type === "home" && {
+    orderBy: [
+      {
         createdAt: "desc",
-      }),
-    },
+      },
+    ],
   });
+
   return result;
 };
 
@@ -324,6 +326,81 @@ export const getThreadByIdService = async (
   const result = await prisma.threads.findFirst({
     where: {
       id,
+    },
+    include: {
+      author: true,
+      content: {
+        include: {
+          files: true,
+          tags: true,
+          poll: {
+            include: {
+              options: true,
+            },
+          },
+        },
+      },
+      parent: true,
+      reposted: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
+      likes: {
+        where: {
+          userId,
+        },
+        include: {
+          user: true,
+        },
+      },
+      _count: {
+        select: {
+          child: true,
+          likes: true,
+        },
+      },
+      child: {
+        include: {
+          author: true,
+          likes: true,
+          content: {
+            include: {
+              files: true,
+              tags: true,
+              poll: {
+                include: {
+                  options: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              child: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return result;
+};
+
+export const getPinnedThreadService = async ({
+  authorId,
+  userId,
+}: {
+  authorId: string;
+  userId: string;
+}): Promise<ThreadResponseDTO | null> => {
+  const result = await prisma.threads.findFirst({
+    where: {
+      pinned: true,
+      authorId,
     },
     include: {
       author: true,
@@ -738,4 +815,29 @@ export const checkNewPosts = async (lastChecked: string): Promise<boolean> => {
     },
   });
   return numOfNewPosts > 0;
+};
+
+export const pinThreadService = async ({
+  userId,
+  threadId,
+  pinned,
+}: {
+  userId: string;
+  threadId: string;
+  pinned: boolean;
+}) => {
+  await prisma.threads.updateMany({
+    data: {
+      pinned: false,
+    },
+  });
+  await prisma.threads.update({
+    where: {
+      authorId: userId,
+      id: threadId,
+    },
+    data: {
+      pinned,
+    },
+  });
 };

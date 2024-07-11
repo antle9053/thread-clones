@@ -89,6 +89,7 @@ model threads {
   isQuotedThreadDeleted Boolean              @default(false)
   views               Int                    @default(0)
   notificationContent notificationContents[]
+  pinned              Boolean @default(false)
 }
 
 model reposts {

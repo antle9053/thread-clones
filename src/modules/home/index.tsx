@@ -18,11 +18,11 @@ export type pageType =
   | "reposts";
 
 interface HomeProps {
-  pageType?: pageType;
+  pageType: pageType;
   profileId?: string;
 }
 
-export const Home: FC<HomeProps> = ({ pageType = "home", profileId }) => {
+export const Home: FC<HomeProps> = ({ pageType, profileId }) => {
   const {
     handleNextPage,
     hasMore,
@@ -93,7 +93,7 @@ export const Home: FC<HomeProps> = ({ pageType = "home", profileId }) => {
         overflow: "auto",
       }}
     >
-      {loading && threads?.length === 0 ? (
+      {loading && (threads?.length === 0 || typeof threads === "undefined") ? (
         [1, 2, 3, 4, 5].map((item) => <ThreadSkeleton key={item} />)
       ) : (
         <InfiniteScroll

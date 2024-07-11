@@ -1,17 +1,20 @@
+import { ConfirmDeleteThread } from "@/src/shared/components/common/Modal/ConfirmDeleteThread";
 import { useThreadAction } from "@/src/shared/hooks/useThreadAction";
 import { Drawer, List } from "antd";
-import { ConfirmDeleteThread } from "../Modal/ConfirmDeleteThread";
 
-export const ThreadAction = () => {
+export const ThreadActionDrawer = () => {
   const {
     isOpen,
+    isPinned,
     isSelf,
     isSaved,
     handleClose,
     handleCloseConfirmDelete,
     handleDelete,
     handleOpenConfirmDelete,
+    handlePin,
     handleSave,
+    handleUnpin,
     handleUnsave,
     openConfirmDelete,
   } = useThreadAction();
@@ -25,7 +28,12 @@ export const ThreadAction = () => {
         >
           {isSaved ? "Unsave" : "Save"}
         </List.Item>
-        <List.Item className="!pl-4 font-bold">Pin to profile</List.Item>
+        <List.Item
+          className="!pl-4 font-bold"
+          onClick={() => (isPinned ? handleUnpin() : handlePin())}
+        >
+          {isPinned ? "Unpin" : "Pin to profile"}
+        </List.Item>
         <List.Item className="!pl-4 font-bold">
           Hide like and share counts
         </List.Item>

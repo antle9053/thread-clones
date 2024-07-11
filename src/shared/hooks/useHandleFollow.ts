@@ -3,7 +3,6 @@ import { message } from "antd";
 import {
   followUserService,
   unfollowUserService,
-  User,
 } from "../services/follows.service";
 import { followEvent, unfollowEvent } from "../infra/socket.io/events";
 import { useAppStore } from "../infra/zustand";

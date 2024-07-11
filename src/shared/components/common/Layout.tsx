@@ -13,11 +13,11 @@ import { useAppStore } from "../../infra/zustand";
 import { authSelectors } from "../../infra/zustand/slices/authSlice";
 import { Loading } from "../ui/Loading";
 import { CreateThread } from "@/src/modules/threads/CreateThread";
-import { ThreadAction } from "./Drawer/ThreadAction";
 import { Repost } from "./Drawer/Repost";
 import { Activity } from "./Drawer/Activity";
 import { createSocketConnection } from "../../infra/socket.io";
 import { FollowDrawer } from "@/src/modules/profile/components/FollowDrawer";
+import { ThreadActionDrawer } from "@/src/modules/home/components/ThreadActionDrawer";
 
 const { Header, Content } = Layout;
 
@@ -60,7 +60,7 @@ export const MainLayout = ({
         {children}
         <MobileNavbar />
         <CreateThread />
-        <ThreadAction />
+        <ThreadActionDrawer />
         <Repost />
         <FollowDrawer />
         <Activity />

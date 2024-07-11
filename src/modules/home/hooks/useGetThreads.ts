@@ -3,17 +3,18 @@
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
-  checkNewPosts,
+  getPinnedThreadService,
   getRepliesThread,
   getThreadsService,
 } from "@/src/shared/services/thread.service";
-import { Button, message } from "antd";
-import { useEffect, useState } from "react";
+import { message } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import { pageType } from "..";
 import { homeSelectors } from "../zustand/homeSlice";
+import { useRouter } from "next/navigation";
 
 interface UseGetThreadsProps {
-  pageType?: pageType;
+  pageType: pageType;
   profileId?: string;
 }
 
@@ -37,11 +38,19 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
         if (user) {
           if (profileId) {
             if (pageType === "profile") {
-              result = await getThreadsService({
+              let pinnedResult = await getPinnedThreadService({
                 authorId: profileId,
                 userId: user.id,
+              });
+              let restResult = await getThreadsService({
+                authorId: profileId,
+                userId: user.id,
+                type: "profile",
                 page,
               });
+              result = pinnedResult
+                ? [pinnedResult, ...restResult]
+                : restResult;
             } else if (pageType === "replies") {
               result = await getRepliesThread(profileId);
             } else if (pageType === "reposts") {
@@ -61,7 +70,7 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
             result = await getThreadsService({ userId: user.id, page });
           }
         }
-        setThreads(result);
+        setThreads(result, pageType);
         setHasMore(result.length !== 0);
         setLoading(false);
       } catch (error) {
@@ -85,9 +94,15 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
     return localStorage.getItem("lastChecked") || new Date().toISOString(); // Default to epoch if not found
   };
 
+  const threadsByType = useMemo(() => {
+    // if (pageType === "profile") {
+    // }
+    return threads[pageType];
+  }, [threads, pageType]);
+
   return {
     loading,
-    threads,
+    threads: threadsByType,
     handleNextPage,
     hasMore,
     setLastCheckedTime,

@@ -3,6 +3,7 @@ import {
   Heart,
   MessageCircle,
   MoreHorizontal,
+  Pin,
   Repeat,
   Send,
 } from "lucide-react";
@@ -41,6 +42,7 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
     child,
     reposted,
     quotedThreadId,
+    pinned,
     _count: { child: numOfChilds, likes },
   } = data;
 
@@ -88,6 +90,14 @@ export const Thread: FC<ThreadProps> = ({ data, profileId, type }) => {
             {reposted[0].user.username} has reposted{" "}
             {moment(reposted[0].repostedAt).fromNow()}
           </span>
+        </div>
+      ) : null}
+      {pinned && type === "profile" ? (
+        <div className="flex gap-3 items-center pt-4 px-4">
+          <div className="basis-[48px] grow-0">
+            <Pin className="float-end" size={16} color="#999999" />
+          </div>
+          <span className="text-sm text-[#999999] block">Pinned</span>
         </div>
       ) : null}
       <div className="flex gap-3 items-stretch pt-4 px-4 mb-2">
