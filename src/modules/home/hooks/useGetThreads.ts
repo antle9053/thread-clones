@@ -3,7 +3,6 @@
 import { useAppStore } from "@/src/shared/infra/zustand";
 import { authSelectors } from "@/src/shared/infra/zustand/slices/authSlice";
 import {
-  getPinnedThreadService,
   getRepliesThread,
   getThreadsService,
 } from "@/src/shared/services/thread.service";
@@ -11,7 +10,6 @@ import { message } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { pageType } from "..";
 import { homeSelectors } from "../zustand/homeSlice";
-import { useRouter } from "next/navigation";
 
 interface UseGetThreadsProps {
   pageType: pageType;
@@ -38,19 +36,12 @@ export const useGetThreads = ({ pageType, profileId }: UseGetThreadsProps) => {
         if (user) {
           if (profileId) {
             if (pageType === "profile") {
-              let pinnedResult = await getPinnedThreadService({
-                authorId: profileId,
-                userId: user.id,
-              });
-              let restResult = await getThreadsService({
+              result = await getThreadsService({
                 authorId: profileId,
                 userId: user.id,
                 type: "profile",
                 page,
               });
-              result = pinnedResult
-                ? [pinnedResult, ...restResult]
-                : restResult;
             } else if (pageType === "replies") {
               result = await getRepliesThread(profileId);
             } else if (pageType === "reposts") {

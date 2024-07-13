@@ -217,9 +217,6 @@ export const getThreadsService = async ({
   const result = await prisma.threads.findMany({
     where: {
       parent: null,
-      ...(type === "profile" && {
-        pinned: false,
-      }),
       ...(authorId && {
         authorId,
       }),
@@ -310,6 +307,13 @@ export const getThreadsService = async ({
     skip: 5 * page,
     take: 5,
     orderBy: [
+      ...(type === "profile"
+        ? [
+            {
+              pinned: "desc" as const,
+            },
+          ]
+        : []),
       {
         createdAt: "desc",
       },
@@ -326,81 +330,6 @@ export const getThreadByIdService = async (
   const result = await prisma.threads.findFirst({
     where: {
       id,
-    },
-    include: {
-      author: true,
-      content: {
-        include: {
-          files: true,
-          tags: true,
-          poll: {
-            include: {
-              options: true,
-            },
-          },
-        },
-      },
-      parent: true,
-      reposted: {
-        where: {
-          userId,
-        },
-        include: {
-          user: true,
-        },
-      },
-      likes: {
-        where: {
-          userId,
-        },
-        include: {
-          user: true,
-        },
-      },
-      _count: {
-        select: {
-          child: true,
-          likes: true,
-        },
-      },
-      child: {
-        include: {
-          author: true,
-          likes: true,
-          content: {
-            include: {
-              files: true,
-              tags: true,
-              poll: {
-                include: {
-                  options: true,
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              child: true,
-            },
-          },
-        },
-      },
-    },
-  });
-  return result;
-};
-
-export const getPinnedThreadService = async ({
-  authorId,
-  userId,
-}: {
-  authorId: string;
-  userId: string;
-}): Promise<ThreadResponseDTO | null> => {
-  const result = await prisma.threads.findFirst({
-    where: {
-      pinned: true,
-      authorId,
     },
     include: {
       author: true,
